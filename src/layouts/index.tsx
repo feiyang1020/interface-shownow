@@ -1,5 +1,5 @@
 import { Link, Outlet, useModel } from 'umi';
-import { Avatar, Badge, Breadcrumb, Button, ConfigProvider, Dropdown, Input, Layout, Menu, theme } from 'antd';
+import { Avatar, Badge, Breadcrumb, Button, Col, ConfigProvider, Dropdown, Input, Layout, Menu, Row, theme } from 'antd';
 import { useEffect, useState } from 'react';
 import logo from '@/assets/logo.svg';
 import './index.less';
@@ -10,6 +10,7 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query'
+import NewPost from '@/Components/NewPost';
 
 const queryClient = new QueryClient()
 const { Header, Content, Footer, Sider } = Layout;
@@ -35,6 +36,9 @@ export default function Lay() {
     }
 
   }, [showConf])
+
+  const [showPost, setShowPost] = useState(false)
+
   return (
     <QueryClientProvider client={queryClient}>
       <ConfigProvider
@@ -52,58 +56,64 @@ export default function Lay() {
               <Menus />
 
             </div>
-            <Button size='large' shape='round' className='siderAction' style={{ background: showConf?.gradientColor }}>
-              Join Creators
+            <Button size='large' shape='round' className='siderAction' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
+              Post
             </Button>
 
           </Sider>
           <Layout className='layout2'>
-            <Header style={{ padding: 0, background: " #f6f9fc" }} className='header'>
-              <div className="searchWrap">
-                <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />
-              </div>
-              <div className="userPanel">
-                <div className="user">
-                  <Avatar  size="large" src={user.avater} />
-                  <div className='desc'>
-                    <div className="name">
-                      {user.name}
-                    </div>
-                    <div className="metaid">
-                      MetaID：{user.metaid.slice(0, 8)}
-                    </div>
+            <Header style={{ padding: 0, background: " #f6f9fc",width:'100%' }} className='header'>
+              <Row style={{width:'100%',flexGrow:1}} gutter={[24,24]}>
+                <Col span={15}>
+                  <div className="searchWrap">
+                    <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />
                   </div>
-
-                </div>
-                <div className="actions">
-                  <Badge count={user.notice} className='action'>
-                    <BellOutlined style={{ fontSize: 20 }} />
-                  </Badge>
-                  <MessageOutlined style={{ fontSize: 20 }} className='action' /><Dropdown placement='bottom' dropdownRender={() => {
-                    return <div
-                      className="dropdown"
-                      onClick={() => {
-                        disConnect()
-                      }}
-                    >
-                      <LoginOutlined />
-                      <div className="path" >Log Out</div>
+                </Col>
+                <Col span={9}>
+                  <div className="userPanel">
+                    <div className="user">
+                      <Avatar size="large" src={user.avater} />
+                      <div className='desc'>
+                        <div className="name">
+                          {user.name}
+                        </div>
+                        <div className="metaid">
+                          MetaID：{user.metaid.slice(0, 8)}
+                        </div>
+                      </div>
 
                     </div>
-                  }}>
+                    <div className="actions">
+                      <Badge count={user.notice} className='action'>
+                        <BellOutlined style={{ fontSize: 20 }} />
+                      </Badge>
+                      <MessageOutlined style={{ fontSize: 20 }} className='action' /><Dropdown placement='bottom' dropdownRender={() => {
+                        return <div
+                          className="dropdown"
+                          onClick={() => {
+                            disConnect()
+                          }}
+                        >
+                          <LoginOutlined />
+                          <div className="path" >Log Out</div>
 
-                    <EllipsisOutlined style={{ fontSize: 20 }} className='action' />
+                        </div>
+                      }}>
 
-                  </Dropdown>
+                        <EllipsisOutlined style={{ fontSize: 20 }} className='action' />
 
-                </div>
+                      </Dropdown>
 
-              </div>
+                    </div>
+
+                  </div>
+                </Col>
+              </Row>
 
             </Header>
             <Outlet />
           </Layout>
-
+          <NewPost show={showPost} onClose={() => setShowPost(false)} />
         </Layout>
       </ConfigProvider>
     </QueryClientProvider>

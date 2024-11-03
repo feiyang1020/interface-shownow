@@ -14,6 +14,7 @@ export default defineConfig({
         { path: "follow", component: "@/pages/follow" },
         { path: "profile", component: "@/pages/profile" },
         { path: "profile/:address", component: "@/pages/profile" },
+        { path: "tweet/:id", component: "@/pages/tweet" },
         { path: "setting", component: "@/pages/home" },
       ],
     },

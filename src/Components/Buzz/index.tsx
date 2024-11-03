@@ -2,10 +2,11 @@ import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchCurrentBuzzLikes } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Divider, Image, message, Space, Typography } from "antd";
+import { Avatar, Button, Divider, Image, message, Space, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useModel, history } from "umi";
+import Comment from "../Comment";
 const { Paragraph, Text } = Typography;
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 }
 
 export default ({ buzzItem }: Props) => {
+    const [showComment, setShowComment] = useState(false)
     const queryClient = useQueryClient();
     const { btcConnector, user, isLogin, connect } = useModel('user')
     const currentUserInfoData = useQuery({
@@ -147,7 +149,10 @@ export default ({ buzzItem }: Props) => {
 
         <div className="content" style={{
             marginTop: 24,
-            paddingLeft: 61
+            paddingLeft: 61,
+            cursor: 'pointer'
+        }} onClick={()=>{
+            history.push(`/tweet/${buzzItem.id}`)
         }}>
             <div className="text">
                 {(summary ?? '').split('\n').map((line: string, index: number) => (
@@ -191,7 +196,10 @@ export default ({ buzzItem }: Props) => {
         </div>
         <div className="actions">
             <div className="item">
-                <MessageOutlined />
+                <Button type='text' icon={<MessageOutlined />} onClick={()=>{
+                    showComment ? setShowComment(false) : setShowComment(true)
+                }}  />
+                
             </div>
             <Space className="item" onClick={handleLike} style={{}}>
                 {isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}
@@ -204,5 +212,6 @@ export default ({ buzzItem }: Props) => {
                 <UploadOutlined />
             </div>
         </div>
+        <Comment tweetId={buzzItem.id} onClose={()=>{setShowComment(false)}} show={showComment}  />
     </div>
 }
