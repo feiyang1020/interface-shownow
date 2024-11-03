@@ -1,16 +1,19 @@
 import { Link, Outlet, useModel } from 'umi';
-import { Avatar, Badge, Breadcrumb, Button, Col, ConfigProvider, Dropdown, Input, Layout, Menu, Row, theme } from 'antd';
+import { Avatar, Badge, Button, Col, ConfigProvider, Dropdown, FloatButton, Grid, Input, Layout, Menu, Row, theme } from 'antd';
 import { useEffect, useState } from 'react';
 import logo from '@/assets/logo.svg';
 import './index.less';
 import Menus from './Menus';
-import { BellOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined } from '@ant-design/icons';
+import { BellOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query'
 import NewPost from '@/Components/NewPost';
+import Mobilefooter from './Mobilefooter';
+import { Pencil } from 'lucide-react';
+const { useBreakpoint } = Grid
 
 const queryClient = new QueryClient()
 const { Header, Content, Footer, Sider } = Layout;
@@ -20,6 +23,8 @@ export default function Lay() {
   const { showConf } = useModel('dashboard')
   const { user, setIsLogin, disConnect } = useModel('user')
   const [themeTokens, setThemeTokens] = useState({});
+  const { md } = useBreakpoint()
+
   useEffect(() => {
     if (showConf) {
       setThemeTokens({
@@ -48,22 +53,26 @@ export default function Lay() {
         }}
       >
         <Layout style={{ minHeight: '100vh', width: 1200, }} className='layout'>
-          <Sider style={{ background: '#fff', height: '100vh' }} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sider'>
-            <div>
-              <div className="logoWrap">
-                <img src={showConf?.logo} alt="" className="logo" />
-              </div>
-              <Menus />
+          {
+            md ?
 
-            </div>
-            <Button size='large' shape='round' className='siderAction' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
-              Post
-            </Button>
+              <Sider style={{ background: '#fff', height: '100vh' }} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sider'>
+                <div>
+                  <div className="logoWrap">
+                    <img src={showConf?.logo} alt="" className="logo" />
+                  </div>
+                  <Menus />
 
-          </Sider>
+                </div>
+                <Button size='large' shape='round' className='siderAction' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
+                  Post
+                </Button>
+
+              </Sider> : ''
+          }
           <Layout className='layout2'>
-            <Header style={{ padding: 0, background: " #f6f9fc",width:'100%' }} className='header'>
-              <Row style={{width:'100%',flexGrow:1}} gutter={[24,24]}>
+            <Header style={{ padding: 0, background: " #f6f9fc", width: '100%' }} className='header'>
+              <Row style={{ width: '100%', flexGrow: 1 }} gutter={[24, 24]}>
                 <Col span={15}>
                   <div className="searchWrap">
                     <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />
@@ -113,7 +122,11 @@ export default function Lay() {
             </Header>
             <Outlet />
           </Layout>
+          {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
           <NewPost show={showPost} onClose={() => setShowPost(false)} />
+          {
+            !md && <FloatButton style={{bottom:100}} icon={<EditOutlined />} onClick={() => { setShowPost(true) }} />
+            }
         </Layout>
       </ConfigProvider>
     </QueryClientProvider>
