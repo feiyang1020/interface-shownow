@@ -1,0 +1,44 @@
+.indexPage {
+  background: #f6f9fc;
+  min-height: 100vh;
+  position: relative;
+
+  .bgImg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 40vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+  .indexContent {
+    margin: 0 auto;
+    width: 1200px;
+    max-width: calc(100vw - 40px);
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 50px;
+      padding: 24px;
+      .logo {
+        height: 24px;
+        object-fit: cover;
+      }
+    }
+    .info {
+      margin-top: 176px;
+      width: 476px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      p {
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 18px;
+        font-weight: normal;
+        line-height: 150%;
+      }
+    }
+  }
+}
