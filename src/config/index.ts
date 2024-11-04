@@ -25,8 +25,8 @@ export const getMetaIdUrlByNet = (network: API.Network): string => {
   return MAINNET_METAID_URL;
 };
 
-export const DASHBOARD_API = "http://127.0.0.1:3000/api";
-// export const DASHBOARD_API = "/api";
+// export const DASHBOARD_API = "http://127.0.0.1:3000/api";
+export const DASHBOARD_API = "/api";
 export const DASHBOARD_TOKEN = "DASHBOARD_TOKEN";
 export const BASE_MAN_URL = "https://man-test.metaid.io";
 export const FLAG = "metaid";

@@ -1,4 +1,5 @@
 import Comment from "@/Components/Comment"
+import CommentPanel from "@/Components/CommentPanel"
 import Recommend from "@/Components/Recommend"
 import { Avatar, Button, Card, Col, Divider, Input, Row } from "antd"
 import { useState } from "react"
@@ -18,9 +19,11 @@ export default () => {
                     <Input value={''} placeholder="What's happening?" variant='borderless' style={{ flexGrow: 1 }} onClick={() => { setShowComment(true) }} />
                     <Button type='primary' shape='round' style={{ background: showConf?.gradientColor }} onClick={() => { }}>Reply</Button>
                 </div>
-                <Comment tweetId={match?.params.id} onClose={() => {
+                <Comment tweetId={match?.params.id??''} onClose={() => {
                     setShowComment(false)
                 }} show={showComment} />
+                <Divider />
+                <CommentPanel tweetId={match?.params.id??''} />
 
             </Card>
         </Col>
