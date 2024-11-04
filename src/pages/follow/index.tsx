@@ -74,7 +74,7 @@ export default () => {
             return [...acc||[], ...item||[]]
         }, []) : []
     }, [data])
-    return <div className="homePage">
+    return <div className="homePage2">
         <div className="tweets">
             <div
                 id="scrollableDiv"

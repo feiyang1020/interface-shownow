@@ -85,7 +85,7 @@ export default () => {
             return [...acc || [], ...item || []]
         }, []) : []
     }, [data])
-    return <div className="homePage">
+    return <div className="profilePage">
         <div className="tweets">
             
             <div
