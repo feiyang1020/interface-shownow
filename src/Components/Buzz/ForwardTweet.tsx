@@ -9,7 +9,6 @@ import { useModel, history } from "umi";
 import Comment from "../Comment";
 import NewPost from "../NewPost";
 import './index.less'
-import ForwardTweet from "./ForwardTweet";
 const { Paragraph, Text } = Typography;
 
 type Props = {
@@ -21,7 +20,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
-    const { btcConnector, user, isLogin, connect, feeRate } = useModel('user')
+    const { btcConnector, user, isLogin, connect,feeRate } = useModel('user')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -113,7 +112,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 ],
                 options: {
                     noBroadcast: 'no',
-                    feeRate: Number(feeRate),
+                      feeRate: Number(feeRate),
                     //   service: {
                     //     address: environment.service_address,
                     //     satoshis: environment.service_staoshi,
@@ -140,20 +139,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
             message.error(toastMessage);
         }
     };
-    const quotePinId = useMemo(() => {
-        let _summary = buzzItem!.contentSummary;
-        const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
-        const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
-        return isSummaryJson && !isEmpty(parseSummary?.quotePin ?? '')
-            ? parseSummary.quotePin
-            : '';
-    }, [buzzItem])
+   
 
-    const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
-        enabled: !isEmpty(quotePinId),
-        queryKey: ['buzzDetail', quotePinId],
-        queryFn: () => getPinDetailByPid({ pid: quotePinId }),
-    })
+   
 
     return <div className="tweet" >
         <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
@@ -167,13 +155,13 @@ export default ({ buzzItem, showActions = true }: Props) => {
         </div>
 
         <div className="content" style={{
-
+            
             paddingLeft: 61,
             cursor: 'pointer'
         }} onClick={() => {
             history.push(`/tweet/${buzzItem.id}`)
         }}>
-            <div className="text" style={{ margin: '24px 0', }}>
+            <div className="text" style={{margin:'24px 0'}}>
                 {(summary ?? '').split('\n').map((line: string, index: number) => (
                     <span key={index} style={{ wordBreak: 'break-all' }}>
                         <div
@@ -184,68 +172,34 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     </span>
                 ))}
             </div>
-            {
-                !isEmpty(attachPids) && <div onClick={e => { e.stopPropagation() }} style={{marginBottom:24}}>
-                    <Image.PreviewGroup
 
-                        preview={{
-                            onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                        }}
+            <Image.PreviewGroup
+                preview={{
+                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                }}
 
-                    >
-                        <div style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '10px',
+            >
+                <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '10px', 
+                }}>
+                    {
+                        attachPids.map((pid: string) => {
+                            return <Image
 
-                        }}
-                        >
-                            {
-                                attachPids.map((pid: string) => {
-                                    return <Image
-                                        key={pid}
-                                        width={200}
-                                        src={`${BASE_MAN_URL}/content/${pid}`}
-                                    />
-                                })
-                            }
-                        </div>
-
-
-                    </Image.PreviewGroup>
+                                key={pid}
+                                width={200}
+                                src={`${BASE_MAN_URL}/content/${pid}`}
+                            />
+                        })
+                    }
                 </div>
-            }
 
 
-            {!isEmpty(quotePinId) && (
-
-                <Card style={{ padding: 0 }} styles={{ body: { padding: 0 } }} loading={isQuoteLoading}>
-                    <ForwardTweet buzzItem={quoteDetailData!} showActions={false} />
-                </Card>
-
-            )}
+            </Image.PreviewGroup>
         </div>
-        {showActions && <div className="actions">
-            <div className="item">
-                <Button type='text' icon={<MessageOutlined />} onClick={() => {
-                    showComment ? setShowComment(false) : setShowComment(true)
-                }} />
-
-            </div>
-            <Space className="item" onClick={handleLike} style={{}}>
-                {isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}
-                {currentLikeData?.length}
-            </Space>
-            <div className="item">
-                <GiftOutlined />
-            </div>
-            <div className="item">
-                <Button type='text' icon={<UploadOutlined />} onClick={() => {
-                    showNewPost ? setShowNewPost(false) : setShowNewPost(true)
-                }} />
-
-            </div>
-        </div>}
+        
 
         <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />

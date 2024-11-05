@@ -52,7 +52,7 @@ export default function Lay() {
           ...themeTokens,
         }}
       >
-        <Layout style={{ minHeight: '100vh', width: 1200, }} className='layout'>
+        <Layout style={{  width: 1200, }} className='layout'>
           {
             md ?
 
@@ -71,14 +71,21 @@ export default function Lay() {
               </Sider> : ''
           }
           <Layout className='layout2'>
-            <Header style={{ padding: 0, background: " #f6f9fc", width: '100%' }} className='header'>
+            <Header style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+              width: '100%',
+              padding: 0,
+              background: " #f6f9fc",
+            }} className='header'>
               <Row style={{ width: '100%', flexGrow: 1 }} gutter={[24, 24]}>
-               {md ?<Col span={24} md={15}>
+                {md ? <Col span={24} md={15}>
                   <div className="searchWrap">
                     <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />
                   </div>
-                </Col>:''} 
-                <Col span={24} md={15}>
+                </Col> : ''}
+                <Col span={24} md={9}>
                   <div className="userPanel">
                     <div className="user">
                       <Avatar size="large" src={user.avater} />
@@ -125,8 +132,8 @@ export default function Lay() {
           {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
           <NewPost show={showPost} onClose={() => setShowPost(false)} />
           {
-            !md && <FloatButton style={{bottom:100}} icon={<EditOutlined />} onClick={() => { setShowPost(true) }} />
-            }
+            !md && <FloatButton style={{ bottom: 100 }} icon={<EditOutlined />} onClick={() => { setShowPost(true) }} />
+          }
         </Layout>
       </ConfigProvider>
     </QueryClientProvider>

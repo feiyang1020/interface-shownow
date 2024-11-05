@@ -1,5 +1,6 @@
 declare namespace API {
   type Network = "testnet" | "mainnet";
+  type Chain = 'btc' | 'mvc';
   type Pin = {
     id: string;
     number: number;
@@ -56,5 +57,13 @@ declare namespace API {
     pinAddress: string;
     pinId: string;
     pinNumber: number;
+  };
+
+  type FeeRateApi = {
+    fastestFee: number;
+    halfHourFee: number;
+    hourFee: number;
+    economyFee: number;
+    minimumFee: number;
   };
 }

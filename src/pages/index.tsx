@@ -1,13 +1,16 @@
-import { Button, Space } from 'antd';
+import { Button, Space, Grid } from 'antd';
 import logo from '../assets/logo.svg';
 import bg from '../assets/bg.svg';
 import './index.less';
 import { useModel, history } from 'umi';
 import styles from './dashboard/styles';
+const { useBreakpoint } = Grid
+
 
 export default function HomePage() {
   const { isLogin, setIsLogin, connect } = useModel('user');
-  const { showConf } = useModel('dashboard')
+  const { showConf } = useModel('dashboard');
+  const { md } = useBreakpoint()
   const handleConnect = async () => {
     await connect();
     setTimeout(() => {
@@ -17,11 +20,13 @@ export default function HomePage() {
   }
   return (
     <div className='indexPage'>
-      <img src={bg} alt="" className="bgImg" />
+      {md && <img src={logo} alt="" className="bgImg" />}
+     
+
       <div className="indexContent">
         <div className="header">
           <img src={showConf?.logo} alt="" className="logo" />
-          <Button shape='round' onClick={handleConnect} style={{color:showConf?.brandColor}}>Connect</Button>
+          <Button shape='round' onClick={handleConnect} style={{ color: showConf?.brandColor }}>Connect</Button>
         </div>
         <div className="info">
           <h1>Unbounded Creation Infinite Earnings</h1>

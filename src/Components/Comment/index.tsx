@@ -15,7 +15,7 @@ type Props = {
     tweetId: string
 }
 export default ({ show, onClose, tweetId }: Props) => {
-    const { user,btcConnector } = useModel('user')
+    const { user,btcConnector,feeRate } = useModel('user')
     const { showConf } = useModel('dashboard');
     const [content, setContent] = useState('');
     const [isAdding, setIsAdding] = useState(false);
@@ -46,7 +46,7 @@ export default ({ show, onClose, tweetId }: Props) => {
             // TODO add feeRate
             options: {
               noBroadcast: 'no',
-            //   feeRate: Number(globalFeerate),
+              feeRate: Number(feeRate),
             //   service: {
             //     address: environment.service_address,
             //     satoshis: environment.service_staoshi,

@@ -6,6 +6,9 @@ import {
   btcConnect,
 } from "@metaid/metaid";
 import { curNetwork, getHostByNet } from "@/config";
+import { useQuery } from "@tanstack/react-query";
+import { fetchFeeRate } from "@/request/api";
+import useIntervalAsync from "@/hooks/useIntervalAsync";
 const checkExtension = () => {
   if (!window.metaidwallet) {
     window.open(
@@ -17,20 +20,20 @@ const checkExtension = () => {
 };
 export default () => {
   const [isLogin, setIsLogin] = useState(false);
+  const [chain, setChain] = useState<API.Chain>('mvc')
   const [user, setUser] = useState({
     avater: "https://api.dicebear.com/7.x/miniavs/svg?seed=2",
     name: "Bradley",
     metaid: "001Derteryeryeryeryey7777324e",
     notice: 1,
-    address:''
+    address: ''
   });
 
   const [addressType, setAddressType] = useState<string>();
   const [metaid, setMetaid] = useState<string>();
   const [btcAddress, setBTCAddress] = useState<string>();
   const [btcConnector, setBtcConnector] = useState<IBtcConnector>();
-  const [network, setNetwork] = useState<Network>(curNetwork);
-  const [connected, setConnected] = useState<boolean>(false);
+  const [network, setNetwork] = useState<API.Network>(curNetwork);
   const [userBal, setUserBal] = useState<string>("0");
   const [avatar, setAvatar] = useState<string>("");
   const [userName, setUserName] = useState<string>();
@@ -74,9 +77,9 @@ export default () => {
     if (!_wallet.address) return;
 
     const publicKey = await window.metaidwallet.btc.getPublicKey();
-   
+
     setNetwork(curNetwork);
-   
+
     const _btcConnector: IBtcConnector = await btcConnect({
       wallet: _wallet,
       network,
@@ -89,7 +92,7 @@ export default () => {
     setInitializing(true);
     setBtcConnector(_btcConnector);
     setIsLogin(true);
-    console.log('isLogin',isLogin)
+    console.log('isLogin', isLogin)
     setAvatar(
       _btcConnector.user.avatar
         ? `${getHostByNet(network)}${_btcConnector.user.avatar}`
@@ -97,12 +100,12 @@ export default () => {
     );
     setUser({
       avater: _btcConnector.user.avatar
-      ? `${getHostByNet(network)}${_btcConnector.user.avatar}`
-      : "",
+        ? `${getHostByNet(network)}${_btcConnector.user.avatar}`
+        : "",
       name: _btcConnector.user.name,
       metaid: _btcConnector.user.metaid,
       notice: 0,
-      address:_btcConnector.wallet.address
+      address: _btcConnector.wallet.address
     })
     setInitializing(false);
   };
@@ -124,13 +127,13 @@ export default () => {
     const handleNetChange = (network: string) => {
       disConnect();
     };
-    if ( window.metaidwallet && isLogin) {
+    if (window.metaidwallet && isLogin) {
       window.metaidwallet.on("accountsChanged", handleAccountChange);
       window.metaidwallet.on("networkChanged", handleNetChange);
     }
 
     return () => {
-      if ( window.metaidwallet && isLogin) {
+      if (window.metaidwallet && isLogin) {
         window.metaidwallet.removeListener(
           "accountsChanged",
           handleAccountChange
@@ -138,10 +141,10 @@ export default () => {
         window.metaidwallet.removeListener("networkChanged", handleNetChange);
       }
     };
-  }, [ isLogin]);
+  }, [isLogin]);
 
   const init = useCallback(async () => {
-    if ( window.metaidwallet) {
+    if (window.metaidwallet) {
       const _network = (await window.metaidwallet.getNetwork()).network;
       if (_network !== curNetwork) {
         disConnect();
@@ -151,9 +154,9 @@ export default () => {
       setNetwork(_network);
       const walletParams = sessionStorage.getItem("walletParams");
       if (walletParams) {
-        
+
         const _walletParams = JSON.parse(walletParams);
-       
+
         const _wallet = MetaletWalletForBtc.restore({
           ..._walletParams,
           internal: window.metaidwallet,
@@ -170,7 +173,7 @@ export default () => {
           setInitializing(false);
           return;
         }
-       
+
         const _btcConnector: IBtcConnector = await btcConnect({
           wallet: _wallet,
           network: _network,
@@ -179,15 +182,15 @@ export default () => {
         setBtcConnector(_btcConnector);
         setIsLogin(true);
         setMetaid(_btcConnector.metaid);
-       
+
         setUser({
           avater: _btcConnector.user.avatar
-          ? `${getHostByNet(network)}${_btcConnector.user.avatar}`
-          : "",
+            ? `${getHostByNet(network)}${_btcConnector.user.avatar}`
+            : "",
           name: _btcConnector.user.name,
           metaid: _btcConnector.user.metaid,
           notice: 0,
-          address:_btcConnector.wallet.address
+          address: _btcConnector.wallet.address
         })
         setInitializing(false);
       }
@@ -200,6 +203,13 @@ export default () => {
       init();
     }, 500);
   }, [init]);
+
+  const fetchFeeRateData = useCallback(async () => {
+    const feeRateData = await fetchFeeRate({ netWork: curNetwork })
+    setFeeRate(feeRateData?.fastestFee)
+  }, [])
+  const updateFeeRate = useIntervalAsync(fetchFeeRateData, 60000);
+
   return {
     isLogin,
     setIsLogin,
@@ -207,6 +217,8 @@ export default () => {
     connect,
     disConnect,
     initializing,
-    btcConnector
+    btcConnector,
+    chain,
+    feeRate,
   };
 };

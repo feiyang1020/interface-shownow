@@ -5,9 +5,11 @@ import { Avatar, List } from "antd";
 import { isNil } from "ramda";
 import { useModel } from "umi";
 import dayjs from 'dayjs'
+import { useEffect } from "react";
 
 type CommentPanelProps = {
-    tweetId: string
+    tweetId: string,
+    refetchNum: number
 }
 
 const CommentItem = ({ commentRes }: { commentRes: API.CommentRes }) => {
@@ -31,12 +33,17 @@ const CommentItem = ({ commentRes }: { commentRes: API.CommentRes }) => {
     </List.Item>
 }
 
-export default ({ tweetId }: CommentPanelProps) => {
+export default ({ tweetId, refetchNum }: CommentPanelProps) => {
     const commentData = useQuery({
         enabled: !isNil(tweetId),
         queryKey: ['comment-detail', tweetId],
         queryFn: () => fetchCurrentBuzzComments({ pinId: tweetId }),
     });
+    useEffect(()=>{
+        if(refetchNum){
+            commentData.refetch()
+        }
+    },[refetchNum])
     const commentsNum = (commentData?.data ?? []).length;
     return <List
         itemLayout="horizontal"

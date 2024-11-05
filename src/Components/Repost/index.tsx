@@ -2,7 +2,7 @@
 import { useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
-import { Button, Card, Divider, GetProp, Input, message, Space, Upload, UploadFile, UploadProps } from "antd";
+import { Button, GetProp, Input, message, Space, Upload, UploadFile, UploadProps } from "antd";
 import { CloseOutlined, FileImageOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { AttachmentItem, convertToFileList, image2Attach } from "@/utils/file";
@@ -10,8 +10,6 @@ import { CreateOptions, IBtcEntity } from "@metaid/metaid";
 import { isEmpty, isNil } from "ramda";
 import { FLAG } from "@/config";
 import { useQueryClient } from "@tanstack/react-query";
-import BuzzCard from "../Cards/BuzzCard";
-import Buzz from "../Buzz";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -26,7 +24,7 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 };
 export default ({ show, onClose, quotePin }: Props) => {
     const isQuoted = !isNil(quotePin);
-    const { user, btcConnector, feeRate } = useModel('user')
+    const { user, btcConnector } = useModel('user')
     const { showConf } = useModel('dashboard')
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [images, setImages] = useState<any[]>([]);
@@ -91,7 +89,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                     dataArray: fileOptions,
                     options: {
                         noBroadcast: 'no',
-                        feeRate: Number(feeRate),
+                        // feeRate: Number(globalFeerate),
                         // service: {
                         //     address: environment.service_address,
                         //     satoshis: environment.service_staoshi,
@@ -122,7 +120,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 ],
                 options: {
                     noBroadcast: 'no',
-                    feeRate: Number(feeRate),
+                    // feeRate: Number(globalFeerate),
                     // service: {
                     //     address: environment.service_address,
                     //     satoshis: environment.service_staoshi,
@@ -153,13 +151,10 @@ export default ({ show, onClose, quotePin }: Props) => {
         }
         setIsAdding(false);
     };
-    return <Popup onClose={onClose} show={show} modalWidth={800} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
-        {
-            isQuoted && <Card style={{ margin: 24 }}><Buzz buzzItem={quotePin} showActions={false} /></Card>
-        }
+    return <Popup onClose={onClose} show={show} modalWidth={800} closable  title={isQuoted?'New Tweet':'Repost'}>
         <div>
             <UserInfo user={user} />
-            <TextArea rows={6} placeholder={isQuoted ? 'Add a comment' : "What is happening？"} style={{ marginTop: 24 }} value={content} onChange={(e) => setContent(e.target.value)} />
+            <TextArea rows={6} placeholder="What is happening？" style={{ marginTop: 24 }} value={content} onChange={(e) => setContent(e.target.value)} />
             <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 16 }}>
                 {images.map((image, index) => (
                     <div

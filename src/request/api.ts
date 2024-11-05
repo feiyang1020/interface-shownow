@@ -254,3 +254,19 @@ export async function fetchMyFollowingBuzzs(params: {
     return null;
   }
 }
+
+export async function fetchFeeRate({
+  netWork,
+}: {
+  netWork?: BtcNetwork;
+}): Promise<API.FeeRateApi> {
+  const response = await fetch(
+    `https://mempool.space/${
+      netWork === 'mainnet' ? '' : 'testnet/'
+    }api/v1/fees/recommended`,
+    {
+      method: 'get',
+    }
+  );
+  return response.json();
+}
