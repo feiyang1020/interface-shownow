@@ -23,7 +23,7 @@ export default () => {
     })
 
     if (!quoteDetailData) return null
-    return <Row gutter={[24, 24]} >
+    return <Row gutter={[12, 12]} >
         <Col span={24} md={15}>
             <Card loading={isQuoteLoading}>
                 <Buzz buzzItem={quoteDetailData} showActions={true} />

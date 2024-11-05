@@ -79,7 +79,7 @@ export default function Lay() {
               padding: 0,
               background: " #f6f9fc",
             }} className='header'>
-              <Row style={{ width: '100%', flexGrow: 1 }} gutter={[24, 24]}>
+              <Row style={{ width: '100%', flexGrow: 1 }} gutter={[12, 12]}>
                 {md ? <Col span={24} md={15}>
                   <div className="searchWrap">
                     <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />

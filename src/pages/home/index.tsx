@@ -65,7 +65,7 @@ export default () => {
         }, []) : []
     }, [data])
     return <div className="homePage">
-        <Row gutter={[24,24]}>
+        <Row gutter={[12, 12]}>
             <Col span={24} md={15}>
                 <div className="tweets">
                     <div

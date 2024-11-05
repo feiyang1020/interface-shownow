@@ -143,7 +143,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
    
 
-    return <div className="tweet" >
+    return <div className="tweet" onClick={e=>{
+        e.stopPropagation()
+    }}>
         <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
             history.push(`/profile/${buzzItem.creator}`)
         }}>
@@ -161,7 +163,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
         }} onClick={() => {
             history.push(`/tweet/${buzzItem.id}`)
         }}>
-            <div className="text" style={{margin:'24px 0'}}>
+            <div className="text" style={{margin:'12px 0'}}>
                 {(summary ?? '').split('\n').map((line: string, index: number) => (
                     <span key={index} style={{ wordBreak: 'break-all' }}>
                         <div
