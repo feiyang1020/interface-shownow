@@ -73,12 +73,12 @@ export default function Lay() {
           <Layout className='layout2'>
             <Header style={{ padding: 0, background: " #f6f9fc", width: '100%' }} className='header'>
               <Row style={{ width: '100%', flexGrow: 1 }} gutter={[24, 24]}>
-                <Col span={15}>
+               {md ?<Col span={24} md={15}>
                   <div className="searchWrap">
                     <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />
                   </div>
-                </Col>
-                <Col span={9}>
+                </Col>:''} 
+                <Col span={24} md={15}>
                   <div className="userPanel">
                     <div className="user">
                       <Avatar size="large" src={user.avater} />
