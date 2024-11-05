@@ -128,8 +128,9 @@ export default function Lay() {
 
             </Header>
             <Outlet />
+            {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
           </Layout>
-          {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
+          
           <NewPost show={showPost} onClose={() => setShowPost(false)} />
           {
             !md && <FloatButton style={{ bottom: 100 }} icon={<EditOutlined />} onClick={() => { setShowPost(true) }} />
