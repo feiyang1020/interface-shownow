@@ -43,8 +43,11 @@ export default () => {
                 setCurMenu(item.key)
                 history.push(`/${item.key}`)
             }} >
+
                 <LinearIcon name={item.key} color={curMenu === item.key ? colorPrimary : '#333'} />
-                <span>{item.label}</span>
+
+
+                <span className='text'>{item.label}</span>
             </div>
         })
         }
