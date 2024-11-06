@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
+import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
@@ -149,6 +149,12 @@ export default ({ buzzItem, showActions = true }: Props) => {
             : '';
     }, [buzzItem])
 
+    const commentData = useQuery({
+        enabled: !isNil(buzzItem?.id),
+        queryKey: ['comment-detail', buzzItem!.id],
+        queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
+    })
+
     const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
         enabled: !isEmpty(quotePinId),
         queryKey: ['buzzDetail', quotePinId],
@@ -157,8 +163,8 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
     return <div className="tweet" >
         <div className="avatar" style={{ cursor: 'pointer' }} >
-            <Avatar src={currentUserInfoData.data?.avatar?<img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img>:null} size={40} >
-            {currentUserInfoData.data?.name?currentUserInfoData.data?.name?.slice(0, 1):currentUserInfoData.data?.metaid.slice(0, 1)}
+            <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
+                {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
             </Avatar>
 
         </div>
@@ -170,7 +176,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 e.stopPropagation()
                 history.push(`/profile/${buzzItem.creator}`)
             }}>
-                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name||'Unname'}</div>
+                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unname'}</div>
                 <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
             </div>
             <div className="text" style={{ margin: '8px 0', }} onClick={() => {
@@ -221,24 +227,28 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
             {!isEmpty(quotePinId) && (
 
-                <Card style={{ padding: 0,marginBottom:12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
+                <Card style={{ padding: 0, marginBottom: 12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
                     <ForwardTweet buzzItem={quoteDetailData!} showActions={false} />
                 </Card>
 
             )}
-            {<Tag  bordered={false} color={buzzItem.chainName==='mvc'?'blue':'orange'}>{buzzItem.chainName}</Tag>}
+            {<Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>}
 
             {showActions && <div className="actions">
-                <div className="item">
-                    <Button type='text' icon={<MessageOutlined />} onClick={() => {
-                        showComment ? setShowComment(false) : setShowComment(true)
-                    }} />
 
-                </div>
-                <Space className="item" onClick={handleLike} style={{}}>
-                    {isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}
+                <Button type='text' icon={<MessageOutlined />} onClick={() => {
+                    showComment ? setShowComment(false) : setShowComment(true)
+                }}>
+                    {commentData.data?.length}
+                </Button>
+
+
+                <Button type='text' onClick={handleLike} icon={isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}>
                     {currentLikeData?.length}
-                </Space>
+                </Button>
+
+
+
                 <div className="item">
                     <GiftOutlined />
                 </div>
