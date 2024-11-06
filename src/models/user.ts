@@ -35,6 +35,7 @@ export default () => {
   const [network, setNetwork] = useState<API.Network>(curNetwork);
   const [initializing, setInitializing] = useState<boolean>(true);
   const [feeRate, setFeeRate] = useState<number>(0);
+  const [followList, setFollowList] = useState<string[]>([]);
   const [feeRateModalVisible, setFeeRateModelVisible] =
     useState<boolean>(false);
   const connect = async (chain: API.Chain = 'btc') => {
@@ -197,6 +198,8 @@ export default () => {
     }, 500);
   }, [init]);
 
+
+
   const fetchFeeRateData = useCallback(async () => {
     const feeRateData = await fetchFeeRate({ netWork: curNetwork })
     setFeeRate(feeRateData?.fastestFee)
@@ -216,5 +219,7 @@ export default () => {
     showConnect,
     setShowConnect,
     mvcConnector,
+    followList,
+    setFollowList,
   };
 };

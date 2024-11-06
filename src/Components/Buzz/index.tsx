@@ -11,6 +11,7 @@ import NewPost from "../NewPost";
 import './index.less'
 import ForwardTweet from "./ForwardTweet";
 import { IMvcEntity } from "@metaid/metaid";
+import { FollowIconComponent } from "../Follow";
 const { Paragraph, Text } = Typography;
 
 type Props = {
@@ -196,9 +197,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
             <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
                 {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
             </Avatar>
-            <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#fff', borderRadius: '50%', border: '1px solid #fff', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <PlusCircleFilled size={16} style={{ color: showConf?.brandColor }} />
-            </div>
+            <FollowIconComponent metaid={currentUserInfoData.data?.metaid || ''} />
 
         </div>
 
