@@ -7,8 +7,9 @@ import {
 } from "@metaid/metaid";
 import { curNetwork, getHostByNet } from "@/config";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFeeRate } from "@/request/api";
+import { fetchFeeRate, fetchFollowingList } from "@/request/api";
 import useIntervalAsync from "@/hooks/useIntervalAsync";
+import { isEmpty } from "ramda";
 const checkExtension = () => {
   if (!window.metaidwallet) {
     window.open(
@@ -25,7 +26,7 @@ export default () => {
   const [user, setUser] = useState({
     avater: "https://api.dicebear.com/7.x/miniavs/svg?seed=2",
     name: "Bradley",
-    metaid: "001Derteryeryeryeryey7777324e",
+    metaid: "",
     notice: 1,
     address: ''
   });
@@ -205,6 +206,22 @@ export default () => {
     setFeeRate(feeRateData?.fastestFee)
   }, [])
   const updateFeeRate = useIntervalAsync(fetchFeeRateData, 60000);
+
+  const fetchUserFollowingList = useCallback(async () => {
+    if (user.metaid) {
+      const res = await fetchFollowingList({
+        metaid: user.metaid ?? '',
+        params: { cursor: '0', size: '100', followDetail: false },
+      })
+      console.log('res', res)
+      setFollowList(res && res.list ? res?.list.map((item: any) => item.metaid) : [])
+    }
+
+  }, [user.metaid])
+
+  useEffect(() => {
+    fetchUserFollowingList()
+  }, [fetchUserFollowingList])
 
   return {
     isLogin,
