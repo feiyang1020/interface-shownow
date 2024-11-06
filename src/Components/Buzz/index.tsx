@@ -2,7 +2,7 @@ import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Card, Divider, Image, message, Space, Typography } from "antd";
+import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
 import { useMemo, useState } from "react";
 import { useModel, history } from "umi";
@@ -173,7 +173,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name||'Unname'}</div>
                 <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
             </div>
-            <div className="text" style={{ margin: '12px 0', }} onClick={() => {
+            <div className="text" style={{ margin: '8px 0', }} onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
                 {(summary ?? '').split('\n').map((line: string, index: number) => (
@@ -221,11 +221,12 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
             {!isEmpty(quotePinId) && (
 
-                <Card style={{ padding: 0 }} styles={{ body: { padding: 0 } }} loading={isQuoteLoading}>
+                <Card style={{ padding: 0,marginBottom:12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
                     <ForwardTweet buzzItem={quoteDetailData!} showActions={false} />
                 </Card>
 
             )}
+            {<Tag  bordered={false} color={buzzItem.chainName==='mvc'?'blue':'orange'}>{buzzItem.chainName}</Tag>}
 
             {showActions && <div className="actions">
                 <div className="item">

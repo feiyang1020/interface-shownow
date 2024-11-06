@@ -143,7 +143,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
 
 
-    return <div className="tweet" onClick={e => {
+    return <div className="tweet" style={{padding:0}} onClick={e => {
         e.stopPropagation()
     }}>
         <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
