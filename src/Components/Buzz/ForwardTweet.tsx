@@ -40,7 +40,8 @@ export default ({ buzzItem, showActions = true }: Props) => {
         let _summary = buzzItem!.contentSummary;
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
-        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? []) && isFromBtc
+       
+        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? []) 
             ? (parseSummary?.attachments ?? []).map(
                 (d: string) => d.split('metafile://')[1]
             )

@@ -151,7 +151,7 @@ export default () => {
           address: _walletParams.address,
           xpub: _walletParams.pub,
         });
-        const btcAddress = await window.metaidwallet.btc.getAddress();
+        const btcAddress = _chain === 'btc' ? await window.metaidwallet.btc.getAddress() : await window.metaidwallet.getAddress();
         if (btcAddress !== _walletParams.address) {
           disConnect();
           setInitializing(false);
