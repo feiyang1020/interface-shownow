@@ -6,9 +6,9 @@ import { Button, Card, Divider, GetProp, Input, message, Space, Upload, UploadFi
 import { CloseOutlined, FileImageOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { AttachmentItem, convertToFileList, image2Attach } from "@/utils/file";
-import { CreateOptions, IBtcEntity } from "@metaid/metaid";
+import { CreateOptions, IBtcEntity, IMvcEntity, MvcTransaction } from "@metaid/metaid";
 import { isEmpty, isNil } from "ramda";
-import { FLAG } from "@/config";
+import { curNetwork, FLAG } from "@/config";
 import { useQueryClient } from "@tanstack/react-query";
 import BuzzCard from "../Cards/BuzzCard";
 import Buzz from "../Buzz";
@@ -26,9 +26,8 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 };
 export default ({ show, onClose, quotePin }: Props) => {
     const isQuoted = !isNil(quotePin);
-    const { user, btcConnector, feeRate } = useModel('user')
+    const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
     const { showConf } = useModel('dashboard')
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [images, setImages] = useState<any[]>([]);
     const [content, setContent] = useState('');
     const [isAdding, setIsAdding] = useState(false);
@@ -67,6 +66,7 @@ export default ({ show, onClose, quotePin }: Props) => {
     }) => {
         setIsAdding(true);
         const buzzEntity: IBtcEntity = await btcConnector!.use('buzz');
+        let fileTransactions: MvcTransaction[] = []
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const finalBody: any = {
@@ -75,9 +75,6 @@ export default ({ show, onClose, quotePin }: Props) => {
             };
             if (!isEmpty(buzz.images)) {
                 const fileOptions: CreateOptions[] = [];
-
-                const fileEntity = await btcConnector!.use('file');
-
                 for (const image of buzz.images) {
                     fileOptions.push({
                         body: Buffer.from(image.data, 'hex').toString('base64'),
@@ -86,9 +83,74 @@ export default ({ show, onClose, quotePin }: Props) => {
                         flag: FLAG,
                     });
                 }
-                //TODO: add feeRate
-                const imageRes = await fileEntity.create({
-                    dataArray: fileOptions,
+                if (chain === 'btc') {
+                    //TODO: add feeRate
+                    const fileEntity = await btcConnector!.use('file');
+                    const imageRes = await fileEntity.create({
+                        dataArray: fileOptions,
+                        options: {
+                            noBroadcast: 'no',
+                            feeRate: Number(feeRate),
+                            // service: {
+                            //     address: environment.service_address,
+                            //     satoshis: environment.service_staoshi,
+                            // },
+                            // network: environment.network,
+                        },
+                    });
+
+                    console.log('imageRes', imageRes);
+                    finalBody.attachments = imageRes.revealTxIds.map(
+                        (rid) => 'metafile://' + rid + 'i0'
+                    );
+                } else {
+                    const fileEntity = (await mvcConnector!.use('file')) as IMvcEntity
+                    const finalAttachMetafileUri: string[] = []
+
+                    for (let i = 0; i < fileOptions.length; i++) {
+                        const fileOption = fileOptions[i]
+
+                        const { transactions } = await fileEntity.create({
+                            data: fileOption,
+                            options: {
+                                network: curNetwork,
+                                signMessage: 'upload image file',
+                                serialAction: 'combo',
+                                transactions: fileTransactions,
+                            },
+                        })
+
+                        if (!transactions) {
+                            throw new Error('upload image file failed')
+                        }
+
+                        finalAttachMetafileUri.push(
+                            'metafile://' +
+                            transactions[transactions.length - 1].txComposer.getTxId() +
+                            'i0',
+                        )
+                        fileTransactions = transactions
+                    }
+
+                    finalBody.attachments = finalAttachMetafileUri
+                }
+
+            }
+            //   await sleep(5000);
+
+            console.log('finalBody', finalBody);
+            if (!isNil(quotePin)) {
+                finalBody.quotePin = quotePin.id;
+            }
+            if (chain === 'btc') {
+                const createRes = await buzzEntity!.create({
+                    dataArray: [
+                        {
+                            body: JSON.stringify(finalBody),
+                            contentType: 'text/plain;utf-8',
+                            flag: FLAG,
+                        },
+                    ],
                     options: {
                         noBroadcast: 'no',
                         feeRate: Number(feeRate),
@@ -99,46 +161,39 @@ export default ({ show, onClose, quotePin }: Props) => {
                         // network: environment.network,
                     },
                 });
+                console.log('create res for inscribe', createRes);
+                if (!isNil(createRes?.revealTxIds[0])) {
+                    // await sleep(5000);
+                    queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+                    message.success(`${isQuoted ? 'repost' : 'create'} buzz successfully`);
+                    setContent('');
+                    setImages([]);
+                    onClose();
+                }
+            } else {
+                const buzzEntity = (await mvcConnector!.use('buzz')) as IMvcEntity
 
-                console.log('imageRes', imageRes);
-                finalBody.attachments = imageRes.revealTxIds.map(
-                    (rid) => 'metafile://' + rid + 'i0'
-                );
-            }
-            //   await sleep(5000);
 
-            console.log('finalBody', finalBody);
-            if (!isNil(quotePin)) {
-                finalBody.quotePin = quotePin.id;
-            }
-            //TODO: add feeRate
-            const createRes = await buzzEntity!.create({
-                dataArray: [
-                    {
-                        body: JSON.stringify(finalBody),
-                        contentType: 'text/plain;utf-8',
-                        flag: FLAG,
+                const createRes = await buzzEntity!.create({
+                    data: { body: JSON.stringify(finalBody) },
+                    options: {
+                        network: curNetwork,
+                        signMessage: 'create buzz',
+                        serialAction: 'finish',
+                        transactions: fileTransactions,
                     },
-                ],
-                options: {
-                    noBroadcast: 'no',
-                    feeRate: Number(feeRate),
-                    // service: {
-                    //     address: environment.service_address,
-                    //     satoshis: environment.service_staoshi,
-                    // },
-                    // network: environment.network,
-                },
-            });
-            console.log('create res for inscribe', createRes);
-            if (!isNil(createRes?.revealTxIds[0])) {
-                // await sleep(5000);
-                queryClient.invalidateQueries({ queryKey: ['buzzes'] });
-                message.success(`${isQuoted ? 'repost' : 'create'} buzz successfully`);
-                setContent('');
-                setImages([]);
-                onClose();
+                })
+                console.log('create res for inscribe', createRes)
+                if (!isNil(createRes?.txid)) {
+                    // await sleep(5000);
+                    queryClient.invalidateQueries({ queryKey: ['buzzes'] })
+                    message.success(`${isQuoted ? 'repost' : 'create'} buzz successfully`)
+                    setContent('')
+                    setImages([])
+                    onClose()
+                }
             }
+
         } catch (error) {
             console.log('error', error);
             const errorMessage = (error as any)?.message ?? error;
