@@ -20,7 +20,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
-    const { btcConnector, user, isLogin, connect,feeRate } = useModel('user')
+    const { btcConnector, user, isLogin, connect, feeRate } = useModel('user')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -112,7 +112,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 ],
                 options: {
                     noBroadcast: 'no',
-                      feeRate: Number(feeRate),
+                    feeRate: Number(feeRate),
                     //   service: {
                     //     address: environment.service_address,
                     //     satoshis: environment.service_staoshi,
@@ -139,31 +139,39 @@ export default ({ buzzItem, showActions = true }: Props) => {
             message.error(toastMessage);
         }
     };
-   
 
-   
 
-    return <div className="tweet" onClick={e=>{
+
+
+    return <div className="tweet" onClick={e => {
         e.stopPropagation()
     }}>
         <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
             history.push(`/profile/${buzzItem.creator}`)
         }}>
-            <Avatar src={BASE_MAN_URL + currentUserInfoData.data?.avatar} size={40} />
-            <div className="creater">
-                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name}</div>
-                <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
+            <div className="avatar" style={{ cursor: 'pointer' }} >
+                <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
+                    {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
+                </Avatar>
+
             </div>
         </div>
 
         <div className="content" style={{
+
             
-            paddingLeft: 61,
             cursor: 'pointer'
-        }} onClick={() => {
-            history.push(`/tweet/${buzzItem.id}`)
-        }}>
-            <div className="text" style={{margin:'12px 0'}}>
+        }} >
+            <div className="creater" onClick={(e) => {
+                e.stopPropagation()
+                history.push(`/profile/${buzzItem.creator}`)
+            }}>
+                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unname'}</div>
+                <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
+            </div>
+            <div className="text" style={{ margin: '12px 0' }} onClick={() => {
+                history.push(`/tweet/${buzzItem.id}`)
+            }}>
                 {(summary ?? '').split('\n').map((line: string, index: number) => (
                     <span key={index} style={{ wordBreak: 'break-all' }}>
                         <div
@@ -184,7 +192,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 <div style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '10px', 
+                    gap: '10px',
                 }}>
                     {
                         attachPids.map((pid: string) => {
@@ -201,7 +209,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
             </Image.PreviewGroup>
         </div>
-        
+
 
         <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />

@@ -156,24 +156,26 @@ export default ({ buzzItem, showActions = true }: Props) => {
     })
 
     return <div className="tweet" >
-        <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
-            history.push(`/profile/${buzzItem.creator}`)
-        }}>
-            <Avatar src={BASE_MAN_URL + currentUserInfoData.data?.avatar} size={40} />
-            <div className="creater">
-                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name}</div>
-                <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
-            </div>
+        <div className="avatar" style={{ cursor: 'pointer' }} >
+            <Avatar src={currentUserInfoData.data?.avatar?<img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img>:null} size={40} >
+            {currentUserInfoData.data?.name?currentUserInfoData.data?.name?.slice(0, 1):currentUserInfoData.data?.metaid.slice(0, 1)}
+            </Avatar>
+
         </div>
 
         <div className="content" style={{
-
-            paddingLeft: 61,
             cursor: 'pointer'
-        }} onClick={() => {
-            history.push(`/tweet/${buzzItem.id}`)
-        }}>
-            <div className="text" style={{ margin: '24px 0', }}>
+        }} >
+            <div className="creater" onClick={(e) => {
+                e.stopPropagation()
+                history.push(`/profile/${buzzItem.creator}`)
+            }}>
+                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name||'Unname'}</div>
+                <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
+            </div>
+            <div className="text" style={{ margin: '12px 0', }} onClick={() => {
+                history.push(`/tweet/${buzzItem.id}`)
+            }}>
                 {(summary ?? '').split('\n').map((line: string, index: number) => (
                     <span key={index} style={{ wordBreak: 'break-all' }}>
                         <div
@@ -185,7 +187,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 ))}
             </div>
             {
-                !isEmpty(attachPids) && <div onClick={e => { e.stopPropagation() }} style={{marginBottom:24}}>
+                !isEmpty(attachPids) && <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 24 }}>
                     <Image.PreviewGroup
 
                         preview={{
@@ -224,28 +226,30 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 </Card>
 
             )}
+
+            {showActions && <div className="actions">
+                <div className="item">
+                    <Button type='text' icon={<MessageOutlined />} onClick={() => {
+                        showComment ? setShowComment(false) : setShowComment(true)
+                    }} />
+
+                </div>
+                <Space className="item" onClick={handleLike} style={{}}>
+                    {isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}
+                    {currentLikeData?.length}
+                </Space>
+                <div className="item">
+                    <GiftOutlined />
+                </div>
+                <div className="item">
+                    <Button type='text' icon={<UploadOutlined />} onClick={() => {
+                        showNewPost ? setShowNewPost(false) : setShowNewPost(true)
+                    }} />
+
+                </div>
+            </div>}
         </div>
-        {showActions && <div className="actions">
-            <div className="item">
-                <Button type='text' icon={<MessageOutlined />} onClick={() => {
-                    showComment ? setShowComment(false) : setShowComment(true)
-                }} />
 
-            </div>
-            <Space className="item" onClick={handleLike} style={{}}>
-                {isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}
-                {currentLikeData?.length}
-            </Space>
-            <div className="item">
-                <GiftOutlined />
-            </div>
-            <div className="item">
-                <Button type='text' icon={<UploadOutlined />} onClick={() => {
-                    showNewPost ? setShowNewPost(false) : setShowNewPost(true)
-                }} />
-
-            </div>
-        </div>}
 
         <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />

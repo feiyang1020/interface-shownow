@@ -4,6 +4,8 @@
     border-radius: 16px;
     background: #ffffff;
     padding: 20px;
+    display: flex;
+    align-items: flex-start;
     .avatar {
       display: flex;
       align-items: center;
@@ -14,6 +16,11 @@
         height: 48px;
         border-radius: 50%;
       }
+      
+    }
+    .content {
+      padding-left: 12px;
+      flex-grow: 1;
       .name {
         font-size: 18px;
         font-weight: bold;
@@ -31,13 +38,9 @@
         font-variation-settings: "opsz" auto;
         color: #666666;
       }
-    }
-    .content {
-      padding-left: 21px;
 
     }
     .actions{
-      padding-left: 61px;
       display: flex;
       align-items: center;
       justify-content: space-between;
