@@ -10,6 +10,7 @@ import Comment from "../Comment";
 import NewPost from "../NewPost";
 import './index.less'
 import ForwardTweet from "./ForwardTweet";
+import { IMvcEntity } from "@metaid/metaid";
 const { Paragraph, Text } = Typography;
 
 type Props = {
@@ -21,7 +22,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
-    const { btcConnector, user, isLogin, connect, feeRate } = useModel('user')
+    const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -86,7 +87,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     });
 
     const isLikeByCurrentUser = (currentLikeData ?? [])?.find(
-        (d) => d?.pinAddress === btcConnector?.address
+        (d) => d?.pinAddress ===  user?.address
     );
 
     const handleLike = async () => {
@@ -101,33 +102,61 @@ export default ({ buzzItem, showActions = true }: Props) => {
             return;
         }
 
-        const likeEntity = await btcConnector!.use('like');
+
         try {
-            const likeRes = await likeEntity.create({
-                dataArray: [
-                    {
-                        body: JSON.stringify({ isLike: '1', likeTo: pinId }),
-                        flag: FLAG,
-                        contentType: 'text/plain;utf-8',
+            if (chain === 'btc') {
+                const likeEntity = await btcConnector!.use('like');
+                const likeRes = await likeEntity.create({
+                    dataArray: [
+                        {
+                            body: JSON.stringify({ isLike: '1', likeTo: pinId }),
+                            flag: FLAG,
+                            contentType: 'text/plain;utf-8',
+                        },
+                    ],
+                    options: {
+                        noBroadcast: 'no',
+                        feeRate: Number(feeRate),
+                        //   service: {
+                        //     address: environment.service_address,
+                        //     satoshis: environment.service_staoshi,
+                        //   },
+                        // network: environment.network,
                     },
-                ],
-                options: {
-                    noBroadcast: 'no',
-                    feeRate: Number(feeRate),
-                    //   service: {
-                    //     address: environment.service_address,
-                    //     satoshis: environment.service_staoshi,
-                    //   },
-                    // network: environment.network,
-                },
-            });
-            console.log('likeRes', likeRes);
-            if (!isNil(likeRes?.revealTxIds[0])) {
-                queryClient.invalidateQueries({ queryKey: ['buzzes'] });
-                queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
-                // await sleep(5000);
-                message.success('like buzz successfully');
+                });
+                console.log('likeRes', likeRes);
+                if (!isNil(likeRes?.revealTxIds[0])) {
+                    queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+                    queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
+                    // await sleep(5000);
+                    message.success('like buzz successfully');
+                }
+            } else {
+                const likeEntity = (await mvcConnector!.use('like')) as IMvcEntity
+                const likeRes = await likeEntity.create({
+                    data: {
+                        body: JSON.stringify({
+                            isLike: '1',
+                            likeTo: pinId,
+                        }),
+                    },
+                    options: {
+                        network: curNetwork,
+                        signMessage: 'like buzz',
+                    },
+                })
+                console.log('likeRes', likeRes)
+                if (!isNil(likeRes?.txid)) {
+                    queryClient.invalidateQueries({ queryKey: ['buzzes'] })
+                    queryClient.invalidateQueries({
+                        queryKey: ['payLike', buzzItem!.id],
+                    })
+                    // await sleep(5000);
+                    message.success('like buzz successfully')
+                }
             }
+
+
         } catch (error) {
             console.log('error', error);
             const errorMessage = (error as any)?.message ?? error;
