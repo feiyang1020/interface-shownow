@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
-import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
+import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, PlusCircleFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
@@ -22,7 +22,8 @@ export default ({ buzzItem, showActions = true }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
-    const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user')
+    const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user');
+    const { showConf } = useModel('dashboard')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -42,7 +43,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
         let _summary = buzzItem!.contentSummary;
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
-        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? []) 
+        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? [])
             ? (parseSummary?.attachments ?? []).map(
                 (d: string) => d.split('metafile://')[1]
             )
@@ -87,7 +88,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     });
 
     const isLikeByCurrentUser = (currentLikeData ?? [])?.find(
-        (d) => d?.pinAddress ===  user?.address
+        (d) => d?.pinAddress === user?.address
     );
 
     const handleLike = async () => {
@@ -191,10 +192,13 @@ export default ({ buzzItem, showActions = true }: Props) => {
     })
 
     return <div className="tweet" >
-        <div className="avatar" style={{ cursor: 'pointer' }} >
+        <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
             <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
                 {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
             </Avatar>
+            <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#fff', borderRadius: '50%', border: '1px solid #fff', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <PlusCircleFilled size={16} style={{ color: showConf?.brandColor }} />
+            </div>
 
         </div>
 
