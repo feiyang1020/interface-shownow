@@ -2,10 +2,11 @@ import { BASE_MAN_URL, curNetwork } from "@/config";
 import { fetchFollowDetailPin, fetchFollowingList } from "@/request/api";
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, Card, Divider, Space } from "antd"
-import { isEmpty } from "ramda";
+import { F, isEmpty } from "ramda";
 import { useModel } from "umi";
 import defaultImg from '@/assets/img 2@1x.png'
 import { Divide } from "lucide-react";
+import { FollowButtonComponent } from "../Follow";
 
 type Props = {
     address: string
@@ -68,18 +69,23 @@ export default ({ address }: Props) => {
                 <div className="avatar" style={{ marginTop: -60 }}>
                     <Avatar size={80} src={`${BASE_MAN_URL}` + profileUserData?.data?.avatar} />
                 </div>
-                <div style={{ marginTop: 10 }}>
-                    <h3>{profileUserData?.data?.name}</h3>
-                    <p>MetaID: {profileUserData?.data?.metaid.slice(0, 8)}</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+
+                    <div style={{ marginTop: 10 }}>
+                        <h3>{profileUserData?.data?.name}</h3>
+                        <p>MetaID: {profileUserData?.data?.metaid.slice(0, 8)}</p>
+                    </div>
+                    <FollowButtonComponent metaid={profileUserData?.data?.metaid || ''} />
                 </div>
                 <Space >
                     <Space>
-                        <span>{followingListData?.total || 0}</span>
+                        <span>{followDetailData?.total || 0}</span>
                         <span>Followers</span>
                     </Space>
                     <Divider type='vertical' />
                     <Space>
-                        <span>{followDetailData?.total || 0}</span>
+                        <span>{followingListData?.total || 0}</span>
                         <span>Following</span>
                     </Space>
                 </Space>

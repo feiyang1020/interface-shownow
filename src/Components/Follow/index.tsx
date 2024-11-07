@@ -97,11 +97,12 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
         const handleUnfollow = async () => {
             setLoading(true);
             try {
+                const followDetailData = await fetchFollowDetailPin({
+                    metaId: metaid,
+                    followerMetaId: user.metaid
+                })
                 if (chain === 'btc') {
-                    const followDetailData = await fetchFollowDetailPin({
-                        metaId: metaid,
-                        followerMetaId: user.metaid
-                    })
+
                     const unfollowRes = await btcConnector!.inscribe({
                         inscribeDataArray: [
                             {
@@ -220,6 +221,32 @@ const FollowIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loadin
     );
 };
 
-const FollowIconComponent = withFollow(FollowIcon);
+const FollowButtonIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading }) => {
+    const { showConf } = useModel('dashboard');
+    return (
+        <Button
+            onClick={(e) => { e.preventDefault(); onFollowToggle && onFollowToggle(); }}
+            style={{ color: '#fff', background: showConf?.gradientColor }}
+            loading={loading}
+            shape='round'
 
-export { FollowIconComponent };
+
+        >
+            {
+
+
+                isFollowing
+                    ? 'Following'
+                    : 'Follow'
+
+
+            }
+        </Button>
+
+    );
+};
+
+const FollowIconComponent = withFollow(FollowIcon);
+const FollowButtonComponent = withFollow(FollowButtonIcon);
+
+export { FollowIconComponent, FollowButtonComponent };

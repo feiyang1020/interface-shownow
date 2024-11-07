@@ -1,7 +1,7 @@
 import { fetchBuzzs, getIndexTweet } from "@/request/api";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import './index.less'
-import { Card, Carousel, Divider, List, Skeleton } from "antd";
+import { Grid, Carousel, Col, Divider, List, Row, Skeleton } from "antd";
 import defaultImg from '@/assets/img 2@1x.png'
 import { GiftOutlined, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -12,8 +12,11 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { IBtcConnector } from "@metaid/metaid";
 import { isNil } from "ramda";
 import ProfileCard from "@/Components/ProfileCard";
+import Recommend from "@/Components/Recommend";
+const { useBreakpoint } = Grid
 
 export default () => {
+    const { md } = useBreakpoint()
     const match = useMatch('/profile/:address');
 
     const { btcConnector, user } = useModel('user');
@@ -86,80 +89,45 @@ export default () => {
         }, []) : []
     }, [data])
     return <div className="profilePage">
-        <div className="tweets">
-            
-            <div
-                id="scrollableDiv"
-                style={{
-                    height: 'calc(100vh - 80px)',
-                    overflow: 'auto',
-                }}
-            >
-                <ProfileCard address={address} />
-                <InfiniteScroll
-                    dataLength={tweets.length}
-                    next={fetchNextPage}
-                    hasMore={hasNextPage}
-                    loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-                    endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-                    scrollableTarget="scrollableDiv"
-                >
-                    <List
-                        dataSource={tweets}
-                        renderItem={(item: API.Pin) => (
-                            <List.Item key={item.id}>
-                                <Buzz buzzItem={item} />
-                            </List.Item>
-                        )}
-                    />
-                </InfiniteScroll>
-            </div>
+        <Row gutter={[12, 12]}>
+            <Col span={24} md={15}>
+                <div className="tweets">
 
-        </div>
-        <div className="recommand">
-            <Carousel className="carousel" autoplay>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                </div>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                </div>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                </div>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                </div>
-            </Carousel>
-            <h3>Recommend </h3>
-
-            <Carousel className="carousel2" autoplay>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                </div>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
+                    <div
+                        id="scrollableDiv"
+                        style={{
+                            height: 'calc(100vh - 80px)',
+                            overflow: 'auto',
+                        }}
+                    >
+                        <ProfileCard address={address} />
+                        <InfiniteScroll
+                            dataLength={tweets.length}
+                            next={fetchNextPage}
+                            hasMore={hasNextPage}
+                            loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
+                            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+                            scrollableTarget="scrollableDiv"
+                        >
+                            <List
+                                dataSource={tweets}
+                                renderItem={(item: API.Pin) => (
+                                    <List.Item key={item.id}>
+                                        <Buzz buzzItem={item} />
+                                    </List.Item>
+                                )}
+                            />
+                        </InfiniteScroll>
+                    </div>
 
                 </div>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                </div>
-                <div className="carouselItem">
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                    <img src={defaultImg} alt="" />
-                </div>
-            </Carousel>
-        </div>
+            </Col>
+        </Row>
+        {
+            md && <Col md={9} span={24}>
+                <Recommend />
+            </Col>
+        }
+
     </div>
 }

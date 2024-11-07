@@ -37,6 +37,7 @@ export default () => {
   const [initializing, setInitializing] = useState<boolean>(true);
   const [feeRate, setFeeRate] = useState<number>(0);
   const [followList, setFollowList] = useState<string[]>([]);
+  const [followingList, setFollowingList] = useState<string[]>([]);
   const [feeRateModalVisible, setFeeRateModelVisible] =
     useState<boolean>(false);
   const connect = async (chain: API.Chain = 'btc') => {
@@ -208,13 +209,14 @@ export default () => {
   const updateFeeRate = useIntervalAsync(fetchFeeRateData, 60000);
 
   const fetchUserFollowingList = useCallback(async () => {
+    
     if (user.metaid) {
       const res = await fetchFollowingList({
         metaid: user.metaid ?? '',
         params: { cursor: '0', size: '100', followDetail: false },
       })
-      console.log('res', res)
-      setFollowList(res && res.list ? res?.list.map((item: any) => item.metaid) : [])
+      console.log('fetchFollowingList', res)
+      setFollowList(res && res.list ? res?.list.map((item: string) => item) : [])
     }
 
   }, [user.metaid])

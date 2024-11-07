@@ -1,7 +1,7 @@
 import { fetchBuzzs, getIndexTweet } from "@/request/api";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import './index.less'
-import { Carousel, Col, Divider, List, Row, Skeleton } from "antd";
+import { Carousel, Col, Divider, List, Row, Skeleton, Grid } from "antd";
 import defaultImg from '@/assets/img 2@1x.png'
 import { GiftOutlined, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -12,8 +12,11 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { IBtcConnector } from "@metaid/metaid";
 import { isNil } from "ramda";
 import Recommend from "@/Components/Recommend";
+const { useBreakpoint } = Grid
+
 
 export default () => {
+    const { md } = useBreakpoint()
     const { btcConnector, user } = useModel('user')
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
@@ -71,7 +74,7 @@ export default () => {
                     <div
                         id="scrollableDiv"
                         style={{
-                            height: 'calc(100vh - 80px)',
+                            height: `calc(100vh - ${md ? 80 : 130}px)`,
                             overflow: 'auto',
                         }}
                     >
@@ -97,10 +100,11 @@ export default () => {
 
                 </div>
             </Col>
-            <Col span={24} md={9}>
-                <Recommend />
-            </Col>
-
+            {
+                md && <Col md={9} span={24}>
+                    <Recommend />
+                </Col>
+            }
         </Row>
     </div>
 }
