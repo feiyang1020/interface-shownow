@@ -185,13 +185,16 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
         };
 
         // Pass the follow state and toggle function to the wrapped component
-        return (
-            <WrappedComponent
+
+        return (<>
+            {metaid === user?.metaid ? null : <WrappedComponent
                 {...props}
                 isFollowing={isFollowing}
                 onFollowToggle={handleFollowToggle}
                 loading={loading}
-            />
+            />}
+
+        </>
         );
     };
 };

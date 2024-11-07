@@ -92,11 +92,10 @@ export default () => {
         <Row gutter={[12, 12]}>
             <Col span={24} md={15}>
                 <div className="tweets">
-
                     <div
                         id="scrollableDiv"
                         style={{
-                            height: 'calc(100vh - 80px)',
+                            height: `calc(100vh - ${md ? 80 : 130}px)`,
                             overflow: 'auto',
                         }}
                     >

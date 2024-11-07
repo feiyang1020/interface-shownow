@@ -12,7 +12,7 @@ type Props = {
     address: string
 }
 export default ({ address }: Props) => {
-    const { btcConnector } = useModel('user');
+    const { btcConnector, user } = useModel('user');
 
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
@@ -76,8 +76,11 @@ export default ({ address }: Props) => {
                         <h3>{profileUserData?.data?.name}</h3>
                         <p>MetaID: {profileUserData?.data?.metaid.slice(0, 8)}</p>
                     </div>
+                    
+                    
                     <FollowButtonComponent metaid={profileUserData?.data?.metaid || ''} />
                 </div>
+                
                 <Space >
                     <Space>
                         <span>{followDetailData?.total || 0}</span>

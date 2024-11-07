@@ -1,4 +1,4 @@
-import { ChromeOutlined, DollarOutlined } from '@ant-design/icons';
+import { ChromeOutlined, DollarOutlined, SettingOutlined } from '@ant-design/icons';
 import { PageContainer, ProLayout } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { Link, Outlet, useModel,history } from 'umi';
@@ -27,6 +27,11 @@ export default () => {
                         path: '/dashboard/fees',
                         name: 'FeeRates',
                         icon: <DollarOutlined />,
+                    },
+                    {
+                        path: '/dashboard/rpc',
+                        name: 'RPC',
+                        icon: <SettingOutlined />,
                     },
                 ],
             }}
