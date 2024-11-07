@@ -24,7 +24,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
     const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user');
-    const { showConf } = useModel('dashboard')
+    const { showConf, fetchServiceFee } = useModel('dashboard')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -119,14 +119,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     options: {
                         noBroadcast: 'no',
                         feeRate: Number(feeRate),
-                        //   service: {
-                        //     address: environment.service_address,
-                        //     satoshis: environment.service_staoshi,
-                        //   },
-                        // network: environment.network,
+                        service: fetchServiceFee('like_service_fee_amount')
                     },
                 });
-                console.log('likeRes', likeRes);
                 if (!isNil(likeRes?.revealTxIds[0])) {
                     queryClient.invalidateQueries({ queryKey: ['buzzes'] });
                     queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });

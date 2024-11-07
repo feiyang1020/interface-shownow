@@ -27,7 +27,7 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 export default ({ show, onClose, quotePin }: Props) => {
     const isQuoted = !isNil(quotePin);
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
-    const { showConf } = useModel('dashboard')
+    const { showConf, fetchServiceFee } = useModel('dashboard')
     const [images, setImages] = useState<any[]>([]);
     const [content, setContent] = useState('');
     const [isAdding, setIsAdding] = useState(false);
@@ -40,10 +40,10 @@ export default ({ show, onClose, quotePin }: Props) => {
             return Upload.LIST_IGNORE;
         }
 
-        
+
         const previewUrl = URL.createObjectURL(file);
         setImages((prevImages) => [...prevImages, { file, previewUrl }]);
-        return false; 
+        return false;
     };
     const handleRemoveImage = (index: number) => {
         setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -154,6 +154,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                     options: {
                         noBroadcast: 'no',
                         feeRate: Number(feeRate),
+                        service: fetchServiceFee('post_service_fee_amount'),
                         // service: {
                         //     address: environment.service_address,
                         //     satoshis: environment.service_staoshi,
@@ -208,9 +209,11 @@ export default ({ show, onClose, quotePin }: Props) => {
     };
     return <Popup onClose={onClose} show={show} modalWidth={800} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
         {
-            isQuoted && <Card style={{ margin: 24 }} styles={{body:{
-                padding: 0
-            }}}><Buzz buzzItem={quotePin} showActions={false} /></Card>
+            isQuoted && <Card style={{ margin: 24 }} styles={{
+                body: {
+                    padding: 0
+                }
+            }}><Buzz buzzItem={quotePin} showActions={false} /></Card>
         }
         <div>
             <UserInfo user={user} />
@@ -257,7 +260,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                     <Button disabled icon={<VideoCameraOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
 
                 </Space>
-                <Button shape='round' style={{ background: showConf?.gradientColor,color:'#fff' }} onClick={onCreateSubmit}>
+                <Button shape='round' style={{ background: showConf?.gradientColor, color: '#fff' }} onClick={onCreateSubmit}>
                     Post
                 </Button>
             </div>

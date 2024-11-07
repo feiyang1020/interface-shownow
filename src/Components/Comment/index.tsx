@@ -17,7 +17,7 @@ type Props = {
 }
 export default ({ show, onClose, tweetId }: Props) => {
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
-    const { showConf } = useModel('dashboard');
+    const { showConf, fetchServiceFee } = useModel('dashboard');
     const [content, setContent] = useState('');
     const [isAdding, setIsAdding] = useState(false);
     const queryClient = useQueryClient();
@@ -47,6 +47,7 @@ export default ({ show, onClose, tweetId }: Props) => {
                     options: {
                         noBroadcast: 'no',
                         feeRate: Number(feeRate),
+                        service: fetchServiceFee('comment_service_fee_amount')
                         //   service: {
                         //     address: environment.service_address,
                         //     satoshis: environment.service_staoshi,
@@ -108,7 +109,7 @@ export default ({ show, onClose, tweetId }: Props) => {
                 <Space>
                     <Button disabled icon={<FileImageOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
                 </Space>
-                <Button type='primary' shape='round' loading={isAdding} style={{ background: showConf?.gradientColor,color:'#fff' }} onClick={handleAddComment}>
+                <Button type='primary' shape='round' loading={isAdding} style={{ background: showConf?.gradientColor, color: '#fff' }} onClick={handleAddComment}>
                     Comment
                 </Button>
             </div>

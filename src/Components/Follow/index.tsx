@@ -19,6 +19,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
     return function FollowComponent(props: FollowProps) {
         const { metaid } = props;
         const { followList, chain, btcConnector, mvcConnector, user, feeRate, setFollowList } = useModel('user');
+        const { fetchServiceFee } = useModel('dashboard');
         const [loading, setLoading] = useState(false);
         const isFollowing = useMemo(() => {
             return followList.includes(metaid)
@@ -44,11 +45,8 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
                         options: {
                             noBroadcast: 'no',
                             feeRate: Number(feeRate),
-                            // service: {
-                            //     address: getServiceAddress(),
-                            //     satoshis: environment.service_satoshi,
-                            // },
-                            // network: environment.network,
+                            service: fetchServiceFee('follow_service_fee_amount'),
+
                         },
                     })
                     if (!isNil(followRes?.revealTxIds[0])) {
@@ -116,6 +114,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
                         options: {
                             noBroadcast: 'no',
                             feeRate: Number(feeRate),
+                            service: fetchServiceFee('follow_service_fee_amount'),
                             // service: {
                             //     address: getServiceAddress(),
                             //     satoshis: environment.service_satoshi,

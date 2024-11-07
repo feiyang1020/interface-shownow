@@ -12,10 +12,22 @@ export default () => {
   useEffect(() => {
     fetchConfig();
   }, [fetchConfig]);
+
+  const fetchServiceFee = (feeType: keyof DB.ShowConfDto) => {
+    if (showConf && showConf['service_fee_address'] && showConf[feeType]) {
+      return {
+        address: showConf['service_fee_address'] as string,
+        satoshis: String(showConf[feeType]) as string,
+      }
+    } else {
+      return undefined
+    }
+  }
   return {
     loading,
     fetchConfig,
     showConf,
     setLoading,
+    fetchServiceFee
   };
 };
