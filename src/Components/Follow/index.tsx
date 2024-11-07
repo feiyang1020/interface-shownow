@@ -3,6 +3,7 @@ import followEntitySchema from '@/entities/follow';
 import { fetchFollowDetailPin } from '@/request/api';
 import { CheckCircleFilled, LoadingOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { Button, message } from 'antd';
+import { MvcEntity } from 'node_modules/@metaid/metaid/dist/core/entity/mvc';
 import { isNil } from 'ramda';
 import React, { useMemo, useState } from 'react';
 import { useModel } from 'umi';
@@ -33,7 +34,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
                         inscribeDataArray: [
                             {
                                 operation: 'create',
-                                path: '/follow',
+                                path: '19d636e903efa22:/follow',
                                 body: metaid,
                                 contentType: 'text/plain;utf-8',
 
@@ -134,7 +135,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
                     }
                 } else {
 
-                    const Follow = await mvcConnector!.load(followEntitySchema)
+                    const Follow = await mvcConnector!.load(followEntitySchema) as MvcEntity
 
                     const res = await Follow.create({
                         data: {

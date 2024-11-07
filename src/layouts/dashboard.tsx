@@ -1,7 +1,7 @@
 import { ChromeOutlined, DollarOutlined, SettingOutlined } from '@ant-design/icons';
 import { PageContainer, ProLayout } from '@ant-design/pro-components';
 import { useState } from 'react';
-import { Link, Outlet, useModel,history } from 'umi';
+import { Link, Outlet, useModel, history } from 'umi';
 export default () => {
     const [pathname, setPathname] = useState('/dashboard/styles');
     return <div
@@ -25,7 +25,7 @@ export default () => {
                     },
                     {
                         path: '/dashboard/fees',
-                        name: 'FeeRates',
+                        name: 'Fees',
                         icon: <DollarOutlined />,
                     },
                     {

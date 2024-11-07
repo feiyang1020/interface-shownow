@@ -99,12 +99,15 @@ export default () => {
                             overflow: 'auto',
                         }}
                     >
-                        <ProfileCard address={address} />
+                        <div style={{paddingBottom:12}}>
+                            <ProfileCard address={address} />
+                        </div>
+
                         <InfiniteScroll
                             dataLength={tweets.length}
                             next={fetchNextPage}
                             hasMore={hasNextPage}
-                            loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
+                            loader={<Skeleton avatar paragraph={{ rows: 2 }} active />}
                             endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
                             scrollableTarget="scrollableDiv"
                         >
@@ -121,12 +124,13 @@ export default () => {
 
                 </div>
             </Col>
+            {
+                md && <Col md={9} span={24}>
+                    <Recommend />
+                </Col>
+            }
         </Row>
-        {
-            md && <Col md={9} span={24}>
-                <Recommend />
-            </Col>
-        }
+
 
     </div>
 }

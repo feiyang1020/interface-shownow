@@ -57,7 +57,7 @@ export default ({ address }: Props) => {
             }),
     });
     return (
-        <Card style={{ padding: 0 }} styles={{ body: { padding: 0 } }} cover={
+        <Card style={{ padding: 0 }} styles={{ body: { padding: 0 } }} bordered={false} cover={
             <img
                 style={{ height: 240, objectFit: 'cover' }}
                 alt="example"

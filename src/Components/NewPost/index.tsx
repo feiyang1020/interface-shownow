@@ -40,10 +40,10 @@ export default ({ show, onClose, quotePin }: Props) => {
             return Upload.LIST_IGNORE;
         }
 
-        // 使用 URL.createObjectURL 生成图片预览 URL
+        
         const previewUrl = URL.createObjectURL(file);
         setImages((prevImages) => [...prevImages, { file, previewUrl }]);
-        return false; // 阻止自动上传
+        return false; 
     };
     const handleRemoveImage = (index: number) => {
         setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -172,8 +172,6 @@ export default ({ show, onClose, quotePin }: Props) => {
                 }
             } else {
                 const buzzEntity = (await mvcConnector!.use('buzz')) as IMvcEntity
-
-
                 const createRes = await buzzEntity!.create({
                     data: { body: JSON.stringify(finalBody) },
                     options: {
