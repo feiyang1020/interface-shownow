@@ -210,7 +210,9 @@ export default ({ show, onClose, quotePin }: Props) => {
     };
     return <Popup onClose={onClose} show={show} modalWidth={800} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
         {
-            isQuoted && <Card style={{ margin: 24 }}><Buzz buzzItem={quotePin} showActions={false} /></Card>
+            isQuoted && <Card style={{ margin: 24 }} styles={{body:{
+                padding: 0
+            }}}><Buzz buzzItem={quotePin} showActions={false} /></Card>
         }
         <div>
             <UserInfo user={user} />
@@ -257,7 +259,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                     <Button disabled icon={<VideoCameraOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
 
                 </Space>
-                <Button shape='round' style={{ background: showConf?.gradientColor }} onClick={onCreateSubmit}>
+                <Button shape='round' style={{ background: showConf?.gradientColor,color:'#fff' }} onClick={onCreateSubmit}>
                     Post
                 </Button>
             </div>
