@@ -1,5 +1,5 @@
 import { Link, Outlet, useModel } from 'umi';
-import { Avatar, Badge, Button, Col, ConfigProvider, Dropdown, FloatButton, Grid, Input, Layout, Menu, Row, theme } from 'antd';
+import { Avatar, Badge, Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, theme } from 'antd';
 import { useEffect, useState } from 'react';
 import logo from '@/assets/logo.svg';
 import './index.less';
@@ -12,7 +12,7 @@ import {
 } from '@tanstack/react-query'
 import NewPost from '@/Components/NewPost';
 import Mobilefooter from './Mobilefooter';
-import { Pencil } from 'lucide-react';
+import { Divide, Pencil } from 'lucide-react';
 const { useBreakpoint } = Grid
 
 const queryClient = new QueryClient()
@@ -21,7 +21,7 @@ const { Header, Content, Footer, Sider } = Layout;
 export default function Lay() {
   const [collapsed, setCollapsed] = useState(false);
   const { showConf } = useModel('dashboard')
-  const { user, setIsLogin, disConnect } = useModel('user')
+  const { user, setIsLogin, disConnect, feeRate, setFeeRate } = useModel('user')
   const [themeTokens, setThemeTokens] = useState({});
   const { md } = useBreakpoint()
 
@@ -52,7 +52,7 @@ export default function Lay() {
           ...themeTokens,
         }}
       >
-        <Layout style={{  width: 1200, }} className='layout'>
+        <Layout style={{ width: 1200, }} className='layout'>
           {
             md ?
 
@@ -91,7 +91,7 @@ export default function Lay() {
                       <Avatar size="large" src={user.avater} />
                       <div className='desc'>
                         <div className="name">
-                          {user.name||'Unnanmed'}
+                          {user.name || 'Unnanmed'}
                         </div>
                         <div className="metaid">
                           MetaID：{user.metaid.slice(0, 8)}
@@ -103,21 +103,43 @@ export default function Lay() {
                       <Badge count={user.notice} className='action'>
                         <BellOutlined style={{ fontSize: 20 }} />
                       </Badge>
-                      <MessageOutlined style={{ fontSize: 20 }} className='action' /><Dropdown placement='bottom' dropdownRender={() => {
+                      <MessageOutlined style={{ fontSize: 20 }} className='action' />
+                      <Dropdown placement='bottom' arrow dropdownRender={() => {
                         return <div
-                          className="dropdown"
-                          onClick={() => {
-                            disConnect()
+                          style={{
+                            background: '#fff',
+                            minWidth: 200,
+                            padding: 12,
+                            borderRadius: 8,
+                            display: 'flex',
+                            flexDirection: 'column',
+
+                            boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
                           }}
                         >
-                          <LoginOutlined />
-                          <div className="path" >Log Out</div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <span>
+                              Fee Rate
+                            </span>
+                            <InputNumber value={feeRate} onChange={(_value) => {
+                              setFeeRate(Number(_value))
+                            }} variant='filled' controls={false} suffix={'sats'}
+                              precision={0}
 
+                            >
+                            </InputNumber>
+
+                          </div>
+                          <Divider style={{ margin: '12px 0' }} />
+                          <Button size='large' danger type='text' icon={<LoginOutlined />} onClick={() => {
+                            disConnect()
+                          }}>
+                            Log Out
+                          </Button>
                         </div>
                       }}>
 
                         <EllipsisOutlined style={{ fontSize: 20 }} className='action' />
-
                       </Dropdown>
 
                     </div>
@@ -130,7 +152,7 @@ export default function Lay() {
             <Outlet />
             {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
           </Layout>
-          
+
           <NewPost show={showPost} onClose={() => setShowPost(false)} />
           {
             !md && <FloatButton style={{ bottom: 100 }} icon={<EditOutlined />} onClick={() => { setShowPost(true) }} />

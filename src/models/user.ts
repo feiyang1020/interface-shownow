@@ -209,7 +209,7 @@ export default () => {
   const updateFeeRate = useIntervalAsync(fetchFeeRateData, 60000);
 
   const fetchUserFollowingList = useCallback(async () => {
-    
+
     if (user.metaid) {
       const res = await fetchFollowingList({
         metaid: user.metaid ?? '',
@@ -225,6 +225,8 @@ export default () => {
     fetchUserFollowingList()
   }, [fetchUserFollowingList])
 
+  
+
   return {
     isLogin,
     setIsLogin,
@@ -235,6 +237,7 @@ export default () => {
     btcConnector,
     chain,
     feeRate,
+    setFeeRate,
     showConnect,
     setShowConnect,
     mvcConnector,
