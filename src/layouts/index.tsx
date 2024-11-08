@@ -1,10 +1,10 @@
 import { Link, Outlet, useModel } from 'umi';
-import { Avatar, Badge, Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, theme } from 'antd';
+import { Avatar, Badge, Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, Tag, theme } from 'antd';
 import { useEffect, useState } from 'react';
 import logo from '@/assets/logo.svg';
 import './index.less';
 import Menus from './Menus';
-import { BellOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined } from '@ant-design/icons';
+import { BellOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined, SwitcherOutlined } from '@ant-design/icons';
 import {
   QueryClient,
   QueryClientProvider,
@@ -21,7 +21,7 @@ const { Header, Content, Footer, Sider } = Layout;
 export default function Lay() {
   const [collapsed, setCollapsed] = useState(false);
   const { showConf } = useModel('dashboard')
-  const { user, setIsLogin, disConnect, feeRate, setFeeRate } = useModel('user')
+  const { user, chain, disConnect, feeRate, setFeeRate,connect } = useModel('user')
   const [themeTokens, setThemeTokens] = useState({});
   const { md } = useBreakpoint()
 
@@ -131,7 +131,13 @@ export default function Lay() {
 
                           </div>
                           <Divider style={{ margin: '12px 0' }} />
-                          <Button size='large' danger type='text' icon={<LoginOutlined />} onClick={() => {
+                          <Button  type='text' icon={<SwitcherOutlined />} onClick={() => {
+                            connect(chain === 'btc' ? 'mvc' : 'btc')
+                          }}>
+                            Switch To <Tag bordered={false} color={chain !== 'mvc' ? 'blue' : 'orange'}>{chain === 'btc' ? 'mvc' : 'btc'}</Tag>
+                          </Button>
+                          <Divider style={{ margin: '12px 0' }} />
+                          <Button danger type='text' icon={<LoginOutlined />} onClick={() => {
                             disConnect()
                           }}>
                             Log Out
