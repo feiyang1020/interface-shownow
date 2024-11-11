@@ -187,7 +187,6 @@ export async function fetchFollowingList({
   }
 }
 
-
 export async function getPinDetailByPid({
   pid,
 }: {
@@ -262,11 +261,27 @@ export async function fetchFeeRate({
 }): Promise<API.FeeRateApi> {
   const response = await fetch(
     `https://mempool.space/${
-      netWork === 'mainnet' ? '' : 'testnet/'
+      netWork === "mainnet" ? "" : "testnet/"
     }api/v1/fees/recommended`,
     {
-      method: 'get',
+      method: "get",
     }
   );
   return response.json();
+}
+
+export async function getMetaidByAddress({
+  address,
+}: {
+  address: string;
+}): Promise<{ metaid: string } | undefined> {
+  const url = `${BASE_MAN_URL}api/info/address/${address}`;
+
+  try {
+    const data = await axios.get(url).then((res) => res.data);
+    return data.data;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 }

@@ -1,5 +1,5 @@
 import { curNetwork, FLAG } from '@/config';
-import followEntitySchema from '@/entities/follow';
+import followEntitySchema, { getFollowEntitySchemaWithCustomHost } from '@/entities/follow';
 import { fetchFollowDetailPin } from '@/request/api';
 import { CheckCircleFilled, LoadingOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { Button, message } from 'antd';
@@ -19,7 +19,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
     return function FollowComponent(props: FollowProps) {
         const { metaid } = props;
         const { followList, chain, btcConnector, mvcConnector, user, feeRate, setFollowList } = useModel('user');
-        const { fetchServiceFee } = useModel('dashboard');
+        const { fetchServiceFee, showConf } = useModel('dashboard');
         const [loading, setLoading] = useState(false);
         const isFollowing = useMemo(() => {
             return followList.includes(metaid)
@@ -35,7 +35,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
                         inscribeDataArray: [
                             {
                                 operation: 'create',
-                                path: '19d636e903efa22:/follow',
+                                path: `${showConf?.host || ''}/follow`,
                                 body: metaid,
                                 contentType: 'text/plain;utf-8',
 
@@ -59,7 +59,7 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
                     }
                 } else {
 
-                    const Follow = await mvcConnector!.load(followEntitySchema)
+                    const Follow = await mvcConnector!.load(getFollowEntitySchemaWithCustomHost(showConf?.host || '')) as MvcEntity
 
                     const res = await Follow.create({
                         data: { body: metaid },

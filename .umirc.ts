@@ -26,9 +26,6 @@ export default defineConfig({
     {
       path: "/dashboard",
       component: "@/layouts/dashboard",
-      // wrappers: [
-      //   '@/wrappers/auth',
-      // ],
       layout: false,
       routes: [
         { path: "/dashboard/styles", component: "@/pages/dashboard/styles" },

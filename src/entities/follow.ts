@@ -1,18 +1,25 @@
 const followEntitySchema = {
-  name: 'follow',
-  nodeName: 'follow',
-  path: '19d636e903efa22:/follow',
+  name: "follow",
+  nodeName: "follow",
+  path: "/follow",
   versions: [
     {
       version: 1,
       body: [
         {
-          name: 'metaid',
-          type: 'string',
+          name: "metaid",
+          type: "string",
         },
       ],
     },
   ],
-}
+};
 
-export default followEntitySchema
+export default followEntitySchema;
+
+export const getFollowEntitySchemaWithCustomHost = (host: string) => {
+  return {
+    ...followEntitySchema,
+    path: `${host}${followEntitySchema.path}`,
+  };
+};
