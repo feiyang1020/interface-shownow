@@ -107,6 +107,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
         try {
             if (chain === 'btc') {
+                // TODO Add costom path
                 const likeEntity = await btcConnector!.use('like');
                 const likeRes = await likeEntity.create({
                     dataArray: [
@@ -129,6 +130,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     message.success('like buzz successfully');
                 }
             } else {
+                // TODO Add costom path
                 const likeEntity = (await mvcConnector!.use('like')) as IMvcEntity
                 const likeRes = await likeEntity.create({
                     data: {

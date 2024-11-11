@@ -84,18 +84,13 @@ export default ({ show, onClose, quotePin }: Props) => {
                     });
                 }
                 if (chain === 'btc') {
-                    //TODO: add feeRate
+                    //TODO: custom Path
                     const fileEntity = await btcConnector!.use('file');
                     const imageRes = await fileEntity.create({
                         dataArray: fileOptions,
                         options: {
                             noBroadcast: 'no',
                             feeRate: Number(feeRate),
-                            // service: {
-                            //     address: environment.service_address,
-                            //     satoshis: environment.service_staoshi,
-                            // },
-                            // network: environment.network,
                         },
                     });
 
@@ -104,12 +99,12 @@ export default ({ show, onClose, quotePin }: Props) => {
                         (rid) => 'metafile://' + rid + 'i0'
                     );
                 } else {
+                    //TODO: custom Path
                     const fileEntity = (await mvcConnector!.use('file')) as IMvcEntity
                     const finalAttachMetafileUri: string[] = []
 
                     for (let i = 0; i < fileOptions.length; i++) {
                         const fileOption = fileOptions[i]
-
                         const { transactions } = await fileEntity.create({
                             data: fileOption,
                             options: {
@@ -143,6 +138,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 finalBody.quotePin = quotePin.id;
             }
             if (chain === 'btc') {
+                //TODO: custom Path
                 const createRes = await buzzEntity!.create({
                     dataArray: [
                         {
@@ -172,6 +168,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                     onClose();
                 }
             } else {
+                //TODO: custom Path
                 const buzzEntity = (await mvcConnector!.use('buzz')) as IMvcEntity
                 const createRes = await buzzEntity!.create({
                     data: { body: JSON.stringify(finalBody) },

@@ -23,4 +23,11 @@ const commentEntitySchema = {
   ],
 }
 
-export default commentEntitySchema
+export default commentEntitySchema;
+
+export const getCommentEntitySchemaWithCustomHost= (host:string) => {
+  return{
+    ...commentEntitySchema,
+    path: `${host}${commentEntitySchema.path}`
+  }
+}

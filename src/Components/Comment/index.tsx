@@ -8,7 +8,7 @@ import { useState } from "react";
 import { curNetwork, FLAG } from "@/config";
 import { isNil } from "ramda";
 import { useQueryClient } from "@tanstack/react-query";
-import commentEntitySchema from "@/entities/comment";
+import commentEntitySchema, { getCommentEntitySchemaWithCustomHost } from "@/entities/comment";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -37,22 +37,17 @@ export default ({ show, onClose, tweetId }: Props) => {
                     inscribeDataArray: [
                         {
                             operation: 'create',
-                            path: '/protocols/paycomment',
+                            path: `${showConf?.host ?? ''}/protocols/paycomment`,
                             body: JSON.stringify(finalBody),
                             contentType: 'text/plain;utf-8',
                             flag: FLAG,
                         },
                     ],
-                    // TODO add feeRate
                     options: {
                         noBroadcast: 'no',
                         feeRate: Number(feeRate),
-                        service: fetchServiceFee('comment_service_fee_amount')
-                        //   service: {
-                        //     address: environment.service_address,
-                        //     satoshis: environment.service_staoshi,
-                        //   },
-                        // network: environment.network,
+                        service: fetchServiceFee('comment_service_fee_amount'),
+                        network: curNetwork,
                     },
                 });
 
@@ -66,8 +61,7 @@ export default ({ show, onClose, tweetId }: Props) => {
                 }
             } else {
 
-                const Comment = await mvcConnector!.load(commentEntitySchema)
-
+                const Comment = await mvcConnector!.load(getCommentEntitySchemaWithCustomHost(showConf?.host ?? ''))
                 const createRes = await Comment.create({
                     data: { body: JSON.stringify(finalBody) },
                     options: {

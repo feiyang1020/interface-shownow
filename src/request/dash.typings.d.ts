@@ -4,6 +4,7 @@ declare namespace DB {
     brandColor: string;
     gradientColor: string;
     logo: string;
+    host: string;
     service_fee_address: string;
     follow_service_fee_amount: number;
     post_service_fee_amount: number;
