@@ -12,6 +12,7 @@ import './index.less'
 import ForwardTweet from "./ForwardTweet";
 import { IMvcEntity } from "@metaid/metaid";
 import { FollowIconComponent } from "../Follow";
+import dayjs from "dayjs";
 const { Paragraph, Text } = Typography;
 
 type Props = {
@@ -261,7 +262,13 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 </Card>
 
             )}
-            {<Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>}
+            {<Space>
+                <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
+                <Typography.Text type="secondary" style={{fontSize:12}}>{dayjs
+                    .unix(buzzItem.timestamp)
+                    .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
+
+            </Space>}
 
             {showActions && <div className="actions">
 
