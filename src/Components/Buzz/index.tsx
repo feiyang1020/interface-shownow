@@ -131,7 +131,15 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     message.success('like buzz successfully');
                 }
             } else {
-                const likeEntity = (await mvcConnector!.use('like')) as IMvcEntity
+                const likeEntity = (await mvcConnector!.use('like')) as IMvcEntity;
+                console.log({
+                    body: JSON.stringify({
+                        isLike: '1',
+                        likeTo: pinId,
+                    }),
+                    path: `${showConf?.host || ''}/protocols/paylike`,
+                    'signMessage': 'like buzz',
+                })
                 const likeRes = await likeEntity.create({
                     data: {
                         body: JSON.stringify({

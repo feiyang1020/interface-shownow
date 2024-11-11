@@ -275,7 +275,7 @@ export async function getMetaidByAddress({
 }: {
   address: string;
 }): Promise<{ metaid: string } | undefined> {
-  const url = `${BASE_MAN_URL}api/info/address/${address}`;
+  const url = `${BASE_MAN_URL}/api/info/address/${address}`;
 
   try {
     const data = await axios.get(url).then((res) => res.data);

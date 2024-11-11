@@ -8,11 +8,13 @@ export default () => {
   const fetchConfig = useCallback(async () => {
     const ret = await fetchShowConf();
 
-    if (ret.service_fee_address) {
+    if (true) {
       const userInfo = await getMetaidByAddress({
-        address: ret.service_fee_address,
+        address: "n18EnQDAEh47fYQbLJdzt6xdw8TvUs7haL", //ret.service_fee_address,
       });
-      ret.host = userInfo!.metaid.slice(0, 16);
+      console.log(userInfo,'n18EnQDAEh47fYQbLJdzt6xdw8TvUs7haL');
+      ret.host = userInfo!.metaid.slice(0, 16) + ":";
+      console.log(ret.host,'ret.host');
     }
     setShowConf(ret);
     setLoading(false);
