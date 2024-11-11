@@ -13,6 +13,7 @@ type Props = {
 }
 export default ({ address }: Props) => {
     const { btcConnector, user } = useModel('user');
+    const { showConf } = useModel('dashboard')
 
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
@@ -58,10 +59,10 @@ export default ({ address }: Props) => {
     });
     return (
         <Card style={{ padding: 0 }} styles={{ body: { padding: 0 } }} bordered={false} cover={
-            <img
-                style={{ height: 240, objectFit: 'cover' }}
-                alt="example"
-                src={defaultImg}
+            <div
+                style={{ height: 240, objectFit: 'cover', background: showConf?.gradientColor }}
+                // alt="example"
+                // src={defaultImg}
             />
         }>
             <div style={{ padding: 20 }}>
@@ -76,11 +77,11 @@ export default ({ address }: Props) => {
                         <h3>{profileUserData?.data?.name}</h3>
                         <p>MetaID: {profileUserData?.data?.metaid.slice(0, 8)}</p>
                     </div>
-                    
-                    
+
+
                     <FollowButtonComponent metaid={profileUserData?.data?.metaid || ''} />
                 </div>
-                
+
                 <Space >
                     <Space>
                         <span>{followDetailData?.total || 0}</span>
