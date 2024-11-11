@@ -1,10 +1,10 @@
 import { Link, Outlet, useModel } from 'umi';
-import { Avatar, Badge, Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, Tag, theme } from 'antd';
+import { Avatar, Badge, Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, Space, Tag, theme } from 'antd';
 import { useEffect, useState } from 'react';
 import logo from '@/assets/logo.svg';
 import './index.less';
 import Menus from './Menus';
-import { BellOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined, SwitcherOutlined } from '@ant-design/icons';
+import { BellOutlined, CaretDownOutlined, DownOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined, SwitcherOutlined } from '@ant-design/icons';
 import {
   QueryClient,
   QueryClientProvider,
@@ -12,6 +12,8 @@ import {
 } from '@tanstack/react-query'
 import NewPost from '@/Components/NewPost';
 import Mobilefooter from './Mobilefooter';
+import _btc from '@/assets/btc.png'
+import _mvc from '@/assets/mvc.png'
 import { Divide, Pencil } from 'lucide-react';
 const { useBreakpoint } = Grid
 
@@ -21,7 +23,7 @@ const { Header, Content, Footer, Sider } = Layout;
 export default function Lay() {
   const [collapsed, setCollapsed] = useState(false);
   const { showConf } = useModel('dashboard')
-  const { user, chain, disConnect, feeRate, setFeeRate,connect } = useModel('user')
+  const { user, chain, disConnect, feeRate, setFeeRate, connect } = useModel('user')
   const [themeTokens, setThemeTokens] = useState({});
   const { md } = useBreakpoint()
 
@@ -100,10 +102,41 @@ export default function Lay() {
 
                     </div>
                     <div className="actions">
-                      <Badge count={user.notice} className='action'>
+                      {/* <Badge count={user.notice} className='action'>
                         <BellOutlined style={{ fontSize: 20 }} />
-                      </Badge>
-                      <MessageOutlined style={{ fontSize: 20 }} className='action' />
+                      </Badge> */}
+                      {/* <MessageOutlined style={{ fontSize: 20 }} className='action' /> */}
+                      <Dropdown dropdownRender={() => {
+                        return <div>
+                          <Menu>
+                            <Menu.Item key='1' disabled={chain==='btc'} onClick={() => {
+                              connect('btc')
+                            }}>
+                              <Space>
+                                <img src={_btc} alt="" style={{ width: 20, height: 20 }} />
+                                BTC Netwotk
+                              </Space>
+
+                            </Menu.Item>
+                            <Menu.Item key='2' disabled={chain==='mvc'} onClick={() => {
+                              connect('mvc')
+                            }}>
+                              <Space>
+                                <img src={_mvc} alt="" style={{ width: 20, height: 20 }} />
+                                MVC Network
+                              </Space>
+
+                            </Menu.Item>
+                          </Menu>
+                        </div>
+                      }}>
+
+                        <Button shape='round' type='text'>
+                          <img src={chain === 'btc' ? _btc : _mvc} alt="" style={{ width: 20, height: 20 }} />
+                          <CaretDownOutlined />
+                        </Button>
+
+                      </Dropdown>
                       <Dropdown placement='bottom' arrow dropdownRender={() => {
                         return <div
                           style={{
@@ -130,12 +163,12 @@ export default function Lay() {
                             </InputNumber>
 
                           </div>
-                          <Divider style={{ margin: '12px 0' }} />
-                          <Button  type='text' icon={<SwitcherOutlined />} onClick={() => {
+                          {/* <Divider style={{ margin: '12px 0' }} /> */}
+                          {/* <Button type='text' icon={<SwitcherOutlined />} onClick={() => {
                             connect(chain === 'btc' ? 'mvc' : 'btc')
                           }}>
                             Switch To <Tag bordered={false} color={chain !== 'mvc' ? 'blue' : 'orange'}>{chain === 'btc' ? 'mvc' : 'btc'}</Tag>
-                          </Button>
+                          </Button> */}
                           <Divider style={{ margin: '12px 0' }} />
                           <Button danger type='text' icon={<LoginOutlined />} onClick={() => {
                             disConnect()
