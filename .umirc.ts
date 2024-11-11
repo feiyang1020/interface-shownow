@@ -42,6 +42,6 @@ export default defineConfig({
   model: {},
   request: {},
   npmClient: "pnpm",
-  outputPath: '../server-shownow/public',
+  // outputPath: '../server-shownow/public',
   esbuildMinifyIIFE: true,
 });
