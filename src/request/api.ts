@@ -285,3 +285,15 @@ export async function getMetaidByAddress({
     return undefined;
   }
 }
+
+export async function getPubKey(): Promise<string> {
+  const url = `${BASE_MAN_URL}/api/access/getPubKey`;
+
+  try {
+    const data = await axios.get(url).then((res) => res.data);
+    return data.data;
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
+}

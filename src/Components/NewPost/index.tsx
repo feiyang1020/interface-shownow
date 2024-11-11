@@ -2,8 +2,8 @@
 import { useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
-import { Button, Card, Divider, GetProp, Input, message, Space, Upload, UploadFile, UploadProps } from "antd";
-import { CloseOutlined, FileImageOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import { Button, Card, Divider, GetProp, Input, InputNumber, message, Space, Upload, UploadFile, UploadProps } from "antd";
+import { CloseOutlined, FileImageOutlined, LockOutlined, UnlockOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { AttachmentItem, convertToFileList, image2Attach } from "@/utils/file";
 import { CreateOptions, IBtcEntity, IMvcEntity, MvcTransaction } from "@metaid/metaid";
@@ -12,6 +12,10 @@ import { curNetwork, FLAG } from "@/config";
 import { useQueryClient } from "@tanstack/react-query";
 import BuzzCard from "../Cards/BuzzCard";
 import Buzz from "../Buzz";
+import _btc from '@/assets/btc.png'
+import _mvc from '@/assets/mvc.png'
+import { InscribeData } from "node_modules/@metaid/metaid/dist/core/entity/btc";
+import * as crypto from 'crypto'
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -27,11 +31,12 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 export default ({ show, onClose, quotePin }: Props) => {
     const isQuoted = !isNil(quotePin);
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
-    const { showConf, fetchServiceFee } = useModel('dashboard')
+    const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
     const [images, setImages] = useState<any[]>([]);
     const [content, setContent] = useState('');
     const [isAdding, setIsAdding] = useState(false);
     const queryClient = useQueryClient();
+    const [lock, setLock] = useState(false);
 
     const handleBeforeUpload = (file: any) => {
         const isImage = file.type.startsWith('image/');
@@ -54,10 +59,18 @@ export default ({ show, onClose, quotePin }: Props) => {
             images.length !== 0 ? await image2Attach(convertToFileList(images)) : [];
         // console.log('submit process image',  images);
         console.log('submit process image', _images);
-        await handleAddBuzz({
-            content: content,
-            images: _images,
-        });
+        if (lock) {
+            handleAddBuzzWhthLock({
+                content: content,
+                images: _images,
+            })
+        } else {
+            await handleAddBuzz({
+                content: content,
+                images: _images,
+            });
+        }
+
     };
 
     const handleAddBuzz = async (buzz: {
@@ -137,6 +150,12 @@ export default ({ show, onClose, quotePin }: Props) => {
                 finalBody.quotePin = quotePin.id;
             }
             if (chain === 'btc') {
+                console.log('finalBody', {
+                    body: JSON.stringify(finalBody),
+                    contentType: 'text/plain;utf-8',
+                    flag: FLAG,
+                    path: `${showConf?.host || ''}/protocols/simplebuzz`
+                });
                 const createRes = await buzzEntity!.create({
                     dataArray: [
                         {
@@ -202,7 +221,64 @@ export default ({ show, onClose, quotePin }: Props) => {
         }
         setIsAdding(false);
     };
-    return <Popup onClose={onClose} show={show} modalWidth={800} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
+    const handleAddBuzzWhthLock = async (
+        buzz: {
+            content: string;
+            images: AttachmentItem[];
+        }
+    ) => {
+        const lockContent = {
+            content: content,
+            images: buzz.images.map(image => Buffer.from(image.data, 'hex').toString('base64')),
+        }
+
+        const metaidData: InscribeData = {
+            operation: "create",
+            body: JSON.stringify(lockContent),
+            path: 'protocols/metaaccess/tweet',
+            contentType: "text/plain",
+            flag: "metaid",
+        };
+        if (chain === 'btc') {
+            console.log('manPubKey', manPubKey);
+            const key = await window.crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",    // 或 "AES-CBC"，视需求而定
+                    length: 256         // 密钥长度，可选择 128, 192, 或 256 位
+                },
+                true,                 // 是否可以导出密钥
+                ["encrypt", "decrypt"] // 用途：加密和解密
+            );
+            const { sharedSecret } = await
+                window.metaidwallet.commons.ecdh({ externalPubKey: manPubKey });
+            const ret = await btcConnector!.inscribe({
+                inscribeDataArray: [metaidData],
+                options: {
+                    noBroadcast: "no",
+                    feeRate: Number(feeRate),
+                    service: fetchServiceFee('post_service_fee_amount'),
+                }
+            })
+            if (ret.status) throw new Error(ret.status);
+            const [revealTxId] = ret.revealTxIds
+            const pid = `${revealTxId}i0`
+        } else {
+            // const ret = await mvcConnector!.createPin(metaidData, {
+            //     network: curNetwork,
+            //     signMessage: 'create buzz',
+            //     serialAction: 'finish',
+            //     transactions: [],
+            // })
+            // if (ret.status) throw new Error(ret.status);
+            // const [revealTxId] = ret.revealTxIds
+            // const pid = `${revealTxId}i0`
+        }
+
+
+
+
+    }
+    return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
         {
             isQuoted && <Card style={{ margin: 24 }} styles={{
                 body: {
@@ -246,6 +322,17 @@ export default ({ show, onClose, quotePin }: Props) => {
                     </div>
                 ))}
             </div>
+            {
+                !isQuoted && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <Button type='text' icon={
+                        !lock ? <UnlockOutlined style={{ color: showConf?.brandColor }} /> : <LockOutlined style={{ color: showConf?.brandColor }} />
+                    } onClick={() => setLock(!lock)} />
+                    {
+                        lock && <InputNumber variant='filled' style={{ flexGrow: 1 }} suffix={<img src={chain === 'btc' ? _btc : _mvc} style={{ height: 20, width: 20 }}></img>} />
+                    }
+                </div>
+            }
+
             <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Space>
                     <Upload beforeUpload={handleBeforeUpload}
