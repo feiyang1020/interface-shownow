@@ -108,7 +108,6 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
         try {
             if (chain === 'btc') {
-                // TODO Add costom path
                 const likeEntity = await btcConnector!.use('like');
                 const likeRes = await likeEntity.create({
                     dataArray: [
@@ -116,6 +115,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                             body: JSON.stringify({ isLike: '1', likeTo: pinId }),
                             flag: FLAG,
                             contentType: 'text/plain;utf-8',
+                            path: `${showConf?.host || ''}/protocols/paylike`
                         },
                     ],
                     options: {
@@ -131,7 +131,6 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     message.success('like buzz successfully');
                 }
             } else {
-                // TODO Add costom path
                 const likeEntity = (await mvcConnector!.use('like')) as IMvcEntity
                 const likeRes = await likeEntity.create({
                     data: {
@@ -139,6 +138,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                             isLike: '1',
                             likeTo: pinId,
                         }),
+                        path: `${showConf?.host || ''}/protocols/paylike`
                     },
                     options: {
                         network: curNetwork,
@@ -264,7 +264,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
             )}
             {<Space>
                 <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
-                <Typography.Text type="secondary" style={{fontSize:12}}>{dayjs
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
                     .unix(buzzItem.timestamp)
                     .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
 

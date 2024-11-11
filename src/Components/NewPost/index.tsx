@@ -81,10 +81,10 @@ export default ({ show, onClose, quotePin }: Props) => {
                         contentType: `${image.fileType};binary`,
                         encoding: 'base64',
                         flag: FLAG,
+                        path: `${showConf?.host || ''}/file`
                     });
                 }
                 if (chain === 'btc') {
-                    //TODO: custom Path
                     const fileEntity = await btcConnector!.use('file');
                     const imageRes = await fileEntity.create({
                         dataArray: fileOptions,
@@ -99,7 +99,6 @@ export default ({ show, onClose, quotePin }: Props) => {
                         (rid) => 'metafile://' + rid + 'i0'
                     );
                 } else {
-                    //TODO: custom Path
                     const fileEntity = (await mvcConnector!.use('file')) as IMvcEntity
                     const finalAttachMetafileUri: string[] = []
 
@@ -138,13 +137,13 @@ export default ({ show, onClose, quotePin }: Props) => {
                 finalBody.quotePin = quotePin.id;
             }
             if (chain === 'btc') {
-                //TODO: custom Path
                 const createRes = await buzzEntity!.create({
                     dataArray: [
                         {
                             body: JSON.stringify(finalBody),
                             contentType: 'text/plain;utf-8',
                             flag: FLAG,
+                            path: `${showConf?.host || ''}/protocols/simplebuzz`
                         },
                     ],
                     options: {
@@ -168,10 +167,9 @@ export default ({ show, onClose, quotePin }: Props) => {
                     onClose();
                 }
             } else {
-                //TODO: custom Path
                 const buzzEntity = (await mvcConnector!.use('buzz')) as IMvcEntity
                 const createRes = await buzzEntity!.create({
-                    data: { body: JSON.stringify(finalBody) },
+                    data: { body: JSON.stringify({ ...finalBody, path: `${showConf?.host || ''}/protocols/simplebuzz` }) },
                     options: {
                         network: curNetwork,
                         signMessage: 'create buzz',
