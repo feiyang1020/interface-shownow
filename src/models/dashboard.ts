@@ -7,7 +7,6 @@ export default () => {
   const [showConf, setShowConf] = useState<DB.ShowConfDto>();
   const fetchConfig = useCallback(async () => {
     const ret = await fetchShowConf();
-
     if (true) {
       const userInfo = await getMetaidByAddress({
         address: "n18EnQDAEh47fYQbLJdzt6xdw8TvUs7haL", //ret.service_fee_address,
