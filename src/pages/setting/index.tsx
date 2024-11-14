@@ -3,7 +3,7 @@ import { BASE_MAN_URL, curNetwork } from "@/config";
 import { image2Attach } from "@/utils/file";
 import { PlusOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Form, Input, message, Upload } from "antd"
+import { Avatar, Button, Card, Form, Input, message, Upload } from "antd"
 import { useEffect } from "react";
 import { useModel } from "umi"
 const normFile = (e: any) => {
@@ -20,7 +20,7 @@ export default () => {
     const connector = chain === 'btc' ? btcConnector : mvcConnector;
     const profileUserData = useQuery({
         queryKey: ['userInfo', user.address],
-        enabled: Boolean(user.address&&connector),
+        enabled: Boolean(user.address && connector),
         queryFn: () =>
             connector?.getUser({
                 network: curNetwork,
@@ -102,8 +102,8 @@ export default () => {
                 wrapperCol={{ span: 14 }}
                 layout="horizontal"
                 style={{ maxWidth: 600 }}
-
                 form={form}
+
             >
                 <Form.Item label="Name" name='name'>
                     <Input />
@@ -117,6 +117,10 @@ export default () => {
                 </Form.Item>
 
             </Form>
+
+            
+
+
 
 
         </Card>

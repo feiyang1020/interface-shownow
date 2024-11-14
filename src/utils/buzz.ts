@@ -38,12 +38,6 @@ export const postPayBuzz = async (
   const encryptContent = content.slice(250)
     ? encryptPayloadAES(randomKey, content.slice(250))
     : "";
-  const encryptFiles = encryptImages.map((image) => {
-    return `metafile://${encryptPayloadAES(
-      randomKey,
-      Buffer.from(image.data, "hex").toString("base64")
-    )}`;
-  });
   const { attachments, fileTransactions } = await postImages(
     publicImages,
     feeRate,
@@ -52,13 +46,25 @@ export const postPayBuzz = async (
     btcConnector,
     mvcConnector
   );
+  const {
+    attachments: encryptAttachments,
+    fileTransactions: encryptFileTransactions,
+  } = await postEncryptImages(
+    encryptImages,
+    feeRate,
+    host,
+    chain,
+    btcConnector,
+    mvcConnector,
+    randomKey
+  );
 
   const payload = {
     publicContent,
     encryptContent,
     contentType: "text/plain",
     publicFiles: attachments,
-    encryptFiles,
+    encryptFiles: encryptAttachments,
   };
   const path = `${host || ""}/protocols/paybuzz`;
   const metaidData: InscribeData = {
@@ -87,7 +93,7 @@ export const postPayBuzz = async (
       network: curNetwork,
       signMessage: "create paybuzz",
       serialAction: "finish",
-      transactions: fileTransactions,
+      transactions: [...fileTransactions, ...encryptFileTransactions],
     });
     console.log(txid, "transactions");
     pid = `${txid}i0`;
@@ -139,7 +145,7 @@ export const postPayBuzz = async (
       network: curNetwork,
       signMessage: "create accesscontrol",
       serialAction: "finish",
-      transactions: fileTransactions,
+      transactions: [],
     });
   }
 };
@@ -163,6 +169,85 @@ export const postImages = async (
     fileOptions.push({
       body: Buffer.from(image.data, "hex").toString("base64"),
       contentType: `${image.fileType};binary`,
+      encoding: "base64",
+      flag: FLAG,
+      path: `${host || ""}/file`,
+    });
+  }
+  if (chain === "btc") {
+    const fileEntity = await btcConnector!.use("file");
+    const imageRes = await fileEntity.create({
+      dataArray: fileOptions,
+      options: {
+        noBroadcast: "no",
+        feeRate: Number(feeRate),
+      },
+    });
+    return {
+      attachments: imageRes.revealTxIds.map(
+        (rid) => "metafile://" + rid + "i0"
+      ),
+      fileTransactions: [],
+    };
+  } else {
+    let fileTransactions: MvcTransaction[] = [];
+    const fileEntity = (await mvcConnector!.use("file")) as IMvcEntity;
+    const finalAttachMetafileUri: string[] = [];
+
+    for (let i = 0; i < fileOptions.length; i++) {
+      const fileOption = fileOptions[i];
+      const { transactions } = await fileEntity.create({
+        data: fileOption,
+        options: {
+          network: curNetwork,
+          signMessage: "upload image file",
+          serialAction: "combo",
+          transactions: [],
+        },
+      });
+
+      if (!transactions) {
+        throw new Error("upload image file failed");
+      }
+
+      finalAttachMetafileUri.push(
+        "metafile://" +
+          transactions[transactions.length - 1].txComposer.getTxId() +
+          "i0"
+      );
+      fileTransactions = transactions;
+    }
+
+    return {
+      fileTransactions,
+      attachments: finalAttachMetafileUri,
+    };
+  }
+};
+
+export const postEncryptImages = async (
+  images: AttachmentItem[],
+  feeRate: number,
+  host: string,
+  chain: API.Chain,
+  btcConnector: IBtcConnector | undefined,
+  mvcConnector: IMvcConnector | undefined,
+  randomKey: string
+) => {
+  if (images.length === 0)
+    return {
+      attachments: [],
+      fileTransactions: [],
+    };
+
+  const fileOptions: CreateOptions[] = [];
+  for (const image of images) {
+    fileOptions.push({
+      body: encryptPayloadAES(
+        randomKey,
+        Buffer.from(image.data, "hex").toString("base64")
+      ),
+      contentType: `binary`,
       encoding: "base64",
       flag: FLAG,
       path: `${host || ""}/file`,

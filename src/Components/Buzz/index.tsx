@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
-import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, PlusCircleFilled, UploadOutlined } from "@ant-design/icons"
+import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, PlusCircleFilled, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
@@ -13,6 +13,7 @@ import ForwardTweet from "./ForwardTweet";
 import { IMvcEntity } from "@metaid/metaid";
 import { FollowIconComponent } from "../Follow";
 import dayjs from "dayjs";
+import { buildAccessPass } from "@/utils/buzz";
 const { Paragraph, Text } = Typography;
 
 type Props = {
@@ -39,6 +40,13 @@ export default ({ buzzItem, showActions = true }: Props) => {
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
         return isSummaryJson ? parseSummary.content : _summary;
+    }, [buzzItem])
+
+    const payBuzz = useMemo(() => {
+        let _summary = buzzItem!.content;
+        const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
+        const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
+        return isSummaryJson ? parseSummary : undefined;
     }, [buzzItem])
     const attachPids = useMemo(() => {
         const isFromBtc = buzzItem?.chainName === 'btc';
@@ -197,6 +205,18 @@ export default ({ buzzItem, showActions = true }: Props) => {
         queryKey: ['buzzDetail', quotePinId],
         queryFn: () => getPinDetailByPid({ pid: quotePinId }),
     })
+
+    const handlePay = async () => {
+        await buildAccessPass(
+            buzzItem!.id,
+            showConf?.host || '',
+            btcConnector!,
+            feeRate,
+            'mobeBxaaKAf86WG4GuqFyfqdiQNdpiiwG3',
+            '0.00001',
+        )
+
+    }
     return <div className="tweet" >
         <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
             <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
@@ -229,6 +249,23 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     </span>
                 ))}
             </div>
+            {
+                payBuzz && <div className="text" style={{ margin: '8px 0', }} onClick={() => {
+                    history.push(`/tweet/${buzzItem.id}`)
+                }}>
+                    {(payBuzz.publicContent ?? '').split('\n').map((line: string, index: number) => (
+                        <span key={index} style={{ wordBreak: 'break-all' }}>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: handleSpecial(detectUrl(line)),
+                                }}
+                            />
+                        </span>
+                    ))}
+                </div>
+            }
+
+
             {
                 !isEmpty(attachPids) && <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 24 }}>
                     <Image.PreviewGroup
@@ -279,6 +316,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
             </Space>}
 
+
+
+
             {showActions && <div className="actions">
 
                 <Button type='text' icon={<MessageOutlined />} onClick={() => {
@@ -299,6 +339,11 @@ export default ({ buzzItem, showActions = true }: Props) => {
                         showNewPost ? setShowNewPost(false) : setShowNewPost(true)
                     }} />
                 </div>
+                {
+                    payBuzz && <div className="item">
+                        <Button type='text' icon={<UnlockFilled />} onClick={handlePay} />
+                    </div>
+                }
             </div>}
         </div>
 
