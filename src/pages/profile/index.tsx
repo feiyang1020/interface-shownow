@@ -1,10 +1,10 @@
-import { fetchBuzzs, getIndexTweet } from "@/request/api";
+import { fetchAllBuzzs, fetchBuzzs, getIndexTweet } from "@/request/api";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import './index.less'
 import { Grid, Carousel, Col, Divider, List, Row, Skeleton } from "antd";
 import defaultImg from '@/assets/img 2@1x.png'
 import { GiftOutlined, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useModel, useMatch } from "umi";
 import { curNetwork } from "@/config";
 import Buzz from "@/Components/Buzz";
@@ -55,37 +55,37 @@ export default () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [btcConnector]);
 
+    const profileUserData = useQuery({
+        queryKey: ['userInfo', address],
+        queryFn: () =>
+            btcConnector?.getUser({
+                network: curNetwork,
+                currentAddress: address,
+            }),
+    });
+
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
         useInfiniteQuery({
-            queryKey: ['buzzes', address],
-            enabled: Boolean(btcConnector && address),
+            queryKey: ['homebuzzesnew'],
+            enabled: Boolean(profileUserData.data?.metaid),
             queryFn: ({ pageParam }) =>
-                fetchBuzzs({
-                    page: pageParam,
-                    limit: 5,
-                    btcConnector: btcConnector!,
-                    network: curNetwork,
-                    path: ['/protocols/simplebuzz', '/protocols/banana'],
-                    address: address
+                fetchAllBuzzs({
+                    size: 5,
+                    lastId: pageParam,
+                    metaid: profileUserData.data?.metaid,
                 }),
-            initialPageParam: 1,
+            initialPageParam: '',
             getNextPageParam: (lastPage, allPages) => {
-                const nextPage = lastPage?.length ? allPages.length + 1 : undefined;
-                if (!lastPage || lastPage?.length < 5) {
-                    return undefined
-                }
-                if (allPages.length * 5 >= (total ?? 0)) {
-                    return;
-                }
-                return nextPage;
+                const { data: { lastId } } = lastPage
+                if (!lastId) return
+                return lastId;
             },
         });
 
     const tweets = useMemo(() => {
         return data ? data?.pages.reduce((acc, item) => {
-
-            return [...acc || [], ...item || []]
+            return [...acc || [], ...item.data.list || []]
         }, []) : []
     }, [data])
     return <div className="profilePage">
@@ -99,7 +99,7 @@ export default () => {
                             overflow: 'auto',
                         }}
                     >
-                        <div style={{paddingBottom:12}}>
+                        <div style={{ paddingBottom: 12 }}>
                             <ProfileCard address={address} />
                         </div>
 

@@ -1,4 +1,4 @@
-import { fetchBuzzs, fetchFollowingList, fetchMyFollowingBuzzs, fetchMyFollowingTotal, getIndexTweet } from "@/request/api";
+import { fetchAllBuzzs, fetchBuzzs, fetchFollowingList, fetchMyFollowingBuzzs, fetchMyFollowingTotal, getIndexTweet } from "@/request/api";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import './index.less'
 import { Grid, Col, Divider, List, Row, Skeleton } from "antd";
@@ -53,28 +53,26 @@ export default () => {
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
         useInfiniteQuery({
-            queryKey: ['following', 'buzzes'],
-            enabled: !isEmpty(myFollowingListData?.list ?? []),
-
+            queryKey: ['homebuzzesnew'],
+            enabled: Boolean(user.metaid),
             queryFn: ({ pageParam }) =>
-                fetchMyFollowingBuzzs({
-                    page: pageParam,
+                fetchAllBuzzs({
                     size: 5,
-                    path: '/protocols/simplebuzz,/protocols/banana',
-                    metaidList: myFollowingListData?.list ?? [],
+                    lastId: pageParam,
+                    metaid: user.metaid,
+                    followed: "1"
                 }),
-            initialPageParam: 1,
+            initialPageParam: '',
             getNextPageParam: (lastPage, allPages) => {
-                const nextPage = lastPage?.length ? allPages.length + 1 : undefined;
-                if (allPages.length * 5 >= (total ?? 0)) {
-                    return;
-                }
-                return nextPage;
+                const { data: { lastId } } = lastPage
+                if (!lastId) return
+                return lastId;
             },
         });
+
     const tweets = useMemo(() => {
         return data ? data?.pages.reduce((acc, item) => {
-            return [...acc || [], ...item || []]
+            return [...acc || [], ...item.data.list || []]
         }, []) : []
     }, [data])
     return <div className="homePage2">

@@ -39,10 +39,10 @@ export const postPayBuzz = async (
     ? encryptPayloadAES(randomKey, content.slice(250))
     : "";
   const encryptFiles = encryptImages.map((image) => {
-    return encryptPayloadAES(
+    return `metafile://${encryptPayloadAES(
       randomKey,
       Buffer.from(image.data, "hex").toString("base64")
-    );
+    )}`;
   });
   const { attachments, fileTransactions } = await postImages(
     publicImages,
@@ -60,7 +60,7 @@ export const postPayBuzz = async (
     publicFiles: attachments,
     encryptFiles,
   };
-  const path = `${host || ""}/protocols/metaaccess/paybuzz`;
+  const path = `${host || ""}/protocols/paybuzz`;
   const metaidData: InscribeData = {
     operation: "create",
     body: JSON.stringify(payload),
@@ -115,7 +115,7 @@ export const postPayBuzz = async (
       payTo: address,
     },
   };
-  const contorlPath = `${host || ""}/protocols/metaaccess/accesscontrol`;
+  const contorlPath = `${host || ""}/metaaccess/accesscontrol`;
   const contorlMetaidData: InscribeData = {
     operation: "create",
     body: JSON.stringify(contorlPayload),
