@@ -60,10 +60,16 @@ export default ({ address }: Props) => {
     return (
         <Card style={{ padding: 0 }} styles={{ body: { padding: 0 } }} bordered={false} cover={
             <div
-                style={{ height: 240, objectFit: 'cover', background: showConf?.gradientColor }}
-                // alt="example"
-                // src={defaultImg}
-            />
+                style={{ height: 240, objectFit: 'cover', background: showConf?.gradientColor, borderRadius: 10 }}
+            // alt="example"
+            // src={defaultImg}
+            >
+                {
+                    profileUserData?.data?.background &&
+                    <img src={`${BASE_MAN_URL}` + profileUserData?.data?.background} alt="example" style={{ width: '100%', height: 240, objectFit: 'cover', borderRadius: 10 }} />
+                }
+
+            </div>
         }>
             <div style={{ padding: 20 }}>
 

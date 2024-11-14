@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 
 import { Form, Input, Upload, Button, message, Avatar, UploadProps } from "antd";
@@ -26,8 +26,14 @@ const beforeUpload = (file: FileType) => {
 
 const UploadAvatar = (props: any) => {
     const { user } = useModel('user');
-    const [imageUrl, setImageUrl] = useState<string>(user.avater);
+    const [imageUrl, setImageUrl] = useState<string>(props.value);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (props.value && typeof props.value === 'string' && props.value.indexOf('http') === 0) {
+            setImageUrl(props.value)
+        }
+    }, [props.value])
 
     const handleChange: UploadProps['onChange'] = (info) => {
         if (info.file.status === 'uploading') {

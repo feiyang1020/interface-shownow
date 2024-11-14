@@ -2,7 +2,7 @@ import Buzz from "@/Components/Buzz"
 import Comment from "@/Components/Comment"
 import CommentPanel from "@/Components/CommentPanel"
 import Recommend from "@/Components/Recommend"
-import { getPinDetailByPid } from "@/request/api"
+import { fetchBuzzDetail, getPinDetailByPid } from "@/request/api"
 import { useQuery } from "@tanstack/react-query"
 import { Avatar, Button, Card, Col, Divider, Input, Row } from "antd"
 import { isEmpty } from "ramda"
@@ -19,14 +19,14 @@ export default () => {
     const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
         enabled: !isEmpty(quotePinId),
         queryKey: ['buzzDetail', quotePinId],
-        queryFn: () => getPinDetailByPid({ pid: quotePinId! }),
+        queryFn: () => fetchBuzzDetail({ pinId: quotePinId! }),
     })
 
     if (!quoteDetailData) return null
     return <Row gutter={[12, 12]} >
         <Col span={24} md={15}>
             <Card loading={isQuoteLoading}>
-                <Buzz buzzItem={quoteDetailData} showActions={true} />
+                <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} />
                 <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />

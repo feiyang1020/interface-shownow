@@ -121,4 +121,14 @@ declare namespace API {
       lastId: string;
     };
   };
+
+  type BuzzDetailRet = {
+    code: number;
+    message: string;
+    data: {
+      tweet: Buzz;
+      like: LikeRes;
+      comment: CommentRes[];
+    };
+  }
 }

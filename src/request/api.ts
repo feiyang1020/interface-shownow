@@ -310,3 +310,15 @@ export const fetchAllBuzzs = async (params: {
     params,
   });
 };
+
+export const fetchBuzzDetail = async (params: {
+  pinId: string;
+  lastId?: string;
+  metaid?: string;
+  followed?: string;
+}) => {
+  return request<API.BuzzDetailRet>(`${BASE_MAN_URL}/social/buzz/info`, {
+    method: "GET",
+    params,
+  });
+};
