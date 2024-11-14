@@ -40,8 +40,8 @@ export default ({ buzzItem, showActions = true }: Props) => {
         let _summary = buzzItem!.contentSummary;
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
-       
-        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? []) 
+
+        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? [])
             ? (parseSummary?.attachments ?? []).map(
                 (d: string) => d.split('metafile://')[1]
             )
@@ -144,7 +144,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
 
 
-    return <div className="tweet" style={{padding:0}} onClick={e => {
+    return <div className="tweet" style={{ padding: 0 }} onClick={e => {
         e.stopPropagation()
     }}>
         <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
@@ -160,7 +160,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
         <div className="content" style={{
 
-            
+
             cursor: 'pointer'
         }} >
             <div className="creater" onClick={(e) => {
@@ -200,7 +200,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
                             return <Image
 
                                 key={pid}
-                                width={200}
+                                width={120}
+                                height={120}
+                                style={{ objectFit: 'cover' }}
                                 src={`${BASE_MAN_URL}/content/${pid}`}
                             />
                         })

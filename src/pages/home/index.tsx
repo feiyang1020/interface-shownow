@@ -1,4 +1,4 @@
-import { fetchBuzzs, getIndexTweet } from "@/request/api";
+import { fetchAllBuzzs, fetchBuzzs, getIndexTweet } from "@/request/api";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import './index.less'
 import { Carousel, Col, Divider, List, Row, Skeleton, Grid } from "antd";
@@ -42,29 +42,24 @@ export default () => {
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
         useInfiniteQuery({
-            queryKey: ['buzzes'],
+            queryKey: ['homebuzzesnew'],
             enabled: Boolean(btcConnector),
             queryFn: ({ pageParam }) =>
-                fetchBuzzs({
-                    page: pageParam,
-                    limit: 5,
-                    btcConnector: btcConnector!,
-                    network: curNetwork,
-                    path: ['/protocols/simplebuzz', '/protocols/banana'],
+                fetchAllBuzzs({
+                    size: 5,
+                    lastId: pageParam,
                 }),
-            initialPageParam: 1,
+            initialPageParam: '',
             getNextPageParam: (lastPage, allPages) => {
-                const nextPage = lastPage?.length ? allPages.length + 1 : undefined;
-                if (allPages.length * 5 >= (total ?? 0)) {
-                    return;
-                }
-                return nextPage;
+                const { data: { lastId } } = lastPage
+                if (!lastId) return
+                return lastId;
             },
         });
 
     const tweets = useMemo(() => {
         return data ? data?.pages.reduce((acc, item) => {
-            return [...acc || [], ...item || []]
+            return [...acc || [], ...item.data.list || []]
         }, []) : []
     }, [data])
     return <div className="homePage">

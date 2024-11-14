@@ -23,6 +23,10 @@ export default () => {
             const [image] = await image2Attach([values.avatar] as FileList);
             values.avatar = Buffer.from(image.data, "hex").toString("base64")
         }
+        if (typeof values.background !== 'string') {
+            const [image] = await image2Attach([values.background] as FileList);
+            values.background = Buffer.from(image.data, "hex").toString("base64")
+        }
         const connector = chain === 'btc' ? btcConnector : mvcConnector;
         try {
             if (user.name) {
@@ -53,6 +57,7 @@ export default () => {
                 }).catch(e => {
                     throw new Error(e)
                 });
+                console.log(res);
                 if (!res) {
                     message.error('Create Failed')
                 } else {
@@ -84,6 +89,10 @@ export default () => {
                     <Input />
                 </Form.Item>
                 <Form.Item label="Avatar" name='avatar'>
+                    <UploadAvatar />
+                </Form.Item>
+
+                <Form.Item label="Background" name='background'>
                     <UploadAvatar />
                 </Form.Item>
 

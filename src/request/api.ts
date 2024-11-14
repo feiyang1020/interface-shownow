@@ -1,6 +1,7 @@
 import { BASE_MAN_URL } from "@/config";
 import { IBtcConnector } from "@metaid/metaid";
 import axios from "axios";
+import { request } from "umi";
 export type BtcNetwork = "mainnet" | "testnet" | "regtest";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -297,3 +298,15 @@ export async function getPubKey(): Promise<string> {
     return "";
   }
 }
+
+export const fetchAllBuzzs = async (params: {
+  size: number;
+  lastId?: string;
+  metaid?: string;
+  followed?: string;
+}) => {
+  return request<API.BuzzListRet>(`${BASE_MAN_URL}/social/buzz/newest`, {
+    method: "GET",
+    params,
+  });
+};

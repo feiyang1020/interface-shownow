@@ -1,6 +1,6 @@
 declare namespace API {
   type Network = "testnet" | "mainnet";
-  type Chain = 'btc' | 'mvc';
+  type Chain = "btc" | "mvc";
   type Pin = {
     id: string;
     number: number;
@@ -65,5 +65,60 @@ declare namespace API {
     hourFee: number;
     economyFee: number;
     minimumFee: number;
+  };
+
+  type Buzz = {
+    id: string;
+    number: number;
+    metaid: string;
+    address: string;
+    creator: string;
+    createMetaId: string;
+    initialOwner: string;
+    output: string;
+    outputValue: number;
+    timestamp: number;
+    genesisFee: number;
+    genesisHeight: number;
+    genesisTransaction: string;
+    txIndex: number;
+    txInIndex: number;
+    offset: number;
+    location: string;
+    operation: string;
+    path: string;
+    parentPath: string;
+    originalPath: string;
+    encryption: string;
+    version: string;
+    contentType: string;
+    contentTypeDetect: string;
+    contentBody: any;
+    contentLength: number;
+    contentSummary: string;
+    status: number;
+    originalId: string;
+    isTransfered: boolean;
+    preview: string;
+    content: string;
+    pop: string;
+    popLv: number;
+    chainName: string;
+    dataValue: number;
+    mrc20MintId: any[];
+    MogoID: string;
+    likeCount: number;
+    commentCount: number;
+    shareCount: number;
+    hot: number;
+  };
+
+  type BuzzListRet = {
+    code: number;
+    message: string;
+    data: {
+      list: Buzz[];
+      lastId: string;
+    };
   };
 }

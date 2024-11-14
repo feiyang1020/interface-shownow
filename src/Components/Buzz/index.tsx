@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 const { Paragraph, Text } = Typography;
 
 type Props = {
-    buzzItem: API.Pin
+    buzzItem: API.Buzz
     showActions?: boolean
 }
 
@@ -35,14 +35,14 @@ export default ({ buzzItem, showActions = true }: Props) => {
             }),
     });
     const summary = useMemo(() => {
-        let _summary = buzzItem!.contentSummary;
+        let _summary = buzzItem!.content;
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
         return isSummaryJson ? parseSummary.content : _summary;
     }, [buzzItem])
     const attachPids = useMemo(() => {
         const isFromBtc = buzzItem?.chainName === 'btc';
-        let _summary = buzzItem!.contentSummary;
+        let _summary = buzzItem!.content;
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
         return isSummaryJson && !isEmpty(parseSummary?.attachments ?? [])
@@ -197,7 +197,6 @@ export default ({ buzzItem, showActions = true }: Props) => {
         queryKey: ['buzzDetail', quotePinId],
         queryFn: () => getPinDetailByPid({ pid: quotePinId }),
     })
-
     return <div className="tweet" >
         <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
             <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
@@ -250,7 +249,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
                                 attachPids.map((pid: string) => {
                                     return <Image
                                         key={pid}
-                                        width={200}
+                                        width={120}
+                                        height={120}
+                                        style={{ objectFit: 'cover' }}
                                         src={`${BASE_MAN_URL}/content/${pid}`}
                                     />
                                 })
@@ -283,16 +284,13 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 <Button type='text' icon={<MessageOutlined />} onClick={() => {
                     showComment ? setShowComment(false) : setShowComment(true)
                 }}>
-                    {commentData.data?.length}
+                    {buzzItem.commentCount}
                 </Button>
 
 
                 <Button type='text' onClick={handleLike} icon={isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}>
                     {currentLikeData?.length}
                 </Button>
-
-
-
                 <div className="item">
                     <GiftOutlined />
                 </div>
@@ -300,7 +298,6 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     <Button type='text' icon={<UploadOutlined />} onClick={() => {
                         showNewPost ? setShowNewPost(false) : setShowNewPost(true)
                     }} />
-
                 </div>
             </div>}
         </div>
