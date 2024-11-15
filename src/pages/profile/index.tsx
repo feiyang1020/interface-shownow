@@ -67,7 +67,7 @@ export default () => {
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
         useInfiniteQuery({
-            queryKey: ['homebuzzesnew'],
+            queryKey: ['profilebuzzesnew',profileUserData.data?.metaid],
             enabled: Boolean(profileUserData.data?.metaid),
             queryFn: ({ pageParam }) =>
                 fetchAllBuzzs({
