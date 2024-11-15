@@ -10,7 +10,11 @@ import { curNetwork, FLAG } from "@/config";
 import { IBtcConnector } from "metaid/dist";
 import { InscribeData } from "metaid/src/core/entity/btc";
 import Decimal from "decimal.js";
-
+import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
+import ECPairFactory, { ECPairInterface, SignerAsync } from "ecpair";
+import * as bitcoin from "bitcoinjs-lib";
+bitcoin.initEccLib(ecc);
+const ECPair = ECPairFactory(ecc);
 type PostParams = {
   content: string;
   encryptImages: AttachmentItem[];
@@ -33,6 +37,17 @@ export const postPayBuzz = async (
       }
     | undefined
 ) => {
+  const compressedPubKeyHex =
+    chain === "mvc"
+      ? await window.metaidwallet.getPublicKey()
+      : await window.metaidwallet.btc.getPublicKey();
+  const keyPair = ECPair.fromPublicKey(
+    Buffer.from(compressedPubKeyHex, "hex"),
+    { compressed: false }
+  );
+  const uncompressedPubKey = Buffer.from(keyPair.publicKey).toString("hex");
+  console.log(uncompressedPubKey, "uncompressedPubKey");
+  debugger;
   const randomKey = generateAESKey();
   const publicContent = content.slice(0, 250);
   const encryptContent = content.slice(250)
@@ -99,21 +114,23 @@ export const postPayBuzz = async (
     pid = `${txid}i0`;
   }
 
-  const { sharedSecret } = await window.metaidwallet.commons.ecdh({
-    externalPubKey: manPubKey,
-  });
+  const { sharedSecret, externalPubKey } =
+    await window.metaidwallet.commons.ecdh({
+      externalPubKey: manPubKey,
+    });
 
   const contorlPayload = {
     controlPins: [pid],
     manDomain: "",
     manPubkey: manPubKey,
-    creatorPubkey: await window.metaidwallet.btc.getPublicKey(),
+    creatorPubkey: uncompressedPubKey,
+
     encryptedKey: encryptPayloadAES(sharedSecret, randomKey),
-    holdCheck: {
-      type: "chainCoin",
-      ticker: "",
-      amount: "",
-    },
+    // holdCheck: {
+    //   type: "chainCoin",
+    //   ticker: "",
+    //   amount: "",
+    // },
     payCheck: {
       type: "chainCoin", //"chainCoin" or "mrc20"
       ticker: "",

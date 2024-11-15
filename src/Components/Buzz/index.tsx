@@ -208,7 +208,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
     const handlePay = async () => {
         await buildAccessPass(
-            buzzItem!.id,
+            'c8540cbb0a74722bb3cd4b984ceca848aca6373de92ac908a8e013a5fbdf6151i0',
             showConf?.host || '',
             btcConnector!,
             feeRate,
@@ -278,7 +278,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                         <div style={{
                             display: 'flex',
                             flexWrap: 'wrap',
-                            gap: '10px',
+                            gap: '4px',
 
                         }}
                         >
