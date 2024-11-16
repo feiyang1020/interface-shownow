@@ -40,7 +40,7 @@ export default () => {
                    
                 }
             }}>
-                <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} />
+                <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} padding={0} />
                 <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />

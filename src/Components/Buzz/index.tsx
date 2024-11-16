@@ -19,10 +19,11 @@ import _btc from '@/assets/btc.png'
 
 type Props = {
     buzzItem: API.Buzz
-    showActions?: boolean
+    showActions?: boolean,
+    padding?: number
 }
 
-export default ({ buzzItem, showActions = true }: Props) => {
+export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
@@ -257,7 +258,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
 
     }
-    return <div className="tweet" >
+    return <div className="tweet" style={{padding}} >
         <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
             <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
                 {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
