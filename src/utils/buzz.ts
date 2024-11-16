@@ -340,7 +340,7 @@ export const buildAccessPass = async (
     contentType: "text/plain",
     flag: "metaid",
   };
-  await btcConnector!.inscribe({
+  const res = await btcConnector!.inscribe({
     inscribeDataArray: [metaidData],
     options: {
       noBroadcast: "no",
@@ -351,4 +351,5 @@ export const buildAccessPass = async (
       },
     },
   });
+  if(res.status) throw new Error(res.status)
 };
