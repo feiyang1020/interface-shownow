@@ -41,4 +41,5 @@ export default defineConfig({
   npmClient: "pnpm",
   // outputPath: '../server-shownow/public',
   esbuildMinifyIIFE: true,
+  jsMinifier: "none",
 });
