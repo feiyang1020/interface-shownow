@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
+import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, PlusCircleFilled, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
@@ -15,6 +15,7 @@ import { FollowIconComponent } from "../Follow";
 import dayjs from "dayjs";
 import { buildAccessPass } from "@/utils/buzz";
 const { Paragraph, Text } = Typography;
+import _btc from '@/assets/btc.png'
 
 type Props = {
     buzzItem: API.Buzz
@@ -206,15 +207,51 @@ export default ({ buzzItem, showActions = true }: Props) => {
         queryFn: () => getPinDetailByPid({ pid: quotePinId }),
     })
 
+    const { data: accessControl } = useQuery({
+        enabled: !isEmpty(payBuzz),
+        queryKey: ['buzzAccessControl', buzzItem!.id],
+        queryFn: () => getControlByContentPin({ pinId: buzzItem!.id }),
+    })
+
+    const { data: decryptContent } = useQuery({
+        enabled: Boolean(payBuzz && user.address && payBuzz.encryptContent),
+        queryKey: ['buzzdecryptContent', buzzItem!.id],
+        queryFn: () => getDecryptContent({
+            address: user!.address,
+            sign: '123',
+            timestamp: Date.now(),
+            pinId: buzzItem!.id,
+            controlPath: '',
+        }),
+    })
+
+    console.log('decryptContent', payBuzz, decryptContent)
+
+
+
     const handlePay = async () => {
-        await buildAccessPass(
-            '905ec247d47bef207c2bf47030f5b052c1d546e7088a2a9046a39dcca0310441i0',
-            showConf?.host || '',
-            btcConnector!,
-            feeRate,
-            'mobeBxaaKAf86WG4GuqFyfqdiQNdpiiwG3',
-            '0.00001',
-        )
+        try {
+            if (accessControl && accessControl.data) {
+                const { data } = accessControl;
+                const { payCheck } = data;
+                if (chain !== 'btc') {
+                    await connect('btc')
+                }
+                await buildAccessPass(
+                    data.pinId,
+                    showConf?.host || '',
+                    btcConnector!,
+                    feeRate,
+                    payCheck.payTo,
+                    payCheck.amount,
+                )
+                message.success('Pay successfully, please wait for the transaction to be confirmed!')
+            }
+        } catch (e) {
+            message.error(e.message)
+        }
+
+
 
     }
     return <div className="tweet" >
@@ -262,6 +299,22 @@ export default ({ buzzItem, showActions = true }: Props) => {
                             />
                         </span>
                     ))}
+                    {(decryptContent?.data ?? '').split('\n').map((line: string, index: number) => (
+                        <span key={index} style={{ wordBreak: 'break-all' }}>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: handleSpecial(detectUrl(line)),
+                                }}
+                            />
+                        </span>
+                    ))
+                    }
+                    {
+                        !decryptContent?.data && <Button type='primary' danger icon={<UnlockFilled />} onClick={handlePay} >
+                            {accessControl?.data?.payCheck.amount}  <img src={_btc} style={{ width: 16, height: 16 }} />
+                        </Button>
+                    }
+
                 </div>
             }
 
@@ -339,11 +392,11 @@ export default ({ buzzItem, showActions = true }: Props) => {
                         showNewPost ? setShowNewPost(false) : setShowNewPost(true)
                     }} />
                 </div>
-                {
+                {/* {
                     payBuzz && <div className="item">
                         <Button type='text' icon={<UnlockFilled />} onClick={handlePay} />
                     </div>
-                }
+                } */}
             </div>}
         </div>
 

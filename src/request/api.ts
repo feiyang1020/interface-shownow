@@ -322,3 +322,29 @@ export const fetchBuzzDetail = async (params: {
     params,
   });
 };
+
+export const getControlByContentPin = async (params: { pinId: string }) => {
+  return request<API.ControlByContentPinRet>(
+    `${BASE_MAN_URL + "/api/access/getControlByContentPin"}`,
+    {
+      method: "GET",
+      params,
+    }
+  );
+};
+
+export const getDecryptContent = async (params: {
+  address: string;
+  sign: string;
+  timestamp: number;
+  pinId: string;
+  controlPath: string;
+}) => {
+  return request<{
+    code: number;
+    data: string;
+  }>(`${BASE_MAN_URL + "/api/access/decrypt"}`, {
+    method: "POST",
+    data: params,
+  });
+};

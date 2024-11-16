@@ -130,5 +130,31 @@ declare namespace API {
       like: LikeRes;
       comment: CommentRes[];
     };
-  }
+  };
+
+  type AccessControl = {
+    pinId: string;
+    address: string;
+    metaId: string;
+    controlPins: string[];
+    controlPath: string;
+    manDomain: string;
+    manPubkey: string;
+    creatorPubkey: string;
+    encryptedKey: string;
+    holdCheck: any;
+    payCheck: {
+      type: string;
+      ticker: string;
+      amount: string;
+      payTo: string;
+      validPeriod: string;
+    };
+  };
+
+  type ControlByContentPinRet = {
+    code: number;
+    message: string;
+    data: AccessControl;
+  };
 }
