@@ -313,9 +313,21 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     ))
                     }
                     {
-                        !decryptContent?.data && <Button type='primary' danger icon={<UnlockFilled />} onClick={handlePay} >
-                            {accessControl?.data?.payCheck.amount}  <img src={_btc} style={{ width: 16, height: 16 }} />
-                        </Button>
+                        !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center',gap:8 }}>
+                                <Text type="warning" style={{ lineHeight: '16px' }}>{
+                                    accessControl?.data?.payCheck?.amount
+                                }</Text>
+                                <img src={_btc} alt="" width={16} height={16} />
+                            </div>
+                            <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }} onClick={(e) => {
+                                e.stopPropagation()
+                                handlePay()
+                            }
+                            } >
+                                Decrypt
+                            </Button>
+                        </div>
                     }
 
                 </div>
