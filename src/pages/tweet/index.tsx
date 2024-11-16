@@ -27,7 +27,7 @@ export default () => {
     return <Row gutter={[12, 12]} >
         <Col span={24} md={15}>
             <Card loading={isQuoteLoading} title={
-                <Button type="text" size='small' icon={<LeftOutlined />}>
+                <Button type="text" size='small' icon={<LeftOutlined />} onClick={()=>history.back()}>
 
                 </Button>
             } styles={{
