@@ -37,6 +37,10 @@ export default function Lay() {
         components: {
           "Avatar": {
             "colorTextPlaceholder": showConf.brandColor,
+          },
+          "Button": {
+            "defaultBorderColor": "rgba(217,217,217,0)",
+            "defaultShadow": "0 2px 0 rgba(0, 0, 0,0)"
           }
         }
       })
@@ -109,7 +113,7 @@ export default function Lay() {
                       <Dropdown dropdownRender={() => {
                         return <div>
                           <Menu>
-                            <Menu.Item key='1' disabled={chain==='btc'} onClick={() => {
+                            <Menu.Item key='1' disabled={chain === 'btc'} onClick={() => {
                               connect('btc')
                             }}>
                               <Space>
@@ -118,7 +122,7 @@ export default function Lay() {
                               </Space>
 
                             </Menu.Item>
-                            <Menu.Item key='2' disabled={chain==='mvc'} onClick={() => {
+                            <Menu.Item key='2' disabled={chain === 'mvc'} onClick={() => {
                               connect('mvc')
                             }}>
                               <Space>
