@@ -19,9 +19,10 @@ type PostParams = {
   content: string;
   encryptImages: AttachmentItem[];
   publicImages: AttachmentItem[];
+  encryptContent: string;
 };
 export const postPayBuzz = async (
-  { content, encryptImages, publicImages }: PostParams,
+  { content, encryptImages, publicImages, encryptContent }: PostParams,
   price: string,
   address: string,
   feeRate: number,
@@ -37,21 +38,18 @@ export const postPayBuzz = async (
       }
     | undefined
 ) => {
-  const compressedPubKeyHex =
-    chain === "mvc"
-      ? await window.metaidwallet.getPublicKey()
-      : await window.metaidwallet.btc.getPublicKey();
-  const keyPair = ECPair.fromPublicKey(
-    Buffer.from(compressedPubKeyHex, "hex"),
-    { compressed: false }
-  );
-  const uncompressedPubKey = Buffer.from(keyPair.publicKey).toString("hex");
-  console.log(uncompressedPubKey, "uncompressedPubKey");
-  debugger;
   const randomKey = generateAESKey();
-  const publicContent = content.slice(0, 250);
-  const encryptContent = content.slice(250)
-    ? encryptPayloadAES(randomKey, content.slice(250))
+  console.log(
+    randomKey,
+    "randomKey",
+    Buffer.from(randomKey, "hex").toString("hex")
+  );
+  const publicContent = content;
+  const _encryptContent = encryptContent
+    ? encryptPayloadAES(
+        randomKey,
+        Buffer.from(encryptContent, "utf-8").toString("hex")
+      )
     : "";
   const { attachments, fileTransactions } = await postImages(
     publicImages,
@@ -61,6 +59,9 @@ export const postPayBuzz = async (
     btcConnector,
     mvcConnector
   );
+
+  console.log(randomKey, "randomKey");
+  console.log(encryptContent, "content.slice(250)");
   const {
     attachments: encryptAttachments,
     fileTransactions: encryptFileTransactions,
@@ -76,7 +77,7 @@ export const postPayBuzz = async (
 
   const payload = {
     publicContent,
-    encryptContent,
+    encryptContent: _encryptContent,
     contentType: "text/plain",
     publicFiles: attachments,
     encryptFiles: encryptAttachments,
@@ -114,17 +115,15 @@ export const postPayBuzz = async (
     pid = `${txid}i0`;
   }
 
-  const { sharedSecret, externalPubKey } =
-    await window.metaidwallet.commons.ecdh({
-      externalPubKey: manPubKey,
-    });
+  const { sharedSecret, ecdhPubKey } = await window.metaidwallet.common.ecdh({
+    externalPubKey: manPubKey,
+  });
 
   const contorlPayload = {
     controlPins: [pid],
     manDomain: "",
     manPubkey: manPubKey,
-    creatorPubkey: uncompressedPubKey,
-
+    creatorPubkey: ecdhPubKey,
     encryptedKey: encryptPayloadAES(sharedSecret, randomKey),
     // holdCheck: {
     //   type: "chainCoin",
@@ -262,10 +261,10 @@ export const postEncryptImages = async (
     fileOptions.push({
       body: encryptPayloadAES(
         randomKey,
-        Buffer.from(image.data, "hex").toString("base64")
+        Buffer.from(image.data, "hex").toString("hex")
       ),
       contentType: `binary`,
-      encoding: "base64",
+      encoding: "binary",
       flag: FLAG,
       path: `${host || ""}/file`,
     });

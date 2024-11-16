@@ -37,6 +37,7 @@ export default ({ show, onClose, quotePin }: Props) => {
     const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
     const [images, setImages] = useState<any[]>([]);
     const [content, setContent] = useState('');
+    const [encryptContent, setEncryptContent] = useState('');
     const [isAdding, setIsAdding] = useState(false);
     const queryClient = useQueryClient();
     const [lock, setLock] = useState(false);
@@ -59,8 +60,6 @@ export default ({ show, onClose, quotePin }: Props) => {
         setImages((prevImages) => prevImages.filter((_, i) => i !== index));
     };
     const onCreateSubmit = async () => {
-
-
         const _images =
             images.length !== 0 ? await image2Attach(convertToFileList(images)) : [];
         if (lock) {
@@ -227,11 +226,14 @@ export default ({ show, onClose, quotePin }: Props) => {
         try {
             const encryptImages = images.filter((image) => encryptFiles.includes(image.previewUrl));
             const publicImages = images.filter((image) => !encryptFiles.includes(image.previewUrl));
-            console.log('encryptImages', encryptImages);
+            if (encryptImages.length === 0 && !encryptContent) {
+                throw new Error('Please input encrypt content or encrypt images')
+            }
             await postPayBuzz({
                 content: content,
-                encryptImages:await image2Attach(convertToFileList(encryptImages)),
-                publicImages:await image2Attach(convertToFileList(publicImages)),
+                encryptImages: await image2Attach(convertToFileList(encryptImages)),
+                publicImages: await image2Attach(convertToFileList(publicImages)),
+                encryptContent: encryptContent,
             },
                 String(payAmount),
                 user.address,
@@ -242,8 +244,10 @@ export default ({ show, onClose, quotePin }: Props) => {
                 mvcConnector!,
                 manPubKey || '',
                 fetchServiceFee('post_service_fee_amount'),
-
             )
+            setContent('')
+            setImages([])
+            onClose()
 
         } catch (error) {
             console.log('error', error);
@@ -258,10 +262,6 @@ export default ({ show, onClose, quotePin }: Props) => {
 
         }
         setIsAdding(false);
-
-
-
-
     }
     return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
         {
@@ -273,7 +273,11 @@ export default ({ show, onClose, quotePin }: Props) => {
         }
         <div>
             <UserInfo user={user} />
-            <TextArea rows={6} placeholder={isQuoted ? 'Add a comment' : "What is happening？"} style={{ marginTop: 24 }} value={content} onChange={(e) => setContent(e.target.value)} />
+            <TextArea rows={4} placeholder={isQuoted ? 'Add a comment' : "What is happening？"} style={{ marginTop: 24 }} value={content} onChange={(e) => setContent(e.target.value)} />
+            {
+                lock && <TextArea rows={4} placeholder={"encrypt Content"} style={{ marginTop: 24 }} value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} />
+            }
+
             <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 16 }}>
                 {images.map((image, index) => (
                     <div
