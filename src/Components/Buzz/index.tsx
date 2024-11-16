@@ -230,13 +230,16 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
 
     const handlePay = async () => {
+        if (chain !== 'btc') {
+            await connect('btc');
+            message.info('switch to BTC network to pay')
+            return
+        }
         try {
             if (accessControl && accessControl.data) {
                 const { data } = accessControl;
                 const { payCheck } = data;
-                if (chain !== 'btc') {
-                    await connect('btc')
-                }
+
                 await buildAccessPass(
                     data.pinId,
                     showConf?.host || '',
