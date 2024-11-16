@@ -306,28 +306,31 @@ export default ({ show, onClose, quotePin }: Props) => {
                             icon={<CloseOutlined />}
                         >
                         </Button>
+                        {
+                            lock && <Button
+                                onClick={() => {
+                                    console.log('encryptFiles', encryptFiles);
+                                    if (encryptFiles.includes(image.previewUrl)) {
+                                        setEncryptFiles(encryptFiles.filter(item => item !== image.previewUrl))
+                                    } else {
+                                        setEncryptFiles([...encryptFiles, image.previewUrl])
+                                    }
+                                }}
+                                size="small"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 4,
+                                    right: 4,
+                                }}
+                                icon={
+                                    !encryptFiles.includes(image.previewUrl) ?
+                                        <UnlockOutlined style={{ color: showConf?.brandColor }} /> :
+                                        <LockOutlined style={{ color: showConf?.brandColor }} />}
+                            >
+                            </Button>
+                        }
 
-                        <Button
-                            onClick={() => {
-                                console.log('encryptFiles', encryptFiles);
-                                if (encryptFiles.includes(image.previewUrl)) {
-                                    setEncryptFiles(encryptFiles.filter(item => item !== image.previewUrl))
-                                } else {
-                                    setEncryptFiles([...encryptFiles, image.previewUrl])
-                                }
-                            }}
-                            size="small"
-                            style={{
-                                position: 'absolute',
-                                bottom: 4,
-                                right: 4,
-                            }}
-                            icon={
-                                !encryptFiles.includes(image.previewUrl) ?
-                                    <UnlockOutlined style={{ color: showConf?.brandColor }} /> :
-                                    <LockOutlined style={{ color: showConf?.brandColor }} />}
-                        >
-                        </Button>
+
                     </div>
                 ))}
             </div>
