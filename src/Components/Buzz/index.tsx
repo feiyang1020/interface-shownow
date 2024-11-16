@@ -290,7 +290,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 ))}
             </div>
             {
-                payBuzz && <div className="text" style={{ margin: '8px 0', }} onClick={() => {
+                payBuzz?.publicContent && <div className="text" style={{ margin: '8px 0', }} onClick={() => {
                     history.push(`/tweet/${buzzItem.id}`)
                 }}>
                     {(payBuzz.publicContent ?? '').split('\n').map((line: string, index: number) => (
