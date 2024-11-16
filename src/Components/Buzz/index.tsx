@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid } from "@/request/api";
-import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, PlusCircleFilled, UnlockFilled, UploadOutlined } from "@ant-design/icons"
+import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
@@ -312,9 +312,54 @@ export default ({ buzzItem, showActions = true }: Props) => {
                         </span>
                     ))
                     }
+
+                    {
+                        payBuzz.publicFiles && <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 24, marginTop: 12 }}>
+                            <Image.PreviewGroup
+
+                                preview={{
+                                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                }}
+
+                            >
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '4px',
+
+                                }}
+                                >
+                                    {
+                                        payBuzz.publicFiles.map((pid: string) => {
+                                            return <Image
+                                                key={pid}
+                                                width={120}
+                                                height={120}
+                                                style={{ objectFit: 'cover' }}
+                                                src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
+                                            />
+                                        })
+                                    }
+                                    {
+                                        payBuzz.encryptFiles
+                                            .map((pid: string) => {
+                                                return <div style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
+                                                    <LockOutlined style={{ fontSize: 24 }} />
+
+                                                </div>
+                                            }
+                                            )
+
+                                    }
+                                </div>
+
+
+                            </Image.PreviewGroup>
+                        </div>
+                    }
                     {
                         !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center',gap:8 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Text type="warning" style={{ lineHeight: '16px' }}>{
                                     accessControl?.data?.payCheck?.amount
                                 }</Text>
@@ -332,6 +377,8 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
                 </div>
             }
+
+
 
 
             {
