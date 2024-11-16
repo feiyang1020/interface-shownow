@@ -3,6 +3,7 @@ import Comment from "@/Components/Comment"
 import CommentPanel from "@/Components/CommentPanel"
 import Recommend from "@/Components/Recommend"
 import { fetchBuzzDetail, getPinDetailByPid } from "@/request/api"
+import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query"
 import { Avatar, Button, Card, Col, Divider, Input, Row } from "antd"
 import { isEmpty } from "ramda"
@@ -25,7 +26,20 @@ export default () => {
     if (!quoteDetailData) return null
     return <Row gutter={[12, 12]} >
         <Col span={24} md={15}>
-            <Card loading={isQuoteLoading}>
+            <Card loading={isQuoteLoading} title={
+                <Button type="text" size='small' icon={<LeftOutlined />}>
+
+                </Button>
+            } styles={{
+                header: {
+                    borderBottom: 'none',
+                    minHeight: 30,
+                    padding:'12px 20px'
+                },
+                body: {
+                   
+                }
+            }}>
                 <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} />
                 <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
