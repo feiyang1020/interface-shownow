@@ -309,7 +309,7 @@ export const postEncryptImages = async (
           network: curNetwork,
           signMessage: "upload image file",
           serialAction: "combo",
-          transactions: [],
+          transactions: fileTransactions,
         },
       });
 
