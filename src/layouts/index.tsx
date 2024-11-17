@@ -88,7 +88,7 @@ export default function Lay() {
               <Row style={{ width: '100%', flexGrow: 1 }} gutter={[12, 12]}>
                 {md ? <Col span={24} md={15}>
                   <div className="searchWrap" onClick={() => { setShowPost(true) }}>
-                    <Input size="large"  prefix={
+                    <Input size="large" prefix={
                       <EditOutlined style={{ color: showConf?.brandColor }} />
                     } placeholder='What is happening？' variant="borderless" suffix={
                       <Button shape='round' style={{ background: showConf?.gradientColor, color: '#fff', marginRight: 12 }} > Post</Button>
@@ -117,8 +117,9 @@ export default function Lay() {
                       <Dropdown dropdownRender={() => {
                         return <div>
                           <Menu>
-                            <Menu.Item key='1' disabled={chain === 'btc'} onClick={() => {
-                              connect('btc')
+                            <Menu.Item key='1' disabled={chain === 'btc'} onClick={async () => {
+                              await connect('btc');
+                              queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                             }}>
                               <Space>
                                 <img src={_btc} alt="" style={{ width: 20, height: 20 }} />

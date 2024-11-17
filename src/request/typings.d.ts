@@ -151,7 +151,7 @@ declare namespace API {
       validPeriod: string;
     };
   };
-
+  type PayStatus = "purchased" | "unpurchased" | "mempool";
   type ControlByContentPinRet = {
     code: number;
     message: string;

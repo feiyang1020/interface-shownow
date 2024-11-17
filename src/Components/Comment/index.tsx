@@ -54,7 +54,7 @@ export default ({ show, onClose, tweetId }: Props) => {
                 console.log('create res for inscribe', createRes);
                 if (!isNil(createRes?.revealTxIds[0])) {
                     // await sleep(5000);
-                    queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                     message.success('comment successfully');
                     setContent('');
                     onClose();
@@ -72,7 +72,7 @@ export default ({ show, onClose, tweetId }: Props) => {
                 console.log('create res for inscribe', createRes)
 
                 if (!isNil(createRes?.txid)) {
-                    queryClient.invalidateQueries({ queryKey: ['buzzes'] })
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] })
                     message.success('comment successfully')
                     setContent('')
                     onClose();

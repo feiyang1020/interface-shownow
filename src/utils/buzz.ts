@@ -374,8 +374,14 @@ export const decodePayBuzz = async (
   buzzItem: API.Buzz,
   manPubKey: string,
   chain: API.Chain
-) => {
-
+): Promise<{
+  publicContent: string;
+  encryptContent: string;
+  publicFiles: string[];
+  encryptFiles: string[];
+  buzzType: "normal" | "pay";
+  status: API.PayStatus;
+}> => {
   let _summary = buzzItem!.content;
   const isSummaryJson = _summary.startsWith("{") && _summary.endsWith("}");
   const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
@@ -386,7 +392,7 @@ export const decodePayBuzz = async (
       publicFiles: [],
       encryptFiles: [],
       buzzType: "normal",
-      isDecode: false,
+      status: "unpurchased",
     };
   }
 
@@ -412,10 +418,10 @@ export const decodePayBuzz = async (
       return {
         publicContent: parseSummary.publicContent,
         encryptContent: "",
-        publicFiles: [],
-        encryptFiles: [],
-        buzzType: "normal",
-        isDecode: false,
+        publicFiles: parseSummary.publicFiles,
+        encryptFiles: parseSummary.encryptFiles,
+        buzzType: "pay",
+        status: "unpurchased",
       };
     }
     // const { creatorPubkey, encryptedKey, manPubkey } = controlPin;
@@ -431,7 +437,6 @@ export const decodePayBuzz = async (
           externalPubKey: manPubKey,
         });
       const key = decryptPayloadAES(sharedSecret, encryptedKey);
-      console.log(key, sharedSecret, encryptedKey, "key");
       const encryptContent = decryptPayloadAES(
         key,
         parseSummary.encryptContent
@@ -458,7 +463,7 @@ export const decodePayBuzz = async (
         publicFiles: parseSummary.publicFiles,
         encryptFiles: decryptFiles,
         buzzType: "pay",
-        isDecode: true,
+        status: "purchased",
       };
     }
 
@@ -468,10 +473,6 @@ export const decodePayBuzz = async (
 
     const timestamp = Math.floor(Date.now() / 1000);
     const _signStr = `${sharedSecret}${timestamp}${address}`;
-    console.log(sharedSecret, "sharedSecret");
-    console.log(timestamp, "timestamp");
-    console.log(address, "address");
-    console.log(_signStr, "signStr");
     const sign = sha256ToHex(_signStr);
     const decryptRet = await getDecryptContent({
       publickey: ecdhPubKey,
@@ -480,34 +481,39 @@ export const decodePayBuzz = async (
       timestamp,
       pinId: buzzItem!.id,
       controlPath: "",
+      controlPinId: controlPin.pinId,
     });
     const { data } = decryptRet;
-    if(!data) {
+    if (!data) {
       return {
         publicContent: parseSummary.publicContent,
         encryptContent: parseSummary.encryptContent,
         publicFiles: parseSummary.publicFiles,
         encryptFiles: parseSummary.encryptFiles,
         buzzType: "pay",
-        isDecode: false,
+        status: "unpurchased",
       };
     }
     return {
       publicContent: parseSummary.publicContent,
-      encryptContent: data.contentResult,
+      encryptContent:
+        data.status === "purchased" ? data.contentResult || "" : "",
       publicFiles: parseSummary.publicFiles,
-      encryptFiles: data.filesResult,
+      encryptFiles:
+        data.status === "purchased"
+          ? data.filesResult || []
+          : parseSummary.encryptFiles,
       buzzType: "pay",
-      isDecode: true,
+      status: data.status,
     };
   }
-  
+
   return {
     publicContent: parseSummary.content,
     encryptContent: "",
     publicFiles: [],
     encryptFiles: [],
     buzzType: "normal",
-    isDecode: false,
+    status: "unpurchased",
   };
 };

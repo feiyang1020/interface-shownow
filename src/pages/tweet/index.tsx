@@ -19,7 +19,7 @@ export default () => {
     const [showComment, setShowComment] = useState(false)
     const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
         enabled: !isEmpty(quotePinId),
-        queryKey: ['buzzDetail', quotePinId],
+        queryKey: ['buzzDetail', quotePinId, user.address],
         queryFn: () => fetchBuzzDetail({ pinId: quotePinId! }),
     })
 
@@ -27,17 +27,17 @@ export default () => {
     return <Row gutter={[12, 12]} >
         <Col span={24} md={15}>
             <Card loading={isQuoteLoading} title={
-                <Button type="text" size='small' icon={<LeftOutlined />} onClick={()=>history.back()}>
+                <Button type="text" size='small' icon={<LeftOutlined />} onClick={() => history.back()}>
 
                 </Button>
             } styles={{
                 header: {
                     borderBottom: 'none',
                     minHeight: 30,
-                    padding:'12px 20px'
+                    padding: '12px 20px'
                 },
                 body: {
-                   
+
                 }
             }}>
                 <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} padding={0} />

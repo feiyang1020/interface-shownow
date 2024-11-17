@@ -1,15 +1,18 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchCurrentBuzzLikes, getPinDetailByPid } from "@/request/api";
-import { GiftOutlined, HeartFilled, HeartOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
+import { fetchCurrentBuzzLikes, getControlByContentPin, getPinDetailByPid } from "@/request/api";
+import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Card, Divider, Image, message, Space, Typography } from "antd";
+import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
-import { useMemo, useState } from "react";
 import { useModel, history } from "umi";
-import Comment from "../Comment";
-import NewPost from "../NewPost";
 import './index.less'
-const { Paragraph, Text } = Typography;
+import dayjs from "dayjs";
+import { buildAccessPass, decodePayBuzz } from "@/utils/buzz";
+import { FollowIconComponent } from "../Follow";
+import { detectUrl, handleSpecial } from "@/utils/utils";
+import _btc from '@/assets/btc.png'
+import { useState } from "react";
+const { Text } = Typography;
 
 type Props = {
     buzzItem: API.Pin
@@ -17,10 +20,10 @@ type Props = {
 }
 
 export default ({ buzzItem, showActions = true }: Props) => {
-    const [showComment, setShowComment] = useState(false);
-    const [showNewPost, setShowNewPost] = useState(false);
+    const { showConf, manPubKey } = useModel('dashboard');
+    const [showUnlock, setShowUnlock] = useState(false);
     const queryClient = useQueryClient();
-    const { btcConnector, user, isLogin, connect, feeRate } = useModel('user')
+    const { btcConnector, user, chain, connect, feeRate } = useModel('user')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -29,117 +32,60 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 currentAddress: buzzItem!.address,
             }),
     });
-    const summary = useMemo(() => {
-        let _summary = buzzItem!.contentSummary;
-        const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
-        const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
-        return isSummaryJson ? parseSummary.content : _summary;
-    }, [buzzItem])
-    const attachPids = useMemo(() => {
-        const isFromBtc = buzzItem?.chainName === 'btc';
-        let _summary = buzzItem!.contentSummary;
-        const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
-        const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
 
-        return isSummaryJson && !isEmpty(parseSummary?.attachments ?? [])
-            ? (parseSummary?.attachments ?? []).map(
-                (d: string) => d.split('metafile://')[1]
-            )
-            : [];
-    }, [buzzItem])
 
-    const handleSpecial = (summary: string) => {
-        summary = summary
-            .replace('<metaid_flag>', 'metaid_flag')
-            .replace('<operation>', 'operation')
-            .replace('<path>', 'path')
-            .replace('<encryption>', 'encryption')
-            .replace('<version>', 'version')
-            .replace('<content-type>', 'content-type')
-            .replace('<payload>', 'payload');
-        return summary;
-    };
 
-    const detectUrl = (summary: string) => {
-        const urlReg = /(https?:\/\/[^\s]+)/g;
 
-        const urls = summary.match(urlReg);
 
-        if (urls) {
-            urls.forEach(function (url) {
-                summary = summary.replace(
-                    url,
-                    `<a href="${url}" target="_blank" style="text-decoration: underline;">${url}</a>`
-                );
-            });
-        }
 
-        return summary;
-    };
 
-    const { data: currentLikeData } = useQuery({
-        queryKey: ['payLike', buzzItem!.id],
-        queryFn: () =>
-            fetchCurrentBuzzLikes({
-                pinId: buzzItem!.id,
-            }),
-    });
 
-    const isLikeByCurrentUser = (currentLikeData ?? [])?.find(
-        (d) => d?.pinAddress === btcConnector?.address
-    );
 
-    const handleLike = async () => {
-        const pinId = buzzItem!.id;
-        if (!isLogin) {
-            await connect()
+
+
+
+
+    const { data: accessControl } = useQuery({
+        enabled: !isEmpty(buzzItem),
+        queryKey: ['buzzAccessControl', buzzItem!.id],
+        queryFn: () => getControlByContentPin({ pinId: buzzItem!.id }),
+    })
+
+    const { data: decryptContent, refetch: refetchDecrypt } = useQuery({
+        enabled: Boolean(user.address),
+        queryKey: ['buzzdecryptContent', buzzItem!.id, chain, user.address],
+        queryFn: () => decodePayBuzz(buzzItem, manPubKey!, chain),
+    })
+
+
+
+
+    const handlePay = async () => {
+        if (chain !== 'btc') {
+            await connect('btc');
+            message.info('switch to BTC network to pay')
             return
         }
-
-        if (isLikeByCurrentUser) {
-            message.error('You have already liked that buzz...');
-            return;
-        }
-
-        const likeEntity = await btcConnector!.use('like');
         try {
-            const likeRes = await likeEntity.create({
-                dataArray: [
-                    {
-                        body: JSON.stringify({ isLike: '1', likeTo: pinId }),
-                        flag: FLAG,
-                        contentType: 'text/plain;utf-8',
-                    },
-                ],
-                options: {
-                    noBroadcast: 'no',
-                    feeRate: Number(feeRate),
-                    //   service: {
-                    //     address: environment.service_address,
-                    //     satoshis: environment.service_staoshi,
-                    //   },
-                    // network: environment.network,
-                },
-            });
-            console.log('likeRes', likeRes);
-            if (!isNil(likeRes?.revealTxIds[0])) {
-                queryClient.invalidateQueries({ queryKey: ['buzzes'] });
-                queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
-                // await sleep(5000);
-                message.success('like buzz successfully');
+            if (accessControl && accessControl.data) {
+                const { data } = accessControl;
+                const { payCheck } = data;
+                await buildAccessPass(
+                    data.pinId,
+                    showConf?.host || '',
+                    btcConnector!,
+                    feeRate,
+                    payCheck.payTo,
+                    payCheck.amount,
+                )
+                message.success('Pay successfully, please wait for the transaction to be confirmed!')
+                setShowUnlock(false);
+                refetchDecrypt()
             }
-        } catch (error) {
-            console.log('error', error);
-            const errorMessage = (error as any)?.message ?? error;
-            const toastMessage = errorMessage?.includes(
-                'Cannot read properties of undefined'
-            )
-                ? 'User Canceled'
-                : errorMessage;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            message.error(toastMessage);
+        } catch (e) {
+            message.error(e.message)
         }
-    };
+    }
 
 
 
@@ -147,20 +93,15 @@ export default ({ buzzItem, showActions = true }: Props) => {
     return <div className="tweet" style={{ padding: 0 }} onClick={e => {
         e.stopPropagation()
     }}>
-        <div className="avatar" style={{ cursor: 'pointer' }} onClick={() => {
-            history.push(`/profile/${buzzItem.creator}`)
-        }}>
-            <div className="avatar" style={{ cursor: 'pointer' }} >
-                <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
-                    {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
-                </Avatar>
+        <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
+            <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
+                {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
+            </Avatar>
+            <FollowIconComponent metaid={currentUserInfoData.data?.metaid || ''} />
 
-            </div>
         </div>
 
         <div className="content" style={{
-
-
             cursor: 'pointer'
         }} >
             <div className="creater" onClick={(e) => {
@@ -170,51 +111,134 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unname'}</div>
                 <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
             </div>
-            <div className="text" style={{ margin: '12px 0' }} onClick={() => {
+            <div onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-                {(summary ?? '').split('\n').map((line: string, index: number) => (
-                    <span key={index} style={{ wordBreak: 'break-all' }}>
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: handleSpecial(detectUrl(line)),
-                            }}
-                        />
-                    </span>
-                ))}
-            </div>
 
-            <Image.PreviewGroup
-                preview={{
-                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                }}
 
-            >
-                <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '10px',
-                }}>
-                    {
-                        attachPids.map((pid: string) => {
-                            return <Image
-
-                                key={pid}
-                                width={120}
-                                height={120}
-                                style={{ objectFit: 'cover' }}
-                                src={`${BASE_MAN_URL}/content/${pid}`}
+                <div className="text" style={{ margin: '8px 0', }} >
+                    {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
+                        <span key={index} style={{ wordBreak: 'break-all' }}>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: handleSpecial(detectUrl(line)),
+                                }}
                             />
-                        })
+                        </span>
+                    ))}
+                    {
+                        decryptContent?.buzzType === 'pay' && decryptContent.status === 'purchased' && decryptContent.encryptContent && <>
+
+                            {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
+                                <span key={index} style={{ wordBreak: 'break-all' }}>
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: handleSpecial(detectUrl(line)),
+                                        }}
+                                    />
+                                </span>
+                            ))}
+                        </>
                     }
                 </div>
 
 
-            </Image.PreviewGroup>
+
+
+                {
+                    decryptContent?.publicFiles && <>
+
+                        <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }}>
+                            <Image.PreviewGroup
+
+                                preview={{
+                                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                }}
+
+                            >
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '4px',
+
+                                }}
+                                >
+                                    {
+                                        decryptContent?.publicFiles.map((pid: string) => {
+                                            return <Image
+                                                key={pid}
+                                                width={120}
+                                                height={120}
+                                                style={{ objectFit: 'cover' }}
+                                                src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
+                                            />
+                                        })
+                                    }
+                                    {
+                                        decryptContent.status === 'purchased' ? decryptContent?.encryptFiles.map((pid: string) => {
+                                            return <Image
+                                                key={pid}
+                                                width={120}
+                                                height={120}
+                                                style={{ objectFit: 'cover' }}
+                                                src={`data:image/jpeg;base64,${pid}`}
+                                            />
+                                        }) :
+                                            decryptContent?.encryptFiles
+                                                .map((pid: string) => {
+                                                    return <div style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
+                                                        <LockOutlined style={{ fontSize: 24 }} />
+
+                                                    </div>
+                                                }
+                                                )
+                                    }
+
+                                </div>
+
+
+                            </Image.PreviewGroup>
+                        </div>
+                    </>
+                }
+                {
+                    decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <Text type="warning" style={{ lineHeight: '16px' }}>{
+                                accessControl?.data?.payCheck?.amount
+                            }</Text>
+                            <img src={_btc} alt="" width={16} height={16} />
+                        </div>
+                        <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
+                            disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
+                                e.stopPropagation()
+                                // handlePay()
+                                if (chain === 'mvc') {
+                                    await connect('btc')
+                                }
+                                setShowUnlock(true)
+
+                            }}
+                            loading={decryptContent?.status === 'mempool'}
+                        >
+                            {decryptContent.status === 'unpurchased' ? 'Unlock' : 'Unlocked'}
+                        </Button>
+                    </div>
+                }
+
+
+
+                {<Space>
+                    <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
+                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
+                        .unix(buzzItem.timestamp)
+                        .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
+
+                </Space>}
+
+            </div>
+
         </div>
 
-
-        <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
-        <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />
     </div>
 }

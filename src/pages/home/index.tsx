@@ -42,7 +42,7 @@ export default () => {
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
         useInfiniteQuery({
-            queryKey: ['homebuzzesnew'],
+            queryKey: ['homebuzzesnew', user.address],
             enabled: Boolean(btcConnector),
             queryFn: ({ pageParam }) =>
                 fetchAllBuzzs({

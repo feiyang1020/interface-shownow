@@ -351,7 +351,7 @@ const BuzzCard = ({
       });
       console.log('likeRes', likeRes);
       if (!isNil(likeRes?.revealTxIds[0])) {
-        queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+        queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
         queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
         message.success('like buzz successfully');
       }
@@ -394,7 +394,7 @@ const BuzzCard = ({
           },
         });
         if (!isNil(unfollowRes?.revealTxIds[0])) {
-          queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+          queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
           setMyFollowingList((d) => {
             return d.filter((i) => i !== metaid);
           });
@@ -438,7 +438,7 @@ const BuzzCard = ({
           },
         });
         if (!isNil(followRes?.revealTxIds[0])) {
-          queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+          queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
           setMyFollowingList((d: string[]) => {
             return [...d, metaid!];
           });

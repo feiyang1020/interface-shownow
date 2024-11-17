@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid } from "@/request/api";
+import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
@@ -135,7 +135,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                     },
                 });
                 if (!isNil(likeRes?.revealTxIds[0])) {
-                    queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                     queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
                     // await sleep(5000);
                     message.success('like buzz successfully');
@@ -165,7 +165,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                 })
                 console.log('likeRes', likeRes)
                 if (!isNil(likeRes?.txid)) {
-                    queryClient.invalidateQueries({ queryKey: ['buzzes'] })
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] })
                     queryClient.invalidateQueries({
                         queryKey: ['payLike', buzzItem!.id],
                     })
@@ -188,7 +188,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
         }
     };
     const quotePinId = useMemo(() => {
-        let _summary = buzzItem!.contentSummary;
+        let _summary = buzzItem!.content;
         const isSummaryJson = _summary.startsWith('{') && _summary.endsWith('}');
         const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
         return isSummaryJson && !isEmpty(parseSummary?.quotePin ?? '')
@@ -205,7 +205,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
     const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
         enabled: !isEmpty(quotePinId),
         queryKey: ['buzzDetail', quotePinId],
-        queryFn: () => getPinDetailByPid({ pid: quotePinId }),
+        queryFn: () => fetchBuzzDetail({ pinId: quotePinId }),
     })
 
     const { data: accessControl } = useQuery({
@@ -214,13 +214,12 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
         queryFn: () => getControlByContentPin({ pinId: buzzItem!.id }),
     })
 
-    const { data: decryptContent } = useQuery({
+    const { data: decryptContent, refetch: refetchDecrypt } = useQuery({
         enabled: Boolean(user.address),
-        queryKey: ['buzzdecryptContent', buzzItem!.id],
+        queryKey: ['buzzdecryptContent', buzzItem!.id, chain, user.address],
         queryFn: () => decodePayBuzz(buzzItem, manPubKey!, chain),
     })
 
-    console.log('decryptContent222', payBuzz, decryptContent)
 
 
 
@@ -243,7 +242,8 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                     payCheck.amount,
                 )
                 message.success('Pay successfully, please wait for the transaction to be confirmed!')
-                setShowUnlock(false)
+                setShowUnlock(false);
+                refetchDecrypt()
             }
         } catch (e) {
             message.error(e.message)
@@ -286,7 +286,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                         </span>
                     ))}
                     {
-                        decryptContent?.buzzType === 'pay' && decryptContent.isDecode && decryptContent.encryptContent && <>
+                        decryptContent?.buzzType === 'pay' && decryptContent.status === 'purchased' && decryptContent.encryptContent && <>
 
                             {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
                                 <span key={index} style={{ wordBreak: 'break-all' }}>
@@ -334,7 +334,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                                         })
                                     }
                                     {
-                                        decryptContent.isDecode ? decryptContent?.encryptFiles.map((pid: string) => {
+                                        decryptContent.status === 'purchased' ? decryptContent?.encryptFiles.map((pid: string) => {
                                             return <Image
                                                 key={pid}
                                                 width={120}
@@ -369,7 +369,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                             <img src={_btc} alt="" width={16} height={16} />
                         </div>
                         <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
-                            disabled={decryptContent?.isDecode} onClick={async (e) => {
+                            disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                 e.stopPropagation()
                                 // handlePay()
                                 if (chain === 'mvc') {
@@ -377,9 +377,10 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                                 }
                                 setShowUnlock(true)
 
-                            }
-                            } >
-                            {decryptContent?.isDecode ? 'Unlocked' : 'Unlock'}
+                            }}
+                            loading={decryptContent?.status === 'mempool'}
+                        >
+                            {decryptContent.status === 'unpurchased' ? 'Unlock' : 'Unlocked'}
                         </Button>
                     </div>
                 }
@@ -388,7 +389,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                 {!isEmpty(quotePinId) && (
 
                     <Card style={{ padding: 0, marginBottom: 12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
-                        <ForwardTweet buzzItem={quoteDetailData!} showActions={false} />
+                        <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />
                     </Card>
 
                 )}
@@ -431,7 +432,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
 
         <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />
-        <Unlock show={showUnlock} onClose={() => { setShowUnlock(false) }}  >
+        <Unlock show={showUnlock && (decryptContent?.status !== 'purchased' && decryptContent?.status !== 'mempool')} onClose={() => { setShowUnlock(false) }}  >
             <div style={{
                 display: 'flex',
                 alignItems: 'center',

@@ -313,9 +313,6 @@ export const fetchAllBuzzs = async (params: {
 
 export const fetchBuzzDetail = async (params: {
   pinId: string;
-  lastId?: string;
-  metaid?: string;
-  followed?: string;
 }) => {
   return request<API.BuzzDetailRet>(`${BASE_MAN_URL}/social/buzz/info`, {
     method: "GET",
@@ -340,12 +337,14 @@ export const getDecryptContent = async (params: {
   timestamp: number;
   pinId: string;
   controlPath: string;
+  controlPinId: string;
 }) => {
   return request<{
     code: number;
     data: {
       contentResult: string;
       filesResult: string[];
+      status:API.PayStatus;
     };
   }>(`${BASE_MAN_URL + "/api/access/decrypt"}`, {
     method: "POST",
