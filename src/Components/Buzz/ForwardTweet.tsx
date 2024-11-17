@@ -203,7 +203,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     </>
                 }
                 {
-                    decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                    buzzItem.genesisHeight !== 0 && decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <Text type="warning" style={{ lineHeight: '16px' }}>{
                                 accessControl?.data?.payCheck?.amount
