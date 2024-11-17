@@ -483,6 +483,16 @@ export const decodePayBuzz = async (
       controlPath: "",
     });
     const { data } = decryptRet;
+    if(!data) {
+      return {
+        publicContent: parseSummary.publicContent,
+        encryptContent: parseSummary.encryptContent,
+        publicFiles: parseSummary.publicFiles,
+        encryptFiles: parseSummary.encryptFiles,
+        buzzType: "pay",
+        isDecode: false,
+      };
+    }
     return {
       publicContent: parseSummary.publicContent,
       encryptContent: data.contentResult,
