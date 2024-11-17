@@ -213,12 +213,12 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
     })
 
     const { data: decryptContent } = useQuery({
-        enabled: Boolean(payBuzz && user.address && payBuzz.encryptContent),
+        enabled: Boolean(user.address),
         queryKey: ['buzzdecryptContent', buzzItem!.id],
         queryFn: () => decodePayBuzz(buzzItem, manPubKey!, chain),
     })
 
-    console.log('decryptContent', payBuzz, decryptContent)
+    console.log('decryptContent222', payBuzz, decryptContent)
 
 
 
@@ -249,6 +249,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
 
 
     }
+
 
     return <div className="tweet" style={{ padding }} >
         <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
@@ -360,7 +361,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                     </>
                 }
                 {
-                    !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                    decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <Text type="warning" style={{ lineHeight: '16px' }}>{
                                 accessControl?.data?.payCheck?.amount

@@ -179,7 +179,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 console.log('create res for inscribe', createRes);
                 if (!isNil(createRes?.revealTxIds[0])) {
                     // await sleep(5000);
-                    queryClient.invalidateQueries({ queryKey: ['buzzes'] });
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                     message.success(`${isQuoted ? 'repost' : 'create'} buzz successfully`);
                     setContent('');
                     setImages([]);
@@ -199,7 +199,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 console.log('create res for inscribe', createRes)
                 if (!isNil(createRes?.txid)) {
                     // await sleep(5000);
-                    queryClient.invalidateQueries({ queryKey: ['buzzes'] })
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] })
                     message.success(`${isQuoted ? 'repost' : 'create'} buzz successfully`)
                     setContent('')
                     setImages([])
@@ -248,6 +248,7 @@ export default ({ show, onClose, quotePin }: Props) => {
             setContent('')
             setImages([])
             onClose()
+            queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
 
         } catch (error) {
             console.log('error', error);

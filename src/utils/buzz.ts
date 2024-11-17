@@ -375,7 +375,6 @@ export const decodePayBuzz = async (
   manPubKey: string,
   chain: API.Chain
 ) => {
-  //TODO
 
   let _summary = buzzItem!.content;
   const isSummaryJson = _summary.startsWith("{") && _summary.endsWith("}");
@@ -502,7 +501,7 @@ export const decodePayBuzz = async (
       isDecode: true,
     };
   }
-
+  
   return {
     publicContent: parseSummary.content,
     encryptContent: "",
