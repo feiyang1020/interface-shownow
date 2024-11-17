@@ -230,7 +230,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
 
                 {<Space>
-                    <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
+                    <Tag bordered={false} icon={buzzItem.genesisHeight === 0 ? <SyncOutlined spin /> : null} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
                         .unix(buzzItem.timestamp)
                         .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>

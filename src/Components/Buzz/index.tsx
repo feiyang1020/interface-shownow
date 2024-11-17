@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid } from "@/request/api";
-import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, UnlockFilled, UploadOutlined } from "@ant-design/icons"
+import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
@@ -361,7 +361,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                     </>
                 }
                 {
-                   buzzItem.genesisHeight !== 0 && decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                    buzzItem.genesisHeight !== 0 && decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <Text type="warning" style={{ lineHeight: '16px' }}>{
                                 accessControl?.data?.payCheck?.amount
@@ -394,7 +394,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
 
                 )}
                 {<Space>
-                    <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
+                    <Tag icon={buzzItem.genesisHeight === 0 ? <SyncOutlined spin /> : null} bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
                         .unix(buzzItem.timestamp)
                         .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
