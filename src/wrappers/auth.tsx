@@ -1,14 +1,15 @@
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
 import { Navigate, Outlet, useModel } from 'umi'
 
 export default (props) => {
-  const { isLogin,initializing } = useModel('user');
-  console.log(isLogin,'isLogin')
+  const { isLogin, initializing } = useModel('user');
   if (initializing) {
-    return <div>loading...</div>
+    return <Spin spinning fullscreen indicator={<LoadingOutlined spin />} />
   }
   if (isLogin) {
     return <Outlet />;
-  } else{
+  } else {
     return <Navigate to="/login" />;
   }
 }
