@@ -4,8 +4,9 @@ import { Navigate, Outlet, useModel } from 'umi'
 
 export default (props) => {
   const { isLogin, initializing } = useModel('user');
+  const { showConf } = useModel('dashboard')
   if (initializing) {
-    return <Spin spinning fullscreen indicator={<LoadingOutlined spin />} />
+    return <Spin spinning fullscreen indicator={<LoadingOutlined style={{color:showConf?.brandColor}} spin />} />
   }
   if (isLogin) {
     return <Outlet />;
