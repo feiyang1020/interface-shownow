@@ -240,5 +240,40 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
         </div>
 
+        <Unlock show={showUnlock && (decryptContent?.status !== 'purchased' && decryptContent?.status !== 'mempool')} onClose={() => { setShowUnlock(false) }}  >
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 20,
+                flexDirection: 'column'
+            }}>
+                <img src={_btc} alt="" width={60} height={60} />
+                {accessControl?.data?.payCheck?.amount} BTC
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 20,
+
+                }}>
+                    <Button shape='round' type='primary' block onClick={() => {
+                        setShowUnlock(false)
+                    }} >
+                        Cancel
+                    </Button>
+                    <Button shape='round' block style={{ background: showConf?.gradientColor, color: '#fff' }}
+                        onClick={async (e) => {
+                            e.stopPropagation()
+                            handlePay()
+                        }
+                        } >
+                        Unlock
+                    </Button>
+
+                </div>
+            </div>
+        </Unlock>
+
     </div>
 }
