@@ -226,6 +226,25 @@ export default () => {
     }
     setInitializing(false);
   }, []);
+
+  const fetchUserInfo = useCallback(async () => {
+    const userInfo = await btcConnector!.getUser({
+      network: curNetwork,
+      currentAddress: user.address,
+    });
+    setUser({
+      avater: userInfo.avatar
+        ? `${getHostByNet(network)}${userInfo.avatar}`
+        : "",
+      background: userInfo.background
+        ? `${getHostByNet(network)}${userInfo.background}`
+        : "",
+      name: userInfo.name,
+      metaid: userInfo.metaid,
+      notice: 0,
+      address: userInfo.address,
+    });
+  }, [btcConnector, user]);
   useEffect(() => {
     //
     setTimeout(() => {
@@ -272,5 +291,6 @@ export default () => {
     mvcConnector,
     followList,
     setFollowList,
+    fetchUserInfo,
   };
 };

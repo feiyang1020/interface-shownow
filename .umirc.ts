@@ -42,4 +42,5 @@ export default defineConfig({
   // outputPath: '../server-shownow/public',
   esbuildMinifyIIFE: true,
   jsMinifier: "none",
+  favicons: ["/favicon.ico"],
 });

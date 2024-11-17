@@ -13,7 +13,7 @@ import ForwardTweet from "./ForwardTweet";
 import { IMvcEntity } from "@metaid/metaid";
 import { FollowIconComponent } from "../Follow";
 import dayjs from "dayjs";
-import { buildAccessPass } from "@/utils/buzz";
+import { buildAccessPass, decodePayBuzz } from "@/utils/buzz";
 const { Paragraph, Text } = Typography;
 import _btc from '@/assets/btc.png'
 
@@ -23,12 +23,12 @@ type Props = {
     padding?: number
 }
 
-export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
+export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const queryClient = useQueryClient();
     const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user');
-    const { showConf, fetchServiceFee } = useModel('dashboard')
+    const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () =>
@@ -78,7 +78,6 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
         const urlReg = /(https?:\/\/[^\s]+)/g;
 
         const urls = summary.match(urlReg);
-
         if (urls) {
             urls.forEach(function (url) {
                 summary = summary.replace(
@@ -87,7 +86,6 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
                 );
             });
         }
-
         return summary;
     };
 
@@ -196,11 +194,11 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
             : '';
     }, [buzzItem])
 
-    const commentData = useQuery({
-        enabled: !isNil(buzzItem?.id),
-        queryKey: ['comment-detail', buzzItem!.id],
-        queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
-    })
+    // const commentData = useQuery({
+    //     enabled: !isNil(buzzItem?.id),
+    //     queryKey: ['comment-detail', buzzItem!.id],
+    //     queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
+    // })
 
     const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
         enabled: !isEmpty(quotePinId),
@@ -217,13 +215,7 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
     const { data: decryptContent } = useQuery({
         enabled: Boolean(payBuzz && user.address && payBuzz.encryptContent),
         queryKey: ['buzzdecryptContent', buzzItem!.id],
-        queryFn: () => getDecryptContent({
-            address: user!.address,
-            sign: '123',
-            timestamp: Date.now(),
-            pinId: buzzItem!.id,
-            controlPath: '',
-        }),
+        queryFn: () => decodePayBuzz(buzzItem, manPubKey!, chain),
     })
 
     console.log('decryptContent', payBuzz, decryptContent)
@@ -240,7 +232,6 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
             if (accessControl && accessControl.data) {
                 const { data } = accessControl;
                 const { payCheck } = data;
-
                 await buildAccessPass(
                     data.pinId,
                     showConf?.host || '',
@@ -258,7 +249,8 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
 
 
     }
-    return <div className="tweet" style={{padding}} >
+
+    return <div className="tweet" style={{ padding }} >
         <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
             <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
                 {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
@@ -280,7 +272,7 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
             <div className="text" style={{ margin: '8px 0', }} onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-                {(summary ?? '').split('\n').map((line: string, index: number) => (
+                {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
                     <span key={index} style={{ wordBreak: 'break-all' }}>
                         <div
                             dangerouslySetInnerHTML={{
@@ -289,60 +281,65 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
                         />
                     </span>
                 ))}
+                {
+                    decryptContent?.buzzType === 'pay' && decryptContent.isDecode && decryptContent.encryptContent && <>
+
+                        {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
+                            <span key={index} style={{ wordBreak: 'break-all' }}>
+                                <div
+                                    dangerouslySetInnerHTML={{
+                                        __html: handleSpecial(detectUrl(line)),
+                                    }}
+                                />
+                            </span>
+                        ))}
+                    </>
+                }
             </div>
+
+
+
+
             {
-                payBuzz?.publicContent && <div className="text" style={{ margin: '8px 0', }} onClick={() => {
-                    history.push(`/tweet/${buzzItem.id}`)
-                }}>
-                    {(payBuzz.publicContent ?? '').split('\n').map((line: string, index: number) => (
-                        <span key={index} style={{ wordBreak: 'break-all' }}>
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: handleSpecial(detectUrl(line)),
-                                }}
-                            />
-                        </span>
-                    ))}
-                    {(decryptContent?.data ?? '').split('\n').map((line: string, index: number) => (
-                        <span key={index} style={{ wordBreak: 'break-all' }}>
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: handleSpecial(detectUrl(line)),
-                                }}
-                            />
-                        </span>
-                    ))
-                    }
+                decryptContent?.publicFiles && <>
 
-                    {
-                        payBuzz.publicFiles && <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 24, marginTop: 12 }}>
-                            <Image.PreviewGroup
+                    <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }}>
+                        <Image.PreviewGroup
 
-                                preview={{
-                                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                                }}
+                            preview={{
+                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                            }}
 
+                        >
+                            <div style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: '4px',
+
+                            }}
                             >
-                                <div style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: '4px',
-
-                                }}
-                                >
-                                    {
-                                        payBuzz.publicFiles.map((pid: string) => {
-                                            return <Image
-                                                key={pid}
-                                                width={120}
-                                                height={120}
-                                                style={{ objectFit: 'cover' }}
-                                                src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
-                                            />
-                                        })
-                                    }
-                                    {
-                                        payBuzz.encryptFiles
+                                {
+                                    decryptContent?.publicFiles.map((pid: string) => {
+                                        return <Image
+                                            key={pid}
+                                            width={120}
+                                            height={120}
+                                            style={{ objectFit: 'cover' }}
+                                            src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
+                                        />
+                                    })
+                                }
+                                {
+                                    decryptContent.isDecode ? decryptContent?.encryptFiles.map((pid: string) => {
+                                        return <Image
+                                            key={pid}
+                                            width={120}
+                                            height={120}
+                                            style={{ objectFit: 'cover' }}
+                                            src={`data:image/jpeg;base64,${pid}`}
+                                        />
+                                    }) :
+                                        decryptContent?.encryptFiles
                                             .map((pid: string) => {
                                                 return <div style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
                                                     <LockOutlined style={{ fontSize: 24 }} />
@@ -350,69 +347,31 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
                                                 </div>
                                             }
                                             )
+                                }
 
-                                    }
-                                </div>
-
-
-                            </Image.PreviewGroup>
-                        </div>
-                    }
-                    {
-                        !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Text type="warning" style={{ lineHeight: '16px' }}>{
-                                    accessControl?.data?.payCheck?.amount
-                                }</Text>
-                                <img src={_btc} alt="" width={16} height={16} />
                             </div>
-                            <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }} onClick={(e) => {
-                                e.stopPropagation()
-                                handlePay()
-                            }
-                            } >
-                                Decrypt
-                            </Button>
-                        </div>
-                    }
 
-                </div>
+
+                        </Image.PreviewGroup>
+                    </div>
+                </>
             }
-
-
-
-
             {
-                !isEmpty(attachPids) && <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 24 }}>
-                    <Image.PreviewGroup
-
-                        preview={{
-                            onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                        }}
-
-                    >
-                        <div style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '4px',
-
-                        }}
-                        >
-                            {
-                                attachPids.map((pid: string) => {
-                                    return <Image
-                                        key={pid}
-                                        width={120}
-                                        height={120}
-                                        style={{ objectFit: 'cover' }}
-                                        src={`${BASE_MAN_URL}/content/${pid}`}
-                                    />
-                                })
-                            }
-                        </div>
-
-
-                    </Image.PreviewGroup>
+                !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Text type="warning" style={{ lineHeight: '16px' }}>{
+                            accessControl?.data?.payCheck?.amount
+                        }</Text>
+                        <img src={_btc} alt="" width={16} height={16} />
+                    </div>
+                    <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
+                        disabled={decryptContent?.isDecode} onClick={(e) => {
+                            e.stopPropagation()
+                            handlePay()
+                        }
+                        } >
+                        {decryptContent?.isDecode ? 'Unlocked' : 'Unlock'}
+                    </Button>
                 </div>
             }
 
@@ -455,11 +414,6 @@ export default ({ buzzItem, showActions = true, padding=20 }: Props) => {
                         showNewPost ? setShowNewPost(false) : setShowNewPost(true)
                     }} />
                 </div>
-                {/* {
-                    payBuzz && <div className="item">
-                        <Button type='text' icon={<UnlockFilled />} onClick={handlePay} />
-                    </div>
-                } */}
             </div>}
         </div>
 

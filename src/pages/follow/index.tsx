@@ -53,7 +53,7 @@ export default () => {
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
         useInfiniteQuery({
-            queryKey: ['homebuzzesnew'],
+            queryKey: ['homebuzzesfollow',user.metaid],
             enabled: Boolean(user.metaid),
             queryFn: ({ pageParam }) =>
                 fetchAllBuzzs({

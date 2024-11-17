@@ -5,7 +5,12 @@ import {
   MvcTransaction,
 } from "@metaid/metaid";
 import { AttachmentItem } from "./file";
-import { encryptPayloadAES, generateAESKey } from "./utils";
+import {
+  decryptPayloadAES,
+  encryptPayloadAES,
+  generateAESKey,
+  sha256sum,
+} from "./utils";
 import { curNetwork, FLAG } from "@/config";
 import { IBtcConnector } from "metaid/dist";
 import { InscribeData } from "metaid/src/core/entity/btc";
@@ -13,6 +18,13 @@ import Decimal from "decimal.js";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import ECPairFactory, { ECPairInterface, SignerAsync } from "ecpair";
 import * as bitcoin from "bitcoinjs-lib";
+import { dec, isEmpty } from "ramda";
+import {
+  getControlByContentPin,
+  getDecryptContent,
+  getPinDetailByPid,
+} from "@/request/api";
+import * as crypto from "crypto";
 bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
 type PostParams = {
@@ -351,5 +363,142 @@ export const buildAccessPass = async (
       },
     },
   });
-  if(res.status) throw new Error(res.status)
+  if (res.status) throw new Error(res.status);
+};
+
+function sha256ToHex(input: string): string {
+  return crypto.createHash("sha256").update(input).digest("hex");
+}
+
+export const decodePayBuzz = async (
+  buzzItem: API.Buzz,
+  manPubKey: string,
+  chain: API.Chain
+) => {
+  //TODO
+
+  let _summary = buzzItem!.content;
+  const isSummaryJson = _summary.startsWith("{") && _summary.endsWith("}");
+  const parseSummary = isSummaryJson ? JSON.parse(_summary) : {};
+  if (!isSummaryJson) {
+    return {
+      publicContent: _summary,
+      encryptContent: "",
+      publicFiles: [],
+      encryptFiles: [],
+      buzzType: "normal",
+      isDecode: false,
+    };
+  }
+
+  if (!isEmpty(parseSummary?.attachments ?? [])) {
+    return {
+      publicContent: parseSummary.content,
+      encryptContent: "",
+      publicFiles: (parseSummary?.attachments ?? []).map(
+        (d: string) => d.split("metafile://")[1]
+      ),
+      encryptFiles: [],
+    };
+  }
+
+  if (
+    parseSummary.encryptContent ||
+    !isEmpty(parseSummary?.encryptFiles ?? [])
+  ) {
+    const { data: controlPin } = await getControlByContentPin({
+      pinId: buzzItem!.id,
+    });
+    if (!controlPin) {
+      return {
+        publicContent: parseSummary.publicContent,
+        encryptContent: "",
+        publicFiles: [],
+        encryptFiles: [],
+        buzzType: "normal",
+        isDecode: false,
+      };
+    }
+    // const { creatorPubkey, encryptedKey, manPubkey } = controlPin;
+    const address =
+      chain === "btc"
+        ? await window.metaidwallet.btc.getAddress()
+        : await window.metaidwallet.getAddress();
+    console.log(address, buzzItem, "address");
+    if (buzzItem.creator === address) {
+      const { manPubkey, encryptedKey } = controlPin;
+      const { sharedSecret, ecdhPubKey } =
+        await window.metaidwallet.common.ecdh({
+          externalPubKey: manPubKey,
+        });
+      const key = decryptPayloadAES(sharedSecret, encryptedKey);
+      console.log(key, sharedSecret, encryptedKey, "key");
+      const encryptContent = decryptPayloadAES(
+        key,
+        parseSummary.encryptContent
+      );
+      const { encryptFiles } = parseSummary;
+      let decryptFiles: string[] = [];
+      if (encryptFiles.length > 0) {
+        const pids = encryptFiles.map((d: string) => d.split("metafile://")[1]);
+        const _pins = await Promise.all(
+          pids.map((pid: string) => getPinDetailByPid({ pid }))
+        );
+        const pins = _pins.filter((d) => Boolean(d));
+        decryptFiles = pins.map((pin) => {
+          return Buffer.from(
+            decryptPayloadAES(key, pin.contentSummary),
+            "hex"
+          ).toString("base64");
+        });
+      }
+
+      return {
+        publicContent: parseSummary.publicContent,
+        encryptContent: Buffer.from(encryptContent, "hex").toString("utf-8"),
+        publicFiles: parseSummary.publicFiles,
+        encryptFiles: decryptFiles,
+        buzzType: "pay",
+        isDecode: true,
+      };
+    }
+
+    const { sharedSecret, ecdhPubKey } = await window.metaidwallet.common.ecdh({
+      externalPubKey: manPubKey,
+    });
+
+    const timestamp = Math.floor(Date.now() / 1000);
+    const _signStr = `${sharedSecret}${timestamp}${address}`;
+    console.log(sharedSecret, "sharedSecret");
+    console.log(timestamp, "timestamp");
+    console.log(address, "address");
+    console.log(_signStr, "signStr");
+    const sign = sha256ToHex(_signStr);
+    const decryptRet = await getDecryptContent({
+      publickey: ecdhPubKey,
+      address: address,
+      sign: sign,
+      timestamp,
+      pinId: buzzItem!.id,
+      controlPath: "",
+    });
+    const { data } = decryptRet;
+    return {
+      publicContent: parseSummary.publicContent,
+      encryptContent: data.contentResult,
+      publicFiles: parseSummary.publicFiles,
+      encryptFiles: data.filesResult,
+      buzzType: "pay",
+      isDecode: true,
+    };
+  }
+
+  return {
+    publicContent: parseSummary.content,
+    encryptContent: "",
+    publicFiles: [],
+    encryptFiles: [],
+    buzzType: "normal",
+    isDecode: false,
+  };
 };

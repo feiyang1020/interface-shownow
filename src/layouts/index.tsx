@@ -87,14 +87,18 @@ export default function Lay() {
             }} className='header'>
               <Row style={{ width: '100%', flexGrow: 1 }} gutter={[12, 12]}>
                 {md ? <Col span={24} md={15}>
-                  <div className="searchWrap">
-                    <Input size="large" placeholder="Search" prefix={<SearchOutlined style={{ opacity: 0.5 }} />} variant="borderless" />
+                  <div className="searchWrap" onClick={() => { setShowPost(true) }}>
+                    <Input size="large"  prefix={
+                      <EditOutlined style={{ color: showConf?.brandColor }} />
+                    } placeholder='What is happening？' variant="borderless" suffix={
+                      <Button shape='round' style={{ background: showConf?.gradientColor, color: '#fff', marginRight: 12 }} > Post</Button>
+                    } />
                   </div>
                 </Col> : ''}
                 <Col span={24} md={9}>
                   <div className="userPanel">
                     <div className="user">
-                      <Avatar size="large" src={user.avater} />
+                      <Avatar size="large" src={user.avater ? <img src={user.avater}></img> : null} />
                       <div className='desc'>
                         <div className="name">
                           {user.name || 'Unnanmed'}

@@ -334,6 +334,7 @@ export const getControlByContentPin = async (params: { pinId: string }) => {
 };
 
 export const getDecryptContent = async (params: {
+  publickey: string;
   address: string;
   sign: string;
   timestamp: number;
@@ -342,7 +343,10 @@ export const getDecryptContent = async (params: {
 }) => {
   return request<{
     code: number;
-    data: string;
+    data: {
+      contentResult: string;
+      filesResult: string[];
+    };
   }>(`${BASE_MAN_URL + "/api/access/decrypt"}`, {
     method: "POST",
     data: params,

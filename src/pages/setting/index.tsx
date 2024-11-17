@@ -15,7 +15,7 @@ const normFile = (e: any) => {
 
 export default () => {
     const { showConf } = useModel('dashboard');
-    const { user, btcConnector, mvcConnector, chain, feeRate } = useModel('user');
+    const { user, btcConnector, mvcConnector, chain, feeRate, fetchUserInfo } = useModel('user');
     const [form] = Form.useForm();
     const connector = chain === 'btc' ? btcConnector : mvcConnector;
     const profileUserData = useQuery({
@@ -88,6 +88,7 @@ export default () => {
 
                 }
             }
+            fetchUserInfo()
         } catch (e) {
             message.error(e.message)
         }
@@ -113,12 +114,12 @@ export default () => {
                 </Form.Item>
 
                 <Form.Item label="Background" name='background'>
-                    <UploadAvatar />
+                    <UploadAvatar listType='picture-card' />
                 </Form.Item>
 
             </Form>
 
-            
+
 
 
 

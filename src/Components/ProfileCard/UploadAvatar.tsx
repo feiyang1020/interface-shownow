@@ -67,7 +67,7 @@ const UploadAvatar = (props: any) => {
             beforeUpload={beforeUpload}
             onChange={handleChange}
             name="avatar"
-            listType="picture-circle"
+            listType={props.listType || "picture-circle"}
             className="avatar-uploader"
             showUploadList={false}
             style={{ overflow: 'hidden' }}
