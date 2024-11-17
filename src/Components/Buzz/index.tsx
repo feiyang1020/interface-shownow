@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import { buildAccessPass, decodePayBuzz } from "@/utils/buzz";
 const { Paragraph, Text } = Typography;
 import _btc from '@/assets/btc.png'
+import Unlock from "../Unlock";
 
 type Props = {
     buzzItem: API.Buzz
@@ -26,6 +27,7 @@ type Props = {
 export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
+    const [showUnlock, setShowUnlock] = useState(false);
     const queryClient = useQueryClient();
     const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user');
     const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
@@ -241,13 +243,11 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                     payCheck.amount,
                 )
                 message.success('Pay successfully, please wait for the transaction to be confirmed!')
+                setShowUnlock(false)
             }
         } catch (e) {
             message.error(e.message)
         }
-
-
-
     }
 
 
@@ -369,9 +369,14 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                             <img src={_btc} alt="" width={16} height={16} />
                         </div>
                         <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
-                            disabled={decryptContent?.isDecode} onClick={(e) => {
+                            disabled={decryptContent?.isDecode} onClick={async (e) => {
                                 e.stopPropagation()
-                                handlePay()
+                                // handlePay()
+                                if (chain === 'mvc') {
+                                    await connect('btc')
+                                }
+                                setShowUnlock(true)
+
                             }
                             } >
                             {decryptContent?.isDecode ? 'Unlocked' : 'Unlock'}
@@ -426,5 +431,39 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
 
         <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />
+        <Unlock show={showUnlock} onClose={() => { setShowUnlock(false) }}  >
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 20,
+                flexDirection: 'column'
+            }}>
+                <img src={_btc} alt="" width={60} height={60} />
+                {accessControl?.data?.payCheck?.amount} BTC
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 20,
+
+                }}>
+                    <Button shape='round' type='primary' block onClick={() => {
+                        setShowUnlock(false)
+                    }} >
+                        Cancel
+                    </Button>
+                    <Button shape='round' block style={{ background: showConf?.gradientColor, color: '#fff' }}
+                        onClick={async (e) => {
+                            e.stopPropagation()
+                            handlePay()
+                        }
+                        } >
+                        Unlock
+                    </Button>
+
+                </div>
+            </div>
+        </Unlock>
     </div>
 }
