@@ -12,6 +12,7 @@ import { FollowIconComponent } from "../Follow";
 import { detectUrl, handleSpecial } from "@/utils/utils";
 import _btc from '@/assets/btc.png'
 import { useState } from "react";
+import Unlock from "../Unlock";
 const { Text } = Typography;
 
 type Props = {
