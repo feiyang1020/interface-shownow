@@ -269,127 +269,132 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                 <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unname'}</div>
                 <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
             </div>
-            <div className="text" style={{ margin: '8px 0', }} onClick={() => {
+            <div onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-                {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
-                    <span key={index} style={{ wordBreak: 'break-all' }}>
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: handleSpecial(detectUrl(line)),
-                            }}
-                        />
-                    </span>
-                ))}
-                {
-                    decryptContent?.buzzType === 'pay' && decryptContent.isDecode && decryptContent.encryptContent && <>
 
-                        {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
-                            <span key={index} style={{ wordBreak: 'break-all' }}>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: handleSpecial(detectUrl(line)),
-                                    }}
-                                />
-                            </span>
-                        ))}
+
+                <div className="text" style={{ margin: '8px 0', }} >
+                    {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
+                        <span key={index} style={{ wordBreak: 'break-all' }}>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: handleSpecial(detectUrl(line)),
+                                }}
+                            />
+                        </span>
+                    ))}
+                    {
+                        decryptContent?.buzzType === 'pay' && decryptContent.isDecode && decryptContent.encryptContent && <>
+
+                            {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
+                                <span key={index} style={{ wordBreak: 'break-all' }}>
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: handleSpecial(detectUrl(line)),
+                                        }}
+                                    />
+                                </span>
+                            ))}
+                        </>
+                    }
+                </div>
+
+
+
+
+                {
+                    decryptContent?.publicFiles && <>
+
+                        <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }}>
+                            <Image.PreviewGroup
+
+                                preview={{
+                                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                }}
+
+                            >
+                                <div style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '4px',
+
+                                }}
+                                >
+                                    {
+                                        decryptContent?.publicFiles.map((pid: string) => {
+                                            return <Image
+                                                key={pid}
+                                                width={120}
+                                                height={120}
+                                                style={{ objectFit: 'cover' }}
+                                                src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
+                                            />
+                                        })
+                                    }
+                                    {
+                                        decryptContent.isDecode ? decryptContent?.encryptFiles.map((pid: string) => {
+                                            return <Image
+                                                key={pid}
+                                                width={120}
+                                                height={120}
+                                                style={{ objectFit: 'cover' }}
+                                                src={`data:image/jpeg;base64,${pid}`}
+                                            />
+                                        }) :
+                                            decryptContent?.encryptFiles
+                                                .map((pid: string) => {
+                                                    return <div style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
+                                                        <LockOutlined style={{ fontSize: 24 }} />
+
+                                                    </div>
+                                                }
+                                                )
+                                    }
+
+                                </div>
+
+
+                            </Image.PreviewGroup>
+                        </div>
                     </>
                 }
+                {
+                    !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <Text type="warning" style={{ lineHeight: '16px' }}>{
+                                accessControl?.data?.payCheck?.amount
+                            }</Text>
+                            <img src={_btc} alt="" width={16} height={16} />
+                        </div>
+                        <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
+                            disabled={decryptContent?.isDecode} onClick={(e) => {
+                                e.stopPropagation()
+                                handlePay()
+                            }
+                            } >
+                            {decryptContent?.isDecode ? 'Unlocked' : 'Unlock'}
+                        </Button>
+                    </div>
+                }
+
+
+                {!isEmpty(quotePinId) && (
+
+                    <Card style={{ padding: 0, marginBottom: 12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
+                        <ForwardTweet buzzItem={quoteDetailData!} showActions={false} />
+                    </Card>
+
+                )}
+                {<Space>
+                    <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
+                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
+                        .unix(buzzItem.timestamp)
+                        .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
+
+                </Space>}
+
             </div>
-
-
-
-
-            {
-                decryptContent?.publicFiles && <>
-
-                    <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }}>
-                        <Image.PreviewGroup
-
-                            preview={{
-                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                            }}
-
-                        >
-                            <div style={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: '4px',
-
-                            }}
-                            >
-                                {
-                                    decryptContent?.publicFiles.map((pid: string) => {
-                                        return <Image
-                                            key={pid}
-                                            width={120}
-                                            height={120}
-                                            style={{ objectFit: 'cover' }}
-                                            src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
-                                        />
-                                    })
-                                }
-                                {
-                                    decryptContent.isDecode ? decryptContent?.encryptFiles.map((pid: string) => {
-                                        return <Image
-                                            key={pid}
-                                            width={120}
-                                            height={120}
-                                            style={{ objectFit: 'cover' }}
-                                            src={`data:image/jpeg;base64,${pid}`}
-                                        />
-                                    }) :
-                                        decryptContent?.encryptFiles
-                                            .map((pid: string) => {
-                                                return <div style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
-                                                    <LockOutlined style={{ fontSize: 24 }} />
-
-                                                </div>
-                                            }
-                                            )
-                                }
-
-                            </div>
-
-
-                        </Image.PreviewGroup>
-                    </div>
-                </>
-            }
-            {
-                !decryptContent?.data && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Text type="warning" style={{ lineHeight: '16px' }}>{
-                            accessControl?.data?.payCheck?.amount
-                        }</Text>
-                        <img src={_btc} alt="" width={16} height={16} />
-                    </div>
-                    <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
-                        disabled={decryptContent?.isDecode} onClick={(e) => {
-                            e.stopPropagation()
-                            handlePay()
-                        }
-                        } >
-                        {decryptContent?.isDecode ? 'Unlocked' : 'Unlock'}
-                    </Button>
-                </div>
-            }
-
-
-            {!isEmpty(quotePinId) && (
-
-                <Card style={{ padding: 0, marginBottom: 12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
-                    <ForwardTweet buzzItem={quoteDetailData!} showActions={false} />
-                </Card>
-
-            )}
-            {<Space>
-                <Tag bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
-                    .unix(buzzItem.timestamp)
-                    .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
-
-            </Space>}
 
 
 
