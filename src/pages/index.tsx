@@ -1,4 +1,4 @@
-import { Button, Space, Grid } from 'antd';
+import { Button, Space, Grid, notification } from 'antd';
 import logo from '../assets/logo.svg';
 import bg from '../assets/bg.svg';
 import './index.less';
@@ -9,7 +9,8 @@ const { useBreakpoint } = Grid
 
 
 export default function HomePage() {
-  const { isLogin, setIsLogin, connect, setShowConnect } = useModel('user');
+  const { isLogin, setIsLogin, connect, setShowConnect: _setShowConnect } = useModel('user');
+  const [api, contextHolder] = notification.useNotification();
   const { showConf } = useModel('dashboard');
   const { md } = useBreakpoint()
   const handleConnect = async () => {
@@ -17,7 +18,36 @@ export default function HomePage() {
     setTimeout(() => {
       history.push('/')
     }, 100);
+  }
 
+  const openNotification = () => {
+    const key = `open${Date.now()}`;
+    const btn = (
+      <Space>
+        <Button type="primary" size="small" onClick={() => {
+          window.open(
+            "https://chromewebstore.google.com/detail/metalet/lbjapbcmmceacocpimbpbidpgmlmoaao"
+          );
+          api.destroy()
+        }}>
+          Install Wallet Now
+        </Button>
+      </Space>
+    );
+    api.open({
+      message: 'Metalat Wallet',
+      description:
+        "It looks like you don't have a wallet installed yet. Please install the Metalat wallet.",
+      btn,
+    });
+  }
+
+  const setShowConnect = (_show: boolean) => {
+    if (_show && !window.metaidwallet) {
+      openNotification();
+      return
+    }
+    _setShowConnect(_show)
   }
   return (
     <div className='indexPage'>
@@ -40,13 +70,14 @@ export default function HomePage() {
           <p>Connect your wallet to create a new Account or open an existing one</p>
           <Space>
             <Button shape='round'>Twitter</Button>
-            <Button type="primary" shape='round' onClick={()=>{
+            <Button type="primary" shape='round' onClick={() => {
               setShowConnect(true)
             }} style={{ background: showConf?.brandColor }}>Connect</Button  >
           </Space>
         </div>
       </div>
       <ConnectWallet />
+      {contextHolder}
     </div>
   );
 }
