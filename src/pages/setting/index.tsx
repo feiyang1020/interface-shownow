@@ -77,7 +77,7 @@ export default () => {
                         if (!nameStatus && !avatarStatus && !backgroundStatus) {
                             message.success('Update Successfully')
                         } else {
-                            message.error('User Cancelled')
+                            message.error('User Canceled')
                         }
 
                     }
@@ -104,7 +104,7 @@ export default () => {
                         if (!nameStatus && !avatarStatus && !backgroundStatus) {
                             message.success('Create Successfully')
                         } else {
-                            message.error('User Cancelled')
+                            message.error('User Canceled')
                         }
 
                     }
