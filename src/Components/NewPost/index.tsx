@@ -357,7 +357,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                     <Button disabled icon={<VideoCameraOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
 
                 </Space>
-                <Button shape='round' style={{ background: showConf?.gradientColor, color: '#fff' }} onClick={onCreateSubmit}>
+                <Button shape='round' style={{ background: showConf?.gradientColor, color: '#fff' }} loading={isAdding} onClick={onCreateSubmit}>
                     Post
                 </Button>
             </div>
