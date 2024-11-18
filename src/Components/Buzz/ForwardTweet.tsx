@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchCurrentBuzzLikes, getControlByContentPin, getPinDetailByPid } from "@/request/api";
-import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons"
+import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, SyncOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
@@ -210,7 +210,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                             }</Text>
                             <img src={_btc} alt="" width={16} height={16} />
                         </div>
-                        <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
+                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased'?showConf?.gradientColor:'', color: decryptContent.status === 'unpurchased'?'#fff':'' }}
                             disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                 e.stopPropagation()
                                 // handlePay()

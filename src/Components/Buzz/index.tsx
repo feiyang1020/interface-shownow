@@ -368,7 +368,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                             }</Text>
                             <img src={_btc} alt="" width={16} height={16} />
                         </div>
-                        <Button shape='round' size='small' style={{ background: showConf?.gradientColor, color: '#fff' }}
+                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased'?showConf?.gradientColor:'', color: decryptContent.status === 'unpurchased'?'#fff':'' }}
                             disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                 e.stopPropagation()
                                 // handlePay()
