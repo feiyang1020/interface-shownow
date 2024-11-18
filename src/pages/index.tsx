@@ -24,7 +24,7 @@ export default function HomePage() {
     const key = `open${Date.now()}`;
     const btn = (
       <Space>
-        <Button type="primary" size="small" onClick={() => {
+        <Button type="primary" style={{background:showConf?.brandColor}} size="small" onClick={() => {
           window.open(
             "https://chromewebstore.google.com/detail/metalet/lbjapbcmmceacocpimbpbidpgmlmoaao"
           );
