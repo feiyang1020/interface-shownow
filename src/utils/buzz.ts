@@ -432,7 +432,7 @@ export const decodePayBuzz = async (
     const btcAddress = await window.metaidwallet.btc.getAddress();
     const mvcAddress = await window.metaidwallet.getAddress();
     console.log(address, buzzItem, "address");
-    if (buzzItem.creator === btcAddress||buzzItem.creator === mvcAddress) {
+    if (buzzItem.creator === btcAddress || buzzItem.creator === mvcAddress) {
       const { manPubkey, encryptedKey } = controlPin;
       const { sharedSecret, ecdhPubKey } =
         await window.metaidwallet.common.ecdh({
@@ -474,11 +474,11 @@ export const decodePayBuzz = async (
     });
 
     const timestamp = Math.floor(Date.now() / 1000);
-    const _signStr = `${sharedSecret}${timestamp}${address}`;
+    const _signStr = `${sharedSecret}${timestamp}${btcAddress}`;
     const sign = sha256ToHex(_signStr);
     const decryptRet = await getDecryptContent({
       publickey: ecdhPubKey,
-      address: address,
+      address: btcAddress,
       sign: sign,
       timestamp,
       pinId: buzzItem!.id,
