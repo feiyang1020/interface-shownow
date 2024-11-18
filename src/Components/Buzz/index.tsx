@@ -196,15 +196,15 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
             : '';
     }, [buzzItem])
 
-    // const commentData = useQuery({
-    //     enabled: !isNil(buzzItem?.id),
-    //     queryKey: ['comment-detail', buzzItem!.id],
-    //     queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
-    // })
+    const commentData = useQuery({
+        enabled: !isNil(buzzItem?.id),
+        queryKey: ['comment-detail', buzzItem!.id, showComment],
+        queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
+    })
 
-    const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
+    const { isLoading: isQuoteLoading, data: quoteDetailData, } = useQuery({
         enabled: !isEmpty(quotePinId),
-        queryKey: ['buzzDetail', quotePinId],
+        queryKey: ['buzzDetail', quotePinId,],
         queryFn: () => fetchBuzzDetail({ pinId: quotePinId }),
     })
 
@@ -368,7 +368,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                             }</Text>
                             <img src={_btc} alt="" width={16} height={16} />
                         </div>
-                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased'?showConf?.gradientColor:'', color: decryptContent.status === 'unpurchased'?'#fff':'' }}
+                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
                             disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                 e.stopPropagation()
                                 // handlePay()
@@ -411,7 +411,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
                 <Button type='text' icon={<MessageOutlined />} onClick={() => {
                     showComment ? setShowComment(false) : setShowComment(true)
                 }}>
-                    {buzzItem.commentCount}
+                    {commentData.data?.length}
                 </Button>
 
 
@@ -430,7 +430,9 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
         </div>
 
 
-        <Comment tweetId={buzzItem.id} onClose={() => { setShowComment(false) }} show={showComment} />
+        <Comment tweetId={buzzItem.id} onClose={() => {
+            setShowComment(false)
+        }} show={showComment} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />
         <Unlock show={showUnlock && (decryptContent?.status !== 'purchased' && decryptContent?.status !== 'mempool')} onClose={() => { setShowUnlock(false) }}  >
             <div style={{
