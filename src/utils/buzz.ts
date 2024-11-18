@@ -429,8 +429,10 @@ export const decodePayBuzz = async (
       chain === "btc"
         ? await window.metaidwallet.btc.getAddress()
         : await window.metaidwallet.getAddress();
+    const btcAddress = await window.metaidwallet.btc.getAddress();
+    const mvcAddress = await window.metaidwallet.getAddress();
     console.log(address, buzzItem, "address");
-    if (buzzItem.creator === address) {
+    if (buzzItem.creator === btcAddress||buzzItem.creator === mvcAddress) {
       const { manPubkey, encryptedKey } = controlPin;
       const { sharedSecret, ecdhPubKey } =
         await window.metaidwallet.common.ecdh({
