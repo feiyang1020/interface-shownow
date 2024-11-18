@@ -4,7 +4,7 @@ import { image2Attach } from "@/utils/file";
 import { PlusOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, Button, Card, Form, Input, message, Upload } from "antd"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useModel } from "umi"
 const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -16,6 +16,7 @@ const normFile = (e: any) => {
 export default () => {
     const { showConf } = useModel('dashboard');
     const { user, btcConnector, mvcConnector, chain, feeRate, fetchUserInfo } = useModel('user');
+    const [submitting, setSubmitting] = useState(false);
     const [form] = Form.useForm();
     const connector = chain === 'btc' ? btcConnector : mvcConnector;
     const profileUserData = useQuery({
@@ -38,7 +39,7 @@ export default () => {
 
     const updateUser = async () => {
         const values = form.getFieldsValue();
-        console.log(values);
+        setSubmitting(true);
         if (typeof values.avatar !== 'string') {
             const [image] = await image2Attach([values.avatar] as FileList);
             values.avatar = Buffer.from(image.data, "hex").toString("base64")
@@ -64,11 +65,23 @@ export default () => {
                     },
                 }).catch(e => {
                     throw new Error(e)
-                });;
+                });
                 if (!res) {
                     message.error('Update Failed')
                 } else {
-                    message.success('Update Successfully')
+                    const { avatarRes, backgroundRes, nameRes } = res;
+                    if (avatarRes || backgroundRes || nameRes) {
+                        const nameStatus = nameRes?.status ?? '';
+                        const avatarStatus = avatarRes?.status ?? '';
+                        const backgroundStatus = backgroundRes?.status ?? '';
+                        if (!nameStatus && !avatarStatus && !backgroundStatus) {
+                            message.success('Update Successfully')
+                        } else {
+                            message.error('User Cancelled')
+                        }
+
+                    }
+
                 }
             } else {
                 const res = await connector!.createUserInfo({
@@ -80,23 +93,35 @@ export default () => {
                 }).catch(e => {
                     throw new Error(e)
                 });
-                console.log(res);
                 if (!res) {
                     message.error('Create Failed')
                 } else {
-                    message.success('Create Successfully')
+                    const { avatarRes, backgroundRes, nameRes } = res;
+                    if (avatarRes || backgroundRes || nameRes) {
+                        const nameStatus = nameRes?.status ?? '';
+                        const avatarStatus = avatarRes?.status ?? '';
+                        const backgroundStatus = backgroundRes?.status ?? '';
+                        if (!nameStatus && !avatarStatus && !backgroundStatus) {
+                            message.success('Create Successfully')
+                        } else {
+                            message.error('User Cancelled')
+                        }
+
+                    }
 
                 }
             }
             fetchUserInfo()
         } catch (e) {
+            console.log(e, 'error');
             message.error(e.message)
         }
+        setSubmitting(false);
     }
     return <div>
         <Button shape='round' style={{ color: '#fff', background: showConf?.gradientColor }}>Account</Button>
         <Card title="Personal data" style={{ marginTop: 12 }} bordered={false} extra={
-            <Button shape='round' type="primary" style={{ color: '#fff', background: showConf?.gradientColor }} onClick={updateUser}>Save</Button>
+            <Button shape='round' type="primary" style={{ color: '#fff', background: showConf?.gradientColor }} loading={submitting} onClick={updateUser}>Save</Button>
         }>
             <Form
                 labelCol={{ span: 4 }}
