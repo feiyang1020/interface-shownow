@@ -101,7 +101,7 @@ export default function Lay() {
                       <Avatar size="large" src={user.avater ? <img src={user.avater}></img> : null} />
                       <div className='desc'>
                         <div className="name">
-                          {user.name || 'Unnanmed'}
+                          {user.name || 'Unnamed'}
                         </div>
                         <div className="metaid">
                           MetaID：{user.metaid.slice(0, 8)}

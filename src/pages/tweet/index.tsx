@@ -15,7 +15,8 @@ export default () => {
     const { showConf } = useModel('dashboard')
     const match = useMatch('/tweet/:id')
     const quotePinId = match?.params.id
-    const [refetchNum, setRefetchNum] = useState(0)
+    const [refetchNum, setRefetchNum] = useState(0);
+    const [reLoading, setReLoading] = useState(false)
     const [showComment, setShowComment] = useState(false)
     const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
         enabled: !isEmpty(quotePinId),
@@ -40,7 +41,7 @@ export default () => {
 
                 }
             }}>
-                <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} padding={0} />
+                <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} padding={0} reLoading={reLoading} />
                 <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />
@@ -49,7 +50,8 @@ export default () => {
                 </div>
                 <Comment tweetId={match?.params.id ?? ''} onClose={() => {
                     setShowComment(false);
-                    setRefetchNum(refetchNum + 1)
+                    setRefetchNum(refetchNum + 1);
+                    setReLoading(!reLoading)
                 }} show={showComment} />
                 <Divider />
                 <CommentPanel tweetId={match?.params.id ?? ''} refetchNum={refetchNum} />

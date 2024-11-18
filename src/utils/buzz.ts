@@ -419,8 +419,8 @@ export const decodePayBuzz = async (
         publicContent: parseSummary.publicContent,
         encryptContent: "",
         publicFiles: parseSummary.publicFiles,
-        encryptFiles: parseSummary.encryptFiles,
-        buzzType: "pay",
+        encryptFiles: [],
+        buzzType: "normal",
         status: "unpurchased",
       };
     }

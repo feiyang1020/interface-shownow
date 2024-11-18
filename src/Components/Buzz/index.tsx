@@ -22,9 +22,10 @@ type Props = {
     buzzItem: API.Buzz
     showActions?: boolean,
     padding?: number
+    reLoading?: boolean
 }
 
-export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
+export default ({ buzzItem, showActions = true, padding = 20, reLoading = false }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
@@ -198,7 +199,7 @@ export default ({ buzzItem, showActions = true, padding = 20 }: Props) => {
 
     const commentData = useQuery({
         enabled: !isNil(buzzItem?.id),
-        queryKey: ['comment-detail', buzzItem!.id, showComment],
+        queryKey: ['comment-detail', buzzItem!.id, showComment, reLoading],
         queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
     })
 
