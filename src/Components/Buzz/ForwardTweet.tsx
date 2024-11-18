@@ -23,6 +23,7 @@ type Props = {
 export default ({ buzzItem, showActions = true }: Props) => {
     const { showConf, manPubKey } = useModel('dashboard');
     const [showUnlock, setShowUnlock] = useState(false);
+    const [paying, setPaying] = useState(false);
     const queryClient = useQueryClient();
     const { btcConnector, user, chain, connect, feeRate } = useModel('user')
     const currentUserInfoData = useQuery({
@@ -67,6 +68,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
             message.info('switch to BTC network to pay')
             return
         }
+        setPaying(true);
         try {
             if (accessControl && accessControl.data) {
                 const { data } = accessControl;
@@ -86,6 +88,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
         } catch (e) {
             message.error(e.message)
         }
+        setPaying(false);
     }
 
 
@@ -263,7 +266,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     }} >
                         Cancel
                     </Button>
-                    <Button shape='round' block style={{ background: showConf?.gradientColor, color: '#fff' }}
+                    <Button shape='round' block loading={paying} style={{ background: showConf?.gradientColor, color: '#fff' }}
                         onClick={async (e) => {
                             e.stopPropagation()
                             handlePay()
