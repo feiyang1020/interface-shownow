@@ -244,7 +244,10 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 )
                 message.success('Pay successfully, please wait for the transaction to be confirmed!')
                 setShowUnlock(false);
-                refetchDecrypt()
+                setTimeout(() => {
+                    refetchDecrypt()
+                }, 1000)
+
             }
         } catch (e) {
             message.error(e.message)
