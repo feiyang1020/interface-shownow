@@ -356,8 +356,7 @@ export const getUserInfo = async (params: { address: string }) => {
     code: number;
     data: UserInfo;
   }>(`${BASE_MAN_URL}/api/info/address/${params.address}`, {
-    method: "POST",
-    data: params,
+    method: "GET",
   });
   return ret.data ?? undefined;
 };
