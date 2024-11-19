@@ -1,4 +1,4 @@
-import { Button, Space, Grid, notification } from 'antd';
+import { Button, Space, Grid, notification, message } from 'antd';
 import logo from '../assets/logo.svg';
 import bg from '../assets/bg.svg';
 import './index.less';
@@ -24,7 +24,7 @@ export default function HomePage() {
     const key = `open${Date.now()}`;
     const btn = (
       <Space>
-        <Button type="primary" style={{background:showConf?.brandColor}} size="small" onClick={() => {
+        <Button type="primary" style={{ background: showConf?.brandColor }} size="small" onClick={() => {
           window.open(
             "https://chromewebstore.google.com/detail/metalet/lbjapbcmmceacocpimbpbidpgmlmoaao"
           );
@@ -42,12 +42,20 @@ export default function HomePage() {
     });
   }
 
-  const setShowConnect = (_show: boolean) => {
+  const setShowConnect = async (_show: boolean) => {
     if (_show && !window.metaidwallet) {
       openNotification();
       return
     }
-    _setShowConnect(_show)
+    try {
+      await connect()
+      setTimeout(() => {
+        history.push('/')
+      }, 100);
+    } catch (err: any) {
+      message.error(err.message)
+    }
+
   }
   return (
     <div className='indexPage'>
