@@ -226,11 +226,6 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
 
 
     const handlePay = async () => {
-        if (chain !== 'btc') {
-            await connect('btc');
-            message.info('switch to BTC network to pay')
-            return
-        }
         setPaying(true)
         try {
             if (accessControl && accessControl.data) {
@@ -280,8 +275,6 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
             <div onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-
-
                 <div className="text" style={{ margin: '8px 0', }} >
                     {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
                         <span key={index} style={{ wordBreak: 'break-all' }}>
@@ -316,17 +309,14 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
 
                         <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }}>
                             <Image.PreviewGroup
-
                                 preview={{
                                     onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
                                 }}
-
                             >
                                 <div style={{
                                     display: 'flex',
                                     flexWrap: 'wrap',
                                     gap: '4px',
-
                                 }}
                                 >
                                     {
@@ -378,12 +368,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                         <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
                             disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                 e.stopPropagation()
-                                // handlePay()
-                                if (chain === 'mvc') {
-                                    await connect('btc')
-                                }
                                 setShowUnlock(true)
-
                             }}
                             loading={decryptContent?.status === 'mempool'}
                         >

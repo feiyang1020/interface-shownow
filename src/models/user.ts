@@ -24,10 +24,28 @@ const checkExtension = () => {
   }
   return true;
 };
+
+const checkWallet = async () => {
+  try {
+    const isConnected: any = await window.metaidwallet.isConnected();
+    if (isConnected.status === "no-wallets") {
+      throw new Error("please init wallet");
+    }
+    if (isConnected.status === "locked") {
+      throw new Error("please unlock your wallet");
+    }
+    if (isConnected.status === "not-connected") {
+      throw new Error("not-connected");
+    }
+    return [isConnected, ""];
+  } catch (e: any) {
+    return [false, e.message];
+  }
+};
 export default () => {
   const [isLogin, setIsLogin] = useState(false);
   const [chain, setChain] = useState<API.Chain>(
-    (localStorage.getItem("show_chain") as API.Chain) || "btc"
+    (localStorage.getItem("show_chain") as API.Chain) || "mvc"
   );
   const [showConnect, setShowConnect] = useState(false);
   const [user, setUser] = useState({
@@ -45,21 +63,18 @@ export default () => {
   const [initializing, setInitializing] = useState<boolean>(true);
   const [feeRate, setFeeRate] = useState<number>(0);
   const [followList, setFollowList] = useState<string[]>([]);
-  const [followingList, setFollowingList] = useState<string[]>([]);
-  const [feeRateModalVisible, setFeeRateModelVisible] =
-    useState<boolean>(false);
-  const connect = async (chain: API.Chain = "btc") => {
-    if (!checkExtension()) return;
-    let { network: _net, status } = await window.metaidwallet.getNetwork();
-    let _wallet: IMetaletWalletForBtc | MetaletWalletForMvc | undefined =
-      undefined;
-    if (status === "not-connected") {
-      _wallet =
-        chain === "btc"
-          ? await MetaletWalletForBtc.create()
-          : ((await MetaletWalletForMvc.create()) as MetaletWalletForMvc);
-      _net = (await window.metaidwallet.getNetwork()).network;
+  const connectWallet = useCallback(async () => {
+    const [isConnected, errMsg] = await checkWallet();
+    if (!isConnected && !isEmpty(errMsg)) {
+      throw new Error(errMsg);
     }
+    if (!isConnected) {
+      const ret = await window.metaidwallet.connect();
+      if (ret.status) {
+        throw new Error(ret.status);
+      }
+    }
+    let { network: _net } = await window.metaidwallet.getNetwork();
     if (_net !== curNetwork) {
       const ret = await window.metaidwallet.switchNetwork(
         curNetwork === "testnet" ? "testnet" : "livenet"
@@ -70,48 +85,30 @@ export default () => {
         return;
       }
     }
-    if (_wallet === undefined) {
-      _wallet =
-        chain === "btc"
-          ? await MetaletWalletForBtc.create()
-          : ((await MetaletWalletForMvc.create()) as MetaletWalletForMvc);
-    }
-    if (!_wallet.address) return;
-
-    const publicKey = await window.metaidwallet.btc.getPublicKey();
-
-    setNetwork(curNetwork);
-
-    const connector: IBtcConnector | IMvcConnector =
-      chain === "btc"
-        ? await btcConnect({
-            wallet: _wallet as IMetaletWalletForBtc,
-            network,
-          })
-        : await mvcConnect({
-            wallet: _wallet as MetaletWalletForMvc,
-            network,
-          });
-    const _walletParams = {
-      address: _wallet.address,
-      pub:
-        (_wallet as IMetaletWalletForBtc).pub ||
-        (_wallet as MetaletWalletForMvc).xpub,
-    };
-    sessionStorage.setItem("walletParams", JSON.stringify(_walletParams));
-    setInitializing(true);
-    if (chain === "mvc") {
-      setMvcConnector(connector as IMvcConnector);
-      setBtcConnector(
-        await btcConnect({
-          network: network,
-        })
-      );
-    } else {
-      setBtcConnector(connector as IBtcConnector);
-    }
-
-    setIsLogin(true);
+    const btcAddress = await window.metaidwallet.btc.getAddress();
+    const btcPub = await window.metaidwallet.btc.getPublicKey();
+    const mvcAddress = await window.metaidwallet.getAddress();
+    const mvcPub = await window.metaidwallet.getPublicKey();
+    const btcWallet = MetaletWalletForBtc.restore({
+      address: btcAddress,
+      pub: btcPub,
+      internal: window.metaidwallet,
+    });
+    const mvcWallet = MetaletWalletForMvc.restore({
+      address: mvcAddress,
+      xpub: mvcPub,
+    });
+    const btcConnector = await btcConnect({
+      wallet: btcWallet,
+      network: curNetwork,
+    });
+    setBtcConnector(btcConnector);
+    const mvcConnector = await mvcConnect({
+      wallet: mvcWallet,
+      network: curNetwork,
+    });
+    setMvcConnector(mvcConnector);
+    const connector = chain === "btc" ? btcConnector : mvcConnector;
     setUser({
       avater: connector.user.avatar
         ? `${getHostByNet(network)}${connector.user.avatar}`
@@ -124,14 +121,23 @@ export default () => {
       notice: 0,
       address: connector.wallet.address,
     });
-    setChain(chain);
-    localStorage.setItem("show_chain", chain);
-    setInitializing(false);
-  };
+    setIsLogin(true);
+  }, [chain]);
 
   const disConnect = async () => {
+    const ret = await window.metaidwallet.disconnect();
+    if (ret.status === "canceled") return;
     setIsLogin(false);
     setBtcConnector(undefined);
+    setMvcConnector(undefined);
+    setUser({
+      avater: "",
+      name: "",
+      metaid: "",
+      notice: 1,
+      address: "",
+      background: "",
+    });
   };
   useEffect(() => {
     const handleAccountChange = (newAccount: any) => {
@@ -158,74 +164,56 @@ export default () => {
 
   const init = useCallback(async () => {
     if (window.metaidwallet) {
-      const _network = (await window.metaidwallet.getNetwork()).network;
-      if (_network !== curNetwork) {
-        disConnect();
+      const [isConnected, errMsg] = await checkWallet();
+      if (!isConnected) {
         setInitializing(false);
         return;
       }
-      setNetwork(_network);
-      const walletParams = sessionStorage.getItem("walletParams");
-      const _chain = localStorage.getItem("show_chain") || "btc";
-      if (walletParams) {
-        const _walletParams = JSON.parse(walletParams);
-        const _wallet =
-          _chain === "btc"
-            ? MetaletWalletForBtc.restore({
-                ..._walletParams,
-                internal: window.metaidwallet,
-              })
-            : MetaletWalletForMvc.restore({
-                address: _walletParams.address,
-                xpub: _walletParams.pub,
-              });
-        const btcAddress =
-          _chain === "btc"
-            ? await window.metaidwallet.btc.getAddress()
-            : await window.metaidwallet.getAddress();
-        if (btcAddress !== _walletParams.address) {
-          disConnect();
-          setInitializing(false);
-          return;
-        }
-        let connector: IBtcConnector | IMvcConnector | undefined = undefined;
-        if (_chain === "btc") {
-          connector = await btcConnect({
-            wallet: _wallet as IMetaletWalletForBtc,
-            network: _network,
-          });
-          setBtcConnector(connector);
-        } else {
-          connector = await mvcConnect({
-            wallet: _wallet as MetaletWalletForMvc,
-            network: _network,
-          });
-          setMvcConnector(connector);
-
-          setBtcConnector(
-            await btcConnect({
-              network: _network,
-            })
-          );
-        }
-        setIsLogin(true);
-        setUser({
-          avater: connector.user.avatar
-            ? `${getHostByNet(network)}${connector.user.avatar}`
-            : "",
-          background: connector.user.background
-            ? `${getHostByNet(network)}${connector.user.background}`
-            : "",
-          name: connector.user.name,
-          metaid: connector.user.metaid,
-          notice: 0,
-          address: connector.wallet.address,
-        });
+      const _network = (await window.metaidwallet.getNetwork()).network;
+      if (_network !== curNetwork) {
         setInitializing(false);
+        return;
       }
+      const btcAddress = await window.metaidwallet.btc.getAddress();
+      const btcPub = await window.metaidwallet.btc.getPublicKey();
+      const mvcAddress = await window.metaidwallet.getAddress();
+      const mvcPub = await window.metaidwallet.getPublicKey();
+      const btcWallet = MetaletWalletForBtc.restore({
+        address: btcAddress,
+        pub: btcPub,
+        internal: window.metaidwallet,
+      });
+      const mvcWallet = MetaletWalletForMvc.restore({
+        address: mvcAddress,
+        xpub: mvcPub,
+      });
+      const btcConnector = await btcConnect({
+        wallet: btcWallet,
+        network: curNetwork,
+      });
+      setBtcConnector(btcConnector);
+      const mvcConnector = await mvcConnect({
+        wallet: mvcWallet,
+        network: curNetwork,
+      });
+      setMvcConnector(mvcConnector);
+      const connector = chain === "btc" ? btcConnector : mvcConnector;
+      setUser({
+        avater: connector.user.avatar
+          ? `${getHostByNet(network)}${connector.user.avatar}`
+          : "",
+        background: connector.user.background
+          ? `${getHostByNet(network)}${connector.user.background}`
+          : "",
+        name: connector.user.name,
+        metaid: connector.user.metaid,
+        notice: 0,
+        address: connector.wallet.address,
+      });
+      setIsLogin(true);
     }
     setInitializing(false);
-  }, []);
+  }, [chain]);
 
   const fetchUserInfo = useCallback(async () => {
     const userInfo = await btcConnector!.getUser({
@@ -246,7 +234,6 @@ export default () => {
     });
   }, [btcConnector, user]);
   useEffect(() => {
-    //
     setTimeout(() => {
       init();
     }, 500);
@@ -271,6 +258,25 @@ export default () => {
     }
   }, [user.metaid]);
 
+  const switchChain = async (chain: API.Chain) => {
+    if (!btcConnector || !mvcConnector) return;
+    const connector = chain === "btc" ? btcConnector : mvcConnector;
+    setUser({
+      avater: connector.user.avatar
+        ? `${getHostByNet(network)}${connector.user.avatar}`
+        : "",
+      background: connector.user.background
+        ? `${getHostByNet(network)}${connector.user.background}`
+        : "",
+      name: connector.user.name,
+      metaid: connector.user.metaid,
+      notice: 0,
+      address: connector.wallet.address,
+    });
+    localStorage.setItem("show_chain", chain);
+    setChain(chain);
+  };
+
   useEffect(() => {
     fetchUserFollowingList();
   }, [fetchUserFollowingList]);
@@ -279,7 +285,7 @@ export default () => {
     isLogin,
     setIsLogin,
     user,
-    connect,
+    connect: connectWallet,
     disConnect,
     initializing,
     btcConnector,
@@ -292,5 +298,6 @@ export default () => {
     followList,
     setFollowList,
     fetchUserInfo,
+    switchChain,
   };
 };

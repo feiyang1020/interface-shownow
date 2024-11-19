@@ -23,7 +23,7 @@ const { Header, Content, Footer, Sider } = Layout;
 export default function Lay() {
   const [collapsed, setCollapsed] = useState(false);
   const { showConf } = useModel('dashboard')
-  const { user, chain, disConnect, feeRate, setFeeRate, connect } = useModel('user')
+  const { user, chain, disConnect, feeRate, setFeeRate, connect, switchChain } = useModel('user')
   const [themeTokens, setThemeTokens] = useState({});
   const { md } = useBreakpoint()
 
@@ -118,7 +118,7 @@ export default function Lay() {
                         return <div>
                           <Menu>
                             <Menu.Item key='1' disabled={chain === 'btc'} onClick={async () => {
-                              await connect('btc');
+                              await switchChain('btc');
                               queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                             }}>
                               <Space>
@@ -128,7 +128,7 @@ export default function Lay() {
 
                             </Menu.Item>
                             <Menu.Item key='2' disabled={chain === 'mvc'} onClick={() => {
-                              connect('mvc')
+                              switchChain('mvc')
                             }}>
                               <Space>
                                 <img src={_mvc} alt="" style={{ width: 20, height: 20 }} />

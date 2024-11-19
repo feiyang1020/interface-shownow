@@ -63,11 +63,6 @@ export default ({ buzzItem, showActions = true }: Props) => {
 
 
     const handlePay = async () => {
-        if (chain !== 'btc') {
-            await connect('btc');
-            message.info('switch to BTC network to pay')
-            return
-        }
         setPaying(true);
         try {
             if (accessControl && accessControl.data) {
@@ -213,13 +208,9 @@ export default ({ buzzItem, showActions = true }: Props) => {
                             }</Text>
                             <img src={_btc} alt="" width={16} height={16} />
                         </div>
-                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased'?showConf?.gradientColor:'', color: decryptContent.status === 'unpurchased'?'#fff':'' }}
+                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
                             disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                 e.stopPropagation()
-                                // handlePay()
-                                if (chain === 'mvc') {
-                                    await connect('btc')
-                                }
                                 setShowUnlock(true)
 
                             }}
