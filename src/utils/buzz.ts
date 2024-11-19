@@ -431,7 +431,6 @@ export const decodePayBuzz = async (
         : await window.metaidwallet.getAddress();
     const btcAddress = await window.metaidwallet.btc.getAddress();
     const mvcAddress = await window.metaidwallet.getAddress();
-    console.log(address, buzzItem, "address");
     if (buzzItem.creator === btcAddress || buzzItem.creator === mvcAddress) {
       const { manPubkey, encryptedKey } = controlPin;
       const { sharedSecret, ecdhPubKey } =
