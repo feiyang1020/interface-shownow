@@ -12,7 +12,7 @@ import {
 } from "@metaid/metaid";
 import { curNetwork, getHostByNet } from "@/config";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFeeRate, fetchFollowingList } from "@/request/api";
+import { fetchFeeRate, fetchFollowingList, getUserInfo } from "@/request/api";
 import useIntervalAsync from "@/hooks/useIntervalAsync";
 import { isEmpty } from "ramda";
 const checkExtension = () => {
@@ -216,10 +216,7 @@ export default () => {
   }, [chain]);
 
   const fetchUserInfo = useCallback(async () => {
-    const userInfo = await btcConnector!.getUser({
-      network: curNetwork,
-      currentAddress: user.address,
-    });
+    const userInfo = await getUserInfo({ address: user.address });
     setUser({
       avater: userInfo.avatar
         ? `${getHostByNet(network)}${userInfo.avatar}`
@@ -232,7 +229,7 @@ export default () => {
       notice: 0,
       address: userInfo.address,
     });
-  }, [btcConnector, user]);
+  }, [user]);
   useEffect(() => {
     setTimeout(() => {
       init();

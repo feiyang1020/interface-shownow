@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid } from "@/request/api";
+import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
@@ -35,11 +35,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
     const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
-        queryFn: () =>
-            btcConnector?.getUser({
-                network: curNetwork,
-                currentAddress: buzzItem!.address,
-            }),
+        queryFn: () => getUserInfo({ address: buzzItem!.address }),
     });
     const summary = useMemo(() => {
         let _summary = buzzItem!.content;

@@ -23,21 +23,7 @@ export default () => {
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
     const [total, setTotal] = useState<null | number>(null);
-    const getTotal = async (btcConnector: IBtcConnector) => {
-        setTotal(
-            await btcConnector?.totalPin({
-                network: curNetwork,
-                path: ['/protocols/simplebuzz', '/protocols/banana'],
-            })
-        );
-    };
-
-    useEffect(() => {
-        if (!isNil(btcConnector)) {
-            getTotal(btcConnector!);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [btcConnector]);
+   
 
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =

@@ -1,5 +1,6 @@
 import UploadAvatar from "@/Components/ProfileCard/UploadAvatar";
 import { BASE_MAN_URL, curNetwork } from "@/config";
+import { getUserInfo } from "@/request/api";
 import { image2Attach } from "@/utils/file";
 import { PlusOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query";
@@ -22,11 +23,7 @@ export default () => {
     const profileUserData = useQuery({
         queryKey: ['userInfo', user.address],
         enabled: Boolean(user.address && connector),
-        queryFn: () =>
-            connector?.getUser({
-                network: curNetwork,
-                currentAddress: user.address,
-            }),
+        queryFn: () =>getUserInfo({ address: user.address }),
     });
 
     useEffect(() => {

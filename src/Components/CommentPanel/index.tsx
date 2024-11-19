@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork } from "@/config";
-import { fetchCurrentBuzzComments } from "@/request/api";
+import { fetchCurrentBuzzComments, getUserInfo } from "@/request/api";
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, List } from "antd";
 import { isNil } from "ramda";
@@ -17,11 +17,7 @@ const CommentItem = ({ commentRes }: { commentRes: API.CommentRes }) => {
     const currentUserInfoData = useQuery({
         enabled: !isNil(commentRes?.pinAddress),
         queryKey: ['userInfo', commentRes?.pinAddress],
-        queryFn: () =>
-            btcConnector?.getUser({
-                network: curNetwork,
-                currentAddress: commentRes?.pinAddress,
-            }),
+        queryFn: () => getUserInfo({ address: commentRes?.pinAddress }),
     });
     return <List.Item>
         <List.Item.Meta
@@ -39,11 +35,11 @@ export default ({ tweetId, refetchNum }: CommentPanelProps) => {
         queryKey: ['comment-detail', tweetId],
         queryFn: () => fetchCurrentBuzzComments({ pinId: tweetId }),
     });
-    useEffect(()=>{
-        if(refetchNum){
+    useEffect(() => {
+        if (refetchNum) {
             commentData.refetch()
         }
-    },[refetchNum])
+    }, [refetchNum])
     const commentsNum = (commentData?.data ?? []).length;
     return <List
         itemLayout="horizontal"

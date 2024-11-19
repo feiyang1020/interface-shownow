@@ -1,4 +1,4 @@
-import { fetchAllBuzzs, fetchBuzzs, getIndexTweet } from "@/request/api";
+import { fetchAllBuzzs, fetchBuzzs, getIndexTweet, getUserInfo } from "@/request/api";
 import { useCallback, useEffect, useMemo, useState } from "react"
 import './index.less'
 import { Grid, Carousel, Col, Divider, List, Row, Skeleton } from "antd";
@@ -57,11 +57,7 @@ export default () => {
 
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
-        queryFn: () =>
-            btcConnector?.getUser({
-                network: curNetwork,
-                currentAddress: address,
-            }),
+        queryFn: () =>getUserInfo({ address }),
     });
 
 

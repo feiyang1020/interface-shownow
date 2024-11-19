@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchCurrentBuzzLikes, getControlByContentPin, getPinDetailByPid } from "@/request/api";
+import { fetchCurrentBuzzLikes, getControlByContentPin, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, SyncOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
@@ -28,11 +28,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
     const { btcConnector, user, chain, connect, feeRate } = useModel('user')
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
-        queryFn: () =>
-            btcConnector?.getUser({
-                network: curNetwork,
-                currentAddress: buzzItem!.address,
-            }),
+        queryFn: () => getUserInfo({ address: buzzItem!.address }),
     });
 
 

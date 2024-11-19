@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork } from "@/config";
-import { fetchFollowDetailPin, fetchFollowingList } from "@/request/api";
+import { fetchFollowDetailPin, fetchFollowingList, getUserInfo } from "@/request/api";
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, Card, Divider, Space } from "antd"
 import { F, isEmpty } from "ramda";
@@ -17,11 +17,7 @@ export default ({ address }: Props) => {
 
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
-        queryFn: () =>
-            btcConnector?.getUser({
-                network: curNetwork,
-                currentAddress: address,
-            }),
+        queryFn: () => getUserInfo({ address }),
     });
     const { data: myFollowingListData } = useQuery({
         queryKey: ['myFollowing', btcConnector?.metaid],

@@ -1,6 +1,7 @@
 import { BASE_MAN_URL } from "@/config";
 import { IBtcConnector } from "@metaid/metaid";
 import axios from "axios";
+import { UserInfo } from "node_modules/@metaid/metaid/dist/types";
 import { request } from "umi";
 export type BtcNetwork = "mainnet" | "testnet" | "regtest";
 
@@ -311,9 +312,7 @@ export const fetchAllBuzzs = async (params: {
   });
 };
 
-export const fetchBuzzDetail = async (params: {
-  pinId: string;
-}) => {
+export const fetchBuzzDetail = async (params: { pinId: string }) => {
   return request<API.BuzzDetailRet>(`${BASE_MAN_URL}/social/buzz/info`, {
     method: "GET",
     params,
@@ -344,10 +343,21 @@ export const getDecryptContent = async (params: {
     data: {
       contentResult: string;
       filesResult: string[];
-      status:API.PayStatus;
+      status: API.PayStatus;
     };
   }>(`${BASE_MAN_URL + "/api/access/decrypt"}`, {
     method: "POST",
     data: params,
   });
+};
+
+export const getUserInfo = async (params: { address: string }) => {
+  const ret = await request<{
+    code: number;
+    data: UserInfo;
+  }>(`${BASE_MAN_URL}/api/info/address/${params.address}`, {
+    method: "POST",
+    data: params,
+  });
+  return ret.data ?? undefined;
 };
