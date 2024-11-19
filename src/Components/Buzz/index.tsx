@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
 import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getPinDetailByPid, getUserInfo } from "@/request/api";
-import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
+import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
 import { isEmpty, isNil } from "ramda";
@@ -382,6 +382,29 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
 
                 )}
                 {<Space>
+                    <Button
+                        size='small'
+                        type="link"
+                        icon={
+                            <LinkOutlined />
+                        }
+                        style={{
+                            fontSize: 12
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+
+                            const link = buzzItem.chainName === 'btc' ? `${curNetwork === "testnet"
+                                ? "https://mempool.space/testnet/tx/"
+                                : "https://mempool.space/tx/"
+                                }${buzzItem.genesisTransaction}`
+                                : `https://${curNetwork === "testnet" ? "test" : "www"
+                                }.mvcscan.com/tx/${buzzItem.genesisTransaction}`
+                            window.open(link, '_blank')
+                        }}
+                    >
+                        {buzzItem.genesisTransaction.slice(0, 8)}
+                    </Button>
                     <Tag icon={buzzItem.genesisHeight === 0 ? <SyncOutlined spin /> : null} bordered={false} color={buzzItem.chainName === 'mvc' ? 'blue' : 'orange'}>{buzzItem.chainName}</Tag>
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>{dayjs
                         .unix(buzzItem.timestamp)
