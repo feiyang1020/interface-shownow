@@ -76,6 +76,12 @@ declare interface Window {
       getUtxos: (params?: any) => Promise<API.UTXO[]>;
       deployMRC20: (paams: any) => Promise<any>;
     };
+    common: {
+      ecdh: (params: { externalPubKey: string }) => Promise<{
+        sharedSecret: string;
+        ecdhPubKey: string;
+      }>;
+    };
     token: {
       getBalance: () => Promise<any>;
     };

@@ -23,9 +23,7 @@ export default () => {
     fetchConfig();
   }, [fetchConfig]);
   const fetchManPubKey = useCallback(async () => {
-    console.log( "fetchManPubKey");
     const ret = await getPubKey();
-    console.log(ret, "fetchManPubKey");
     setManPubKey(ret);
   }, []);
   useEffect(() => {

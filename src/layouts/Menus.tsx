@@ -26,7 +26,6 @@ export default () => {
         colorPrimary
     } } = theme.useToken()
     useEffect(() => {
-        console.log(path)
         if (path === '/') {
             setCurMenu('home')
         } else {

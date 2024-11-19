@@ -248,7 +248,6 @@ export default () => {
         metaid: user.metaid ?? "",
         params: { cursor: "0", size: "100", followDetail: false },
       });
-      console.log("fetchFollowingList", res);
       setFollowList(
         res && res.list ? res?.list.map((item: string) => item) : []
       );
