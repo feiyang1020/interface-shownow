@@ -1,6 +1,6 @@
 import { FooterToolbar, ProCard, ProForm, ProFormText } from "@ant-design/pro-components"
 import { Col, Divider, Row, Space } from "antd"
-
+import '../index.less'
 export default () => {
     return <ProCard split="vertical"  >
         <ProForm style={{ padding: 24 }}

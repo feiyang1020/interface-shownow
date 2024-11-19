@@ -6,6 +6,8 @@ import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useModel, history } from 'umi';
 import { saveConf } from '@/request/dashboard';
+import RcResizeObserver from 'rc-resize-observer';
+
 const DEFAULT_COLOR = [
     {
         color: '#f824da',
@@ -27,6 +29,7 @@ export default () => {
     const [styles, setStyles] = useState<DB.ShowConfDto>();
     const [submiting, setSubmiting] = useState(false);
     const [api, contextHolder] = notification.useNotification();
+    const [responsive, setResponsive] = useState(false);
     useEffect(() => {
         if (showConf) {
             console.log(showConf, 'showConf');
@@ -139,7 +142,7 @@ export default () => {
                     <ColorPicker
                         defaultValue={DEFAULT_COLOR}
                         allowClear
-                        
+
                         size="large"
                         mode={['single', 'gradient']}
                         onChangeComplete={(color) => {
@@ -174,28 +177,35 @@ export default () => {
             </div>,
         },
     ];
-  
+
     if (!styles) return <div>no data</div>
     return <div>
         {contextHolder}
-        <ProCard split="vertical">
+        <RcResizeObserver
+            key="resize-observer"
+            onResize={(offset) => {
+                setResponsive(offset.width < 596);
+            }}
+        >
+            <ProCard split={responsive ? 'horizontal' : 'vertical'}>
 
-            <ProCard title="" colSpan={8}  >
-                <Tabs defaultActiveKey="1" items={items} />
+                <ProCard title="" colSpan={responsive ? 24 : 8}  >
+                    <Tabs defaultActiveKey="1" items={items} />
+                </ProCard>
+                <ProCard colSpan={responsive ? 24 : 16} title="OverView" headerBordered extra={
+                    <Button type="primary" onClick={handleSave} loading={submiting}>Save</Button>}
+                >
+                    <div style={{ height: '100vh' }}>
+                        <Space direction="vertical" size="large">
+                            <Button type="primary" style={{ background: styles.brandColor }}>Brand Button  </Button>
+                            <Button type="primary" style={{ background: styles.gradientColor }}>Gradient Button</Button>
+                            <img height={64} src={styles.logo ? styles.logo : ''} />
+                        </Space>
+
+
+                    </div>
+                </ProCard>
             </ProCard>
-            <ProCard colSpan={16} title="OverView" headerBordered extra={
-                <Button type="primary" onClick={handleSave} loading={submiting}>Save</Button>}
-            >
-                <div style={{ height: '100vh' }}>
-                    <Space direction="vertical" size="large">
-                        <Button type="primary" style={{ background: styles.brandColor }}>Brand Button  </Button>
-                        <Button type="primary" style={{ background: styles.gradientColor }}>Gradient Button</Button>
-                        <Avatar size={64} src={styles.logo ? styles.logo : ''} />
-                    </Space>
-
-
-                </div>
-            </ProCard>
-        </ProCard>
+        </RcResizeObserver>
     </div>
 }

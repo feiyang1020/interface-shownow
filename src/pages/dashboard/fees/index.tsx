@@ -2,6 +2,7 @@ import { saveConf } from "@/request/dashboard";
 import { FooterToolbar, ProCard, ProForm, ProFormDigit, ProFormText } from "@ant-design/pro-components"
 import { Col, Divider, message, Row, Space } from "antd"
 import { useModel } from "umi";
+import '../index.less'
 
 export default () => {
     const { showConf, loading, fetchConfig } = useModel('dashboard')
