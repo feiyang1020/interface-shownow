@@ -11,19 +11,8 @@ export const getHostByNet = (network: API.Network) => {
   return MAINNET_CONTENT_HOST;
 };
 
-
-const TESTNET_METAID_URL = "https://metaid-testnet.vercel.app/metaid-detail/";
-const MAINNET_METAID_URL = "https://metaid.io/metaid-detail/";
-
-export const curNetwork: API.Network =
-  window.METAID_MARKET_NETWORK || "testnet";
-
-
-
-export const getMetaIdUrlByNet = (network: API.Network): string => {
-  if (network === "testnet") return TESTNET_METAID_URL;
-  return MAINNET_METAID_URL;
-};
+export const curNetwork: API.Network ="testnet";// "mainnet";
+// window.METAID_MARKET_NETWORK || "testnet";
 
 export const DASHBOARD_API = "https://testnet.show.now/api";
 // export const DASHBOARD_API = "http://127.0.0.1:3000/api";
@@ -33,5 +22,3 @@ export const BASE_MAN_URL = "https://man-test.metaid.io";
 // export const BASE_MAN_URL = "http://127.0.0.1:3000/man";
 // export const BASE_MAN_URL = "/man";
 export const FLAG = "metaid";
-
-

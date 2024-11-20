@@ -77,7 +77,9 @@ export default function HomePage() {
           </h3>
           <p>Connect your wallet to create a new Account or open an existing one</p>
           <Space>
-            <Button shape='round'>Twitter</Button>
+            <Button shape='round' disabled={!showConf?.twitterUrl} onClick={() => {
+              window.open(showConf?.twitterUrl)
+            }}>Twitter</Button>
             <Button type="primary" shape='round' onClick={() => {
               setShowConnect(true)
             }} style={{ background: showConf?.brandColor }}>Connect</Button  >

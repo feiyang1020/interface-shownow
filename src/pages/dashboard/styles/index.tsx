@@ -1,5 +1,5 @@
 import { ProCard, ProFormColorPicker } from '@ant-design/pro-components';
-import { Avatar, Button, ColorPicker, Divider, message, notification, Space, Tabs, Upload } from 'antd';
+import { Avatar, Button, ColorPicker, Divider, Input, message, notification, Space, Tabs, Upload } from 'antd';
 import type { TabsProps } from 'antd';
 import { useEffect, useState } from 'react';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
@@ -125,7 +125,7 @@ export default () => {
         {
             key: '1',
             label: 'Color',
-            children: <div>
+            children: <div >
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span>Brand Color</span>
@@ -164,8 +164,8 @@ export default () => {
         },
         {
             key: '3',
-            label: 'Logo',
-            children: <div>
+            label: 'Brand',
+            children: <Space direction="vertical" style={{ width: '100%' }}>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span>Logo</span>
@@ -174,7 +174,17 @@ export default () => {
                         <Button icon={<UploadOutlined />}>Select Image</Button>
                     </Upload>
                 </div>
-            </div>,
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',gap:24 }}>
+                    <span>Twitter</span>
+
+                    <Input value={styles?.twitterUrl} onChange={(e) => {
+                        if (styles) {
+                            setStyles({ ...styles, twitterUrl: e.target.value });
+                        }
+
+                    }} />
+                </div>
+            </Space>,
         },
     ];
 
