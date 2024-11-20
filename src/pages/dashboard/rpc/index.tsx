@@ -1,14 +1,34 @@
-import { FooterToolbar, ProCard, ProForm, ProFormText } from "@ant-design/pro-components"
-import { Col, Divider, Row, Space } from "antd"
+import { FooterToolbar, ProCard, ProForm, ProFormInstance, ProFormText } from "@ant-design/pro-components"
+import { Col, Divider, message, Row, Space } from "antd"
 import '../index.less'
+import { useCallback, useEffect, useMemo, useRef } from "react";
 export default () => {
+    const formRef = useRef<ProFormInstance>();
+    const getConfig = useCallback(async () => {
+        const res = await fetch('/metaso/api/config/get')
+        const data = await res.json();
+        if (data.data) {
+            formRef.current?.setFieldsValue(data.data)
+        } else {
+            formRef.current?.setFieldsValue(data)
+        }
+
+    }, []);
+
+    useEffect(() => {
+        getConfig()
+    }, [getConfig])
+
+
+
     return <ProCard split="vertical"  >
         <ProForm style={{ padding: 24 }}
             layout="horizontal"
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 14 }}
+            formRef={formRef}
             submitter={{
-                searchConfig:{
+                searchConfig: {
                     submitText: 'Save',
                     resetText: 'Reset'
                 },
@@ -19,6 +39,20 @@ export default () => {
                         </Col>
                     </Row>
                 },
+            }}
+
+            onFinish={async (values) => {
+                const res = await fetch('/metaso/api/config/set', {
+                    method: 'POST',
+                    body: JSON.stringify(values)
+                })
+                const data = await res.json();
+                if (data.code === 1) {
+                    message.success('Save successfully');
+                }
+                if (data.code === -1) {
+                    message.error(data.msg || 'Save failed');
+                }
             }}
 
         >

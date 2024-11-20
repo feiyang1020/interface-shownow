@@ -8,7 +8,6 @@ import { BellOutlined, CaretDownOutlined, DownOutlined, EditOutlined, EllipsisOu
 import {
   QueryClient,
   QueryClientProvider,
-  useQuery,
 } from '@tanstack/react-query'
 import NewPost from '@/Components/NewPost';
 import Mobilefooter from './Mobilefooter';
