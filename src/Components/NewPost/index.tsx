@@ -188,7 +188,7 @@ export default ({ show, onClose, quotePin }: Props) => {
             } else {
                 const buzzEntity = (await mvcConnector!.use('buzz')) as IMvcEntity
                 const createRes = await buzzEntity!.create({
-                    data: { body: JSON.stringify({ ...finalBody, path: `${showConf?.host || ''}/protocols/simplebuzz` }) },
+                    data: { body: JSON.stringify({ ...finalBody }) },
                     options: {
                         network: curNetwork,
                         signMessage: 'create buzz',
