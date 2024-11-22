@@ -279,7 +279,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 e.stopPropagation()
                 history.push(`/profile/${buzzItem.creator}`)
             }}>
-                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unname'}</div>
+                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unnamed'}</div>
                 <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
             </div>
             <div onClick={() => {
