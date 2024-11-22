@@ -142,7 +142,11 @@ declare namespace API {
     manPubkey: string;
     creatorPubkey: string;
     encryptedKey: string;
-    holdCheck: any;
+    holdCheck: {
+      ticker: string;
+      type: "mrc20";
+      amount: string;
+    };
     payCheck: {
       type: string;
       ticker: string;
@@ -156,5 +160,24 @@ declare namespace API {
     code: number;
     message: string;
     data: AccessControl;
+  };
+
+  type MRC20TickInfo = {
+    amtPerMint: string;
+    blockHeight: string;
+    decimals: string;
+    metadata: string;
+    mintCount: string;
+    mrc20Id: string;
+    pinNumber: number;
+    pinCheck: {
+      count: string;
+      lvl: string;
+    };
+    tick: string;
+    tokenName: string;
+    totalMinted: number;
+    type: string;
+    mintable: boolean;
   };
 }

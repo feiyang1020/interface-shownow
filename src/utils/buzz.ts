@@ -48,14 +48,11 @@ export const postPayBuzz = async (
         address: string;
         satoshis: string;
       }
-    | undefined
+    | undefined,
+  payType?: string,
+  payTicker?: API.MRC20TickInfo
 ) => {
   const randomKey = generateAESKey();
-  console.log(
-    randomKey,
-    "randomKey",
-    Buffer.from(randomKey, "hex").toString("hex")
-  );
   const publicContent = content;
   const _encryptContent = encryptContent
     ? encryptPayloadAES(
@@ -71,9 +68,6 @@ export const postPayBuzz = async (
     btcConnector,
     mvcConnector
   );
-
-  console.log(randomKey, "randomKey");
-  console.log(encryptContent, "content.slice(250)");
   const {
     attachments: encryptAttachments,
     fileTransactions: encryptFileTransactions,
@@ -121,7 +115,7 @@ export const postPayBuzz = async (
       network: curNetwork,
       signMessage: "create paybuzz",
       serialAction: "finish",
-      transactions: [...fileTransactions, ...encryptFileTransactions],
+      transactions: [],
     });
     console.log(txid, "transactions");
     pid = `${txid}i0`;
@@ -131,7 +125,7 @@ export const postPayBuzz = async (
     externalPubKey: manPubKey,
   });
 
-  const contorlPayload = {
+  const contorlPayload:any = {
     controlPins: [pid],
     manDomain: "",
     manPubkey: manPubKey,
@@ -142,13 +136,28 @@ export const postPayBuzz = async (
     //   ticker: "",
     //   amount: "",
     // },
-    payCheck: {
-      type: "chainCoin", //"chainCoin" or "mrc20"
+    // payCheck: {
+    //   type: "chainCoin", //"chainCoin" or "mrc20"
+    //   ticker: "",
+    //   amount: price,
+    //   payTo: address,
+    // },
+  };
+
+  if(payType === "mrc20" && payTicker) {
+    contorlPayload.holdCheck = {
+      type: "mrc20",
+      ticker: payTicker.tick,
+      amount: '1',
+    }
+  }else{
+    contorlPayload.payCheck = {
+      type: "chainCoin",
       ticker: "",
       amount: price,
       payTo: address,
-    },
-  };
+    }
+  }
   const contorlPath = `${host || ""}/metaaccess/accesscontrol`;
   const contorlMetaidData: InscribeData = {
     operation: "create",

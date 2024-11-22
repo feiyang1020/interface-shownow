@@ -360,3 +360,16 @@ export const getUserInfo = async (params: { address: string }) => {
   });
   return ret.data ?? undefined;
 };
+
+export const getMRC20Info = async (params: {
+  id?: string;
+  tick?: string;
+}) => {
+  return request<{
+    code: number;
+    data: API.MRC20TickInfo;
+  }>(`${BASE_MAN_URL}/api/mrc20/tick/info`, {
+    method: "GET",
+    params,
+  });
+};

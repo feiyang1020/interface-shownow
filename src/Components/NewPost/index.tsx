@@ -2,12 +2,12 @@
 import { useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
-import { Button, Card, Divider, GetProp, Input, InputNumber, message, Space, Upload, UploadFile, UploadProps } from "antd";
+import { Button, Card, Divider, GetProp, Input, InputNumber, message, Segmented, Space, Upload, UploadFile, UploadProps } from "antd";
 import { CloseOutlined, FileImageOutlined, LockOutlined, UnlockOutlined, VideoCameraOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AttachmentItem, convertToFileList, image2Attach } from "@/utils/file";
 import { CreateOptions, IBtcEntity, IMvcEntity, MvcTransaction } from "@metaid/metaid";
-import { isEmpty, isNil } from "ramda";
+import { isEmpty, isNil, set } from "ramda";
 import { curNetwork, FLAG } from "@/config";
 import { useQueryClient } from "@tanstack/react-query";
 import BuzzCard from "../Cards/BuzzCard";
@@ -19,6 +19,8 @@ import * as crypto from 'crypto'
 import { encryptPayloadAES, generateAESKey } from "@/utils/utils";
 import { postPayBuzz } from "@/utils/buzz";
 import { IBtcConnector } from "metaid/dist";
+import { getMRC20Info } from "@/request/api";
+import MRC20Icon from "../MRC20Icon";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -41,7 +43,11 @@ export default ({ show, onClose, quotePin }: Props) => {
     const [isAdding, setIsAdding] = useState(false);
     const queryClient = useQueryClient();
     const [lock, setLock] = useState(false);
+    const [payType, setPayType] = useState<string>('mrc20');
     const [payAmount, setPayAmount] = useState(0.00001);
+    const [holdTokenID, setHoldTokenID] = useState<string>('');
+    const [mrc20, setMrc20] = useState<API.MRC20TickInfo>();
+    const [checkTokenID, setCheckTokenID] = useState<string>('');
     const [encryptFiles, setEncryptFiles] = useState<string[]>([]);
 
     const handleBeforeUpload = (file: any) => {
@@ -229,6 +235,15 @@ export default ({ show, onClose, quotePin }: Props) => {
             if (encryptImages.length === 0 && !encryptContent) {
                 throw new Error('Please input encrypt content or encrypt images')
             }
+            if(!payType){
+                throw new Error('Please select pay type')
+            }
+            if (payType === 'mrc20' && !mrc20) {
+                throw new Error('Please input valid token id')
+            }
+            if (payType === 'btc' && payAmount <= 0) {
+                throw new Error('Please input valid pay amount')
+            }
             await postPayBuzz({
                 content: content,
                 encryptImages: await image2Attach(convertToFileList(encryptImages)),
@@ -244,6 +259,8 @@ export default ({ show, onClose, quotePin }: Props) => {
                 mvcConnector!,
                 manPubKey || '',
                 fetchServiceFee('post_service_fee_amount'),
+                String(payType),
+                mrc20
             )
             setContent('')
             setImages([])
@@ -264,6 +281,37 @@ export default ({ show, onClose, quotePin }: Props) => {
         }
         setIsAdding(false);
     }
+    useEffect(() => {
+        let didCancel = false;
+        const fetchMrc20Info = async () => {
+            if (!holdTokenID) return;
+            setCheckTokenID('validating')
+            const params: {
+                id?: string,
+                tick?: string
+            } = {};
+            if (holdTokenID.length > 24) {
+                params.id = holdTokenID
+            } else {
+                params.tick = holdTokenID.toUpperCase()
+            }
+            console.log('params', params);
+            const { code, message, data } = await getMRC20Info(params);
+            if (didCancel) return;
+            if (data && data.mrc20Id) {
+                setMrc20(data)
+                setCheckTokenID('success')
+                return
+            } else {
+                setMrc20(undefined)
+                setCheckTokenID('error')
+            }
+        }
+        fetchMrc20Info()
+        return () => {
+            didCancel = true
+        }
+    }, [holdTokenID])
     return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
         {
             isQuoted && <Card style={{ margin: 24 }} styles={{
@@ -341,12 +389,38 @@ export default ({ show, onClose, quotePin }: Props) => {
                         !lock ? <UnlockOutlined style={{ color: showConf?.brandColor }} /> : <LockOutlined style={{ color: showConf?.brandColor }} />
                     } onClick={() => setLock(!lock)} />
                     {
-                        lock && <InputNumber variant='filled' value={payAmount} onChange={() => {
-                            setPayAmount(payAmount)
-                        }} style={{ flexGrow: 1 }} suffix={<img src={_btc} style={{ height: 20, width: 20 }}></img>} />
+                        lock && <Segmented<string>
+                            options={[{
+                                label: 'Pay With BTC',
+                                value: 'btc'
+                            }, {
+                                label: 'Hold MRC-20',
+                                value: 'mrc20'
+                            }]}
+                            value={payType}
+                            onChange={(value) => {
+                                setPayType(value)
+                            }}
+                        />
                     }
+
                 </div>
             }
+            <div style={{ display: 'flex', marginTop: 20, flexDirection: 'column' }}>
+                {
+                    lock && payType === 'btc' && <InputNumber variant='filled' value={payAmount} onChange={(value) => {
+                        setPayAmount(value)
+                    }} style={{ flexGrow: 1, width: '100%' }} suffix={<img src={_btc} style={{ height: 20, width: 20 }}></img>} />
+                }
+                {
+                    lock && payType === 'mrc20' && <> <Input status={checkTokenID} variant='filled' placeholder="Ticker/Token ID" value={holdTokenID} onChange={(e) => {
+                        setHoldTokenID(e.target.value)
+                    }} style={{ flexGrow: 1 }} suffix={mrc20 ? <MRC20Icon size={20} tick={mrc20.tick} metadata={mrc20.metadata} /> : null} />
+                        {checkTokenID === 'error' && <span style={{ color: 'red' }}>This Ticker / Token ID does not correspond to any MRC-20; Please re-enter or <a href={curNetwork==='testnet'?'https://testnet.metaid.market/launch':'https://metaid.market/launch'} target='_blank' >launch</a>.</span>}
+                    </>
+                }
+            </div>
+
 
             <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Space>
