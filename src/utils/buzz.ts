@@ -115,7 +115,7 @@ export const postPayBuzz = async (
       network: curNetwork,
       signMessage: "create paybuzz",
       serialAction: "finish",
-      transactions: [],
+      transactions: [ ...fileTransactions,...encryptFileTransactions],
     });
     console.log(txid, "transactions");
     pid = `${txid}i0`;
