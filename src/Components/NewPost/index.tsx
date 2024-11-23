@@ -2,14 +2,14 @@
 import { useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
-import { Button, Card, Divider, GetProp, Input, InputNumber, message, Segmented, Space, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Button, Card, Checkbox, Divider, GetProp, Input, InputNumber, message, Result, Segmented, Space, Typography, Upload, UploadFile, UploadProps } from "antd";
 import { CloseOutlined, FileImageOutlined, LockOutlined, UnlockOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { AttachmentItem, convertToFileList, image2Attach } from "@/utils/file";
 import { CreateOptions, IBtcEntity, IMvcEntity, MvcTransaction } from "@metaid/metaid";
 import { isEmpty, isNil, set } from "ramda";
-import { curNetwork, FLAG } from "@/config";
-import { useQueryClient } from "@tanstack/react-query";
+import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import BuzzCard from "../Cards/BuzzCard";
 import Buzz from "../Buzz";
 import _btc from '@/assets/btc.png'
@@ -19,7 +19,8 @@ import * as crypto from 'crypto'
 import { encryptPayloadAES, generateAESKey } from "@/utils/utils";
 import { postPayBuzz } from "@/utils/buzz";
 import { IBtcConnector } from "metaid/dist";
-import { getMRC20Info } from "@/request/api";
+import { getIDCoinInfo, getMRC20Info } from "@/request/api";
+import defaultAvatar from '@/assets/avatar.svg'
 import MRC20Icon from "../MRC20Icon";
 const { TextArea } = Input;
 type Props = {
@@ -78,7 +79,14 @@ export default ({ show, onClose, quotePin }: Props) => {
         }
 
     };
-
+    const { isLoading, data: IdCoin } = useQuery({
+        queryKey: ['idCoin', user],
+        enabled: Boolean(user),
+        queryFn: async () => {
+            const ret = await getIDCoinInfo({ issuerAddress: await window.metaidwallet.btc.getAddress() });
+            return ret.data;
+        }
+    })
     const handleAddBuzz = async (buzz: {
         content: string;
         images: AttachmentItem[];
@@ -235,11 +243,11 @@ export default ({ show, onClose, quotePin }: Props) => {
             if (encryptImages.length === 0 && !encryptContent) {
                 throw new Error('Please input encrypt content or encrypt images')
             }
-            if(!payType){
+            if (!payType) {
                 throw new Error('Please select pay type')
             }
-            if (payType === 'mrc20' && !mrc20) {
-                throw new Error('Please input valid token id')
+            if (payType === 'mrc20' && !IdCoin) {
+                throw new Error('Please Launch Your Unique ID-COIN')
             }
             if (payType === 'btc' && payAmount <= 0) {
                 throw new Error('Please input valid pay amount')
@@ -260,7 +268,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 manPubKey || '',
                 fetchServiceFee('post_service_fee_amount'),
                 String(payType),
-                mrc20
+                IdCoin
             )
             setContent('')
             setImages([])
@@ -312,6 +320,8 @@ export default ({ show, onClose, quotePin }: Props) => {
             didCancel = true
         }
     }, [holdTokenID])
+
+
     return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
         {
             isQuoted && <Card style={{ margin: 24 }} styles={{
@@ -394,7 +404,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                                 label: 'Pay With BTC',
                                 value: 'btc'
                             }, {
-                                label: 'Hold MRC-20',
+                                label: 'Hold ID Coin',
                                 value: 'mrc20'
                             }]}
                             value={payType}
@@ -413,10 +423,58 @@ export default ({ show, onClose, quotePin }: Props) => {
                     }} style={{ flexGrow: 1, width: '100%' }} suffix={<img src={_btc} style={{ height: 20, width: 20 }}></img>} />
                 }
                 {
-                    lock && payType === 'mrc20' && <> <Input status={checkTokenID} variant='filled' placeholder="Ticker/Token ID" value={holdTokenID} onChange={(e) => {
-                        setHoldTokenID(e.target.value)
-                    }} style={{ flexGrow: 1 }} suffix={mrc20 ? <MRC20Icon size={20} tick={mrc20.tick} metadata={mrc20.metadata} /> : null} />
-                        {checkTokenID === 'error' && <span style={{ color: 'red' }}>This Ticker / Token ID does not correspond to any MRC-20; Please re-enter or <a href={curNetwork==='testnet'?'https://testnet.metaid.market/launch':'https://metaid.market/launch'} target='_blank' >launch</a>.</span>}
+                    lock && payType === 'mrc20' && <>
+                        {
+                            isLoading ?
+                                <span>loading...</span> :
+                                <>
+                                    {
+                                        IdCoin ?
+                                            <Checkbox defaultChecked disabled >
+                                                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>
+                                                    <Avatar
+                                                        size={62}
+                                                        src={
+                                                            <img
+                                                                src={IdCoin.deployerUserInfo.avatar ? IdCoin.deployerUserInfo.avatar.indexOf('http') > -1 ? IdCoin.deployerUserInfo.avatar : BASE_MAN_URL + IdCoin.deployerUserInfo.avatar : defaultAvatar
+                                                                }
+                                                                alt="avatar"
+                                                            />
+                                                        }
+                                                    ></Avatar >
+                                                    <div className="right" style={{ flexGrow: 1 }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                            <div>
+                                                                <Typography.Title level={4} style={{ margin: 0 }}>
+                                                                    {IdCoin.tick}
+                                                                </Typography.Title>
+                                                                <Typography.Text copyable={{ text: IdCoin.deployerMetaId }} className="metaid"> MetaID: {IdCoin.deployerMetaId.replace(/(\w{6})\w+(\w{5})/, "$1...")}</Typography.Text>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div></Checkbox> :
+                                            <Result
+                                                icon={<></>}
+                                                title='Launch Your Unique ID-COIN Now!'
+                                                subTitle="It seems you haven't issued your personal ID-COIN yet. Head over to MetaID.market to create your ID-COIN and unlock new possibilities in the decentralized ecosystem. Start building your on-chain identity today!"
+                                                extra={
+                                                    <Button onClick={() => {
+                                                        window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch')
+                                                    }} type="primary" key="console">
+                                                        Launch Me
+                                                    </Button>
+                                                }
+                                            />
+                                    }
+                                </>
+                        }
+
+                        {/* <Input status={checkTokenID} variant='filled' placeholder="Ticker/Token ID" value={holdTokenID} onChange={(e) => {
+                            setHoldTokenID(e.target.value)
+                        }} style={{ flexGrow: 1 }} suffix={mrc20 ? <MRC20Icon size={20} tick={mrc20.tick} metadata={mrc20.metadata} /> : null} />
+                        {checkTokenID === 'error' && <span style={{ color: 'red' }}>This Ticker / Token ID does not correspond to any MRC-20; Please re-enter or <a href={curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch'} target='_blank' >launch</a>.</span>} */}
                     </>
                 }
             </div>

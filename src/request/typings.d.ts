@@ -155,6 +155,55 @@ declare namespace API {
       validPeriod: string;
     };
   };
+
+  type IdCoin = {
+    tick: string;
+    tokenName: string;
+    decimals: string;
+    amtPerMint: "21000000";
+    followersLimit: "1000";
+    mintCount: "1000";
+    liquidityPerMint: 1200;
+    premineCount: string;
+    totalMinted: "0";
+    blockHeight: string;
+    metaData: string;
+    type: string;
+    qual: {
+      count: "1";
+      creator: string;
+      lvl: string;
+      path: string;
+    };
+    pinCheck: {
+      count: "1";
+      creator: string;
+      lvl: string;
+      path: string;
+    };
+    payCheck: {
+      payAmount: "1200";
+      payTo: string;
+    };
+    mrc20Id: "b4b2e279f0322924076204b325369dbe207121d3b342446b81c216490ded6ae0i0";
+    pinNumber: 1238;
+    holders: 0;
+    deployerMetaId: string;
+    deployerAddress: string;
+    deployerUserInfo: {
+      name: string;
+      avatar: string;
+    };
+    deployTime: number;
+    price: "0.00";
+    priceUsd: string;
+    pool: 0;
+    totalSupply: "21000000000";
+    supply: string;
+    mintable: true;
+    remaining: "21000000000";
+    isFollowing?: boolean;
+  };
   type PayStatus = "purchased" | "unpurchased" | "mempool";
   type ControlByContentPinRet = {
     code: number;

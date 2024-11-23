@@ -1,4 +1,4 @@
-import { BASE_MAN_URL } from "@/config";
+import { BASE_IDCOIN_URL, BASE_MAN_URL } from "@/config";
 import { IBtcConnector } from "@metaid/metaid";
 import axios from "axios";
 import { UserInfo } from "node_modules/@metaid/metaid/dist/types";
@@ -361,14 +361,25 @@ export const getUserInfo = async (params: { address: string }) => {
   return ret.data ?? undefined;
 };
 
-export const getMRC20Info = async (params: {
-  id?: string;
-  tick?: string;
-}) => {
+export const getMRC20Info = async (params: { id?: string; tick?: string }) => {
   return request<{
     code: number;
     data: API.MRC20TickInfo;
   }>(`${BASE_MAN_URL}/api/mrc20/tick/info`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const getIDCoinInfo = async (params: {
+  issuerAddress?: string;
+  tick?: string;
+}) => {
+  return request<{
+    code: number;
+    data: API.IdCoin;
+    message: string;
+  }>(`${BASE_IDCOIN_URL}/api/v1/id-coins/coins-info`, {
     method: "GET",
     params,
   });

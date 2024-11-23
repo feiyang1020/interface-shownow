@@ -50,7 +50,7 @@ export const postPayBuzz = async (
       }
     | undefined,
   payType?: string,
-  payTicker?: API.MRC20TickInfo
+  payTicker?: API.IdCoin
 ) => {
   const randomKey = generateAESKey();
   const publicContent = content;

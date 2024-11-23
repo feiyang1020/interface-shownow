@@ -24,4 +24,6 @@ export const DASHBOARD_TOKEN = "DASHBOARD_TOKEN";
 // export const BASE_MAN_URL = "http://127.0.0.1:3000/man";
 export const BASE_MAN_URL = "https://man-test.metaid.io";
 // export const BASE_MAN_URL = "/man";
+
+export const BASE_IDCOIN_URL = "https://api.metaid.market/api-market-testnet";
 export const FLAG = "metaid";
