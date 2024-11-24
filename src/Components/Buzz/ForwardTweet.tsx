@@ -21,6 +21,7 @@ type Props = {
 }
 
 export default ({ buzzItem, showActions = true }: Props) => {
+    if(!buzzItem || !buzzItem.address) return null
     const { showConf, manPubKey } = useModel('dashboard');
     const [showUnlock, setShowUnlock] = useState(false);
     const [paying, setPaying] = useState(false);
@@ -82,6 +83,8 @@ export default ({ buzzItem, showActions = true }: Props) => {
         setPaying(false);
     }
 
+    
+
 
 
 
@@ -103,7 +106,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                 e.stopPropagation()
                 history.push(`/profile/${buzzItem.creator}`)
             }}>
-                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unname'}</div>
+                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unnamed'}</div>
                 <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
             </div>
             <div onClick={() => {
