@@ -398,15 +398,15 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                                     </Text>
                                     {
                                         mrc20 && <Avatar
-                                        size={20}
-                                        src={
-                                            <img
-                                                src={mrc20.deployerUserInfo.avatar ? mrc20.deployerUserInfo.avatar.indexOf('http') > -1 ? mrc20.deployerUserInfo.avatar : BASE_MAN_URL + mrc20.deployerUserInfo.avatar : defaultAvatar
-                                                }
-                                                alt="avatar"
-                                            />
-                                        }
-                                    ></Avatar >
+                                            size={20}
+                                            src={
+                                                <img
+                                                    src={mrc20.deployerUserInfo.avatar ? mrc20.deployerUserInfo.avatar.indexOf('http') > -1 ? mrc20.deployerUserInfo.avatar : BASE_MAN_URL + mrc20.deployerUserInfo.avatar : defaultAvatar
+                                                    }
+                                                    alt="avatar"
+                                                />
+                                            }
+                                        ></Avatar >
                                     }
                                 </div>
                                 <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
@@ -424,10 +424,10 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 }
 
 
-                {!isEmpty(quotePinId) && (
+                {(!isEmpty(quotePinId) && quoteDetailData?.data.tweet) && (
 
                     <Card style={{ padding: 0, marginBottom: 12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
-                        <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />
+                        {quoteDetailData?.data && <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />}
                     </Card>
 
                 )}
