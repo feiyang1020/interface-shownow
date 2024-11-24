@@ -424,9 +424,9 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 }
 
 
-                {(!isEmpty(quotePinId) && quoteDetailData?.data.tweet) && (
+                {(!isEmpty(quotePinId) ) && (
 
-                    <Card style={{ padding: 0, marginBottom: 12 }} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
+                    <Card style={{ padding: 0, marginBottom: 12,boxShadow:'none' }} bordered={Boolean(isQuoteLoading || quoteDetailData?.data.tweet)} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
                         {quoteDetailData?.data && <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />}
                     </Card>
 
