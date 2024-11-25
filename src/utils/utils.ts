@@ -94,3 +94,10 @@ export const detectUrl = (summary: string) => {
   }
   return summary;
 };
+
+export const openWindowTarget = () => {
+  if (window.innerWidth > 768) {
+    return "_blank";
+  }
+  return "_self";
+};

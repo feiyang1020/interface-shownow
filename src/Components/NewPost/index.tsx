@@ -16,7 +16,7 @@ import _btc from '@/assets/btc.png'
 import _mvc from '@/assets/mvc.png'
 import { InscribeData } from "node_modules/@metaid/metaid/dist/core/entity/btc";
 import * as crypto from 'crypto'
-import { encryptPayloadAES, generateAESKey } from "@/utils/utils";
+import { encryptPayloadAES, generateAESKey, openWindowTarget } from "@/utils/utils";
 import { postPayBuzz } from "@/utils/buzz";
 import { IBtcConnector } from "metaid/dist";
 import { getDeployList, getIDCoinInfo, getMRC20Info, getUserInfo } from "@/request/api";
@@ -466,7 +466,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                                                 subTitle="It seems you haven't issued your personal ID-COIN yet. Head over to MetaID.market to create your ID-COIN and unlock new possibilities in the decentralized ecosystem. Start building your on-chain identity today!"
                                                 extra={
                                                     <Button onClick={() => {
-                                                        window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch')
+                                                        window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch',openWindowTarget())
                                                     }} type="primary" key="console">
                                                         Launch Me
                                                     </Button>

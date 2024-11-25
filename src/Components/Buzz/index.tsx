@@ -20,6 +20,7 @@ import Unlock from "../Unlock";
 import { TicketIcon } from "lucide-react";
 import MRC20Icon from "../MRC20Icon";
 import defaultAvatar from '@/assets/avatar.svg'
+import { openWindowTarget } from "@/utils/utils";
 
 type Props = {
     buzzItem: API.Buzz
@@ -417,7 +418,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                                 </div>
                                 <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
                                     disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
-                                        window.open(`https://${curNetwork === 'testnet' ? 'testnet' : 'www'}.metaid.market/idCoin/${accessControl?.data?.holdCheck?.ticker}`, '_blank')
+                                        window.open(`https://${curNetwork === 'testnet' ? 'testnet' : 'www'}.metaid.market/idCoin/${accessControl?.data?.holdCheck?.ticker}`, openWindowTarget())
                                     }}
                                     loading={decryptContent?.status === 'mempool'}
                                 >

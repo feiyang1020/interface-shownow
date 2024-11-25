@@ -1,50 +1,16 @@
 import { Carousel } from "antd"
-import defaultImg from '@/assets/img 2@1x.png'
+import banner1 from '@/assets/banner.png'
+import banner2 from '@/assets/banner2.png'
 import './index.less'
-export default ()=>{
+import { openWindowTarget } from "@/utils/utils"
+import { curNetwork } from "@/config"
+export default () => {
     return <div className="recommand">
-    {/* <Carousel className="carousel" autoplay>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-        </div>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-        </div>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-        </div>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-        </div>
-    </Carousel>
-    <h3>Recommend </h3>
-
-    <Carousel className="carousel2" autoplay>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-        </div>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-
-        </div>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-        </div>
-        <div className="carouselItem">
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-            <img src={defaultImg} alt="" />
-        </div>
-    </Carousel> */}
-</div>
+        <img src={banner1} alt="" onClick={() => {
+            window.open("https://www.metaso.network", openWindowTarget())
+        }} />
+        <img src={banner2} alt="" onClick={() => {
+            window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch', openWindowTarget())
+        }} />
+    </div>
 }
