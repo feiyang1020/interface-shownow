@@ -9,7 +9,7 @@ import './index.less'
 import dayjs from "dayjs";
 import { buildAccessPass, decodePayBuzz } from "@/utils/buzz";
 import { FollowIconComponent } from "../Follow";
-import { detectUrl, handleSpecial } from "@/utils/utils";
+import { detectUrl, handleSpecial, openWindowTarget } from "@/utils/utils";
 import _btc from '@/assets/btc.png'
 import { useState } from "react";
 import Unlock from "../Unlock";
@@ -258,6 +258,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                                 </div>
                                 <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
                                     disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
+                                        e.stopPropagation();
                                         window.open(`https://${curNetwork === 'testnet' ? 'testnet' : 'www'}.metaid.market/idCoin/${accessControl?.data?.holdCheck?.ticker}`, openWindowTarget())
                                     }}
                                     loading={decryptContent?.status === 'mempool'}
