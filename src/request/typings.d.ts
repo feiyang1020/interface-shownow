@@ -212,6 +212,7 @@ declare namespace API {
   };
 
   type MRC20TickInfo = {
+    address: string;
     amtPerMint: string;
     blockHeight: string;
     decimals: string;

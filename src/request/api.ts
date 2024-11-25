@@ -384,3 +384,17 @@ export const getIDCoinInfo = async (params: {
     params,
   });
 };
+
+export const getDeployList = async (params: {
+  address?: string;
+  tickType: string;
+}) => {
+  return request<{
+    code: number;
+    data: API.IdCoin[];
+    message: string;
+  }>(`${BASE_MAN_URL}/ft/mrc20/address/deploy-list`, {
+    method: "GET",
+    params,
+  });
+};

@@ -215,17 +215,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
         queryFn: () => getControlByContentPin({ pinId: buzzItem!.id }),
     })
 
-    const { data: mrc20 } = useQuery({
-        enabled: Boolean(accessControl?.data?.holdCheck),
-        queryKey: ['mrc20', accessControl?.data?.holdCheck],
-        queryFn: async () => {
-            const { data } = await getIDCoinInfo({ tick: accessControl!.data.holdCheck.ticker })
-            if (data) {
-                return data
-            }
-            return undefined
-        }
-    })
+
 
     const { data: decryptContent, refetch: refetchDecrypt } = useQuery({
         enabled: Boolean(user.address),
@@ -262,6 +252,24 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
         }
         setPaying(false)
     }
+
+    const { data: mrc20 } = useQuery({
+        enabled: Boolean(accessControl?.data?.holdCheck),
+        queryKey: ['mrc20', accessControl],
+        queryFn: async () => {
+            const { data } = await getMRC20Info({ tick: accessControl!.data.holdCheck.ticker })
+            if (data) {
+                const userInfo = await getUserInfo({ address: data.address });
+                return {
+                    ...data,
+                    deployerUserInfo: userInfo
+                }
+                console.log(data, 'data')
+                // return data
+            }
+            return undefined
+        }
+    })
 
 
     return <div className="tweet" style={{ padding }} >
@@ -300,7 +308,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                         decryptContent?.buzzType === 'pay' && decryptContent.status === 'purchased' && decryptContent.encryptContent && <>
 
                             {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
-                                <span key={index} style={{ wordBreak: 'break-all' }}>
+                                <span key={'pay' + index} style={{ wordBreak: 'break-all' }}>
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html: handleSpecial(detectUrl(line)),
@@ -353,7 +361,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                                         }) :
                                             decryptContent?.encryptFiles
                                                 .map((pid: string) => {
-                                                    return <div style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
+                                                    return <div key={pid} style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
                                                         <LockOutlined style={{ fontSize: 24 }} />
 
                                                     </div>
@@ -424,9 +432,9 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 }
 
 
-                {(!isEmpty(quotePinId) ) && (
+                {(!isEmpty(quotePinId)) && (
 
-                    <Card style={{ padding: 0, marginBottom: 12,boxShadow:'none' }} bordered={Boolean(isQuoteLoading || quoteDetailData?.data.tweet)} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
+                    <Card style={{ padding: 0, marginBottom: 12, boxShadow: 'none' }} bordered={Boolean(isQuoteLoading || quoteDetailData?.data.tweet)} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
                         {quoteDetailData?.data && <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />}
                     </Card>
 

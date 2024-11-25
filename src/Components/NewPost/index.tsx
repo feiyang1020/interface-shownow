@@ -19,7 +19,7 @@ import * as crypto from 'crypto'
 import { encryptPayloadAES, generateAESKey } from "@/utils/utils";
 import { postPayBuzz } from "@/utils/buzz";
 import { IBtcConnector } from "metaid/dist";
-import { getIDCoinInfo, getMRC20Info } from "@/request/api";
+import { getDeployList, getIDCoinInfo, getMRC20Info, getUserInfo } from "@/request/api";
 import defaultAvatar from '@/assets/avatar.svg'
 import MRC20Icon from "../MRC20Icon";
 const { TextArea } = Input;
@@ -83,8 +83,16 @@ export default ({ show, onClose, quotePin }: Props) => {
         queryKey: ['idCoin', user],
         enabled: Boolean(user),
         queryFn: async () => {
-            const ret = await getIDCoinInfo({ issuerAddress: await window.metaidwallet.btc.getAddress() });
-            return ret.data;
+            const address = await window.metaidwallet.btc.getAddress()
+            const ret = await getDeployList({ address, tickType: 'idcoins' });
+            if (ret.data.length > 0) {
+                const userInfo = await getUserInfo({ address });
+                return {
+                    ...ret.data[0],
+                    deployerUserInfo: userInfo
+                }
+            }
+            return undefined
         }
     })
     const handleAddBuzz = async (buzz: {
@@ -431,12 +439,12 @@ export default ({ show, onClose, quotePin }: Props) => {
                                     {
                                         IdCoin ?
                                             <Checkbox defaultChecked disabled >
-                                                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>
+                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>
                                                     <Avatar
-                                                        size={62}
+                                                        size={32}
                                                         src={
                                                             <img
-                                                                src={IdCoin.deployerUserInfo.avatar ? IdCoin.deployerUserInfo.avatar.indexOf('http') > -1 ? IdCoin.deployerUserInfo.avatar : BASE_MAN_URL + IdCoin.deployerUserInfo.avatar : defaultAvatar
+                                                                src={IdCoin.deployerUserInfo?.avatar ? IdCoin.deployerUserInfo.avatar.indexOf('http') > -1 ? IdCoin.deployerUserInfo.avatar : BASE_MAN_URL + IdCoin.deployerUserInfo.avatar : defaultAvatar
                                                                 }
                                                                 alt="avatar"
                                                             />
@@ -448,10 +456,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                                                                 <Typography.Title level={4} style={{ margin: 0 }}>
                                                                     {IdCoin.tick}
                                                                 </Typography.Title>
-                                                                <Typography.Text copyable={{ text: IdCoin.deployerMetaId }} className="metaid"> MetaID: {IdCoin.deployerMetaId.replace(/(\w{6})\w+(\w{5})/, "$1...")}</Typography.Text>
                                                             </div>
-
-
                                                         </div>
                                                     </div>
                                                 </div></Checkbox> :
