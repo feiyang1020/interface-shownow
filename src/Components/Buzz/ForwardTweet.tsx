@@ -1,5 +1,5 @@
 import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
-import { fetchCurrentBuzzLikes, getControlByContentPin, getPinDetailByPid, getUserInfo } from "@/request/api";
+import { fetchCurrentBuzzLikes, getControlByContentPin, getMRC20Info, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, SyncOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
@@ -21,7 +21,7 @@ type Props = {
 }
 
 export default ({ buzzItem, showActions = true }: Props) => {
-    if(!buzzItem || !buzzItem.address) return null
+    if (!buzzItem || !buzzItem.address) return null
     const { showConf, manPubKey } = useModel('dashboard');
     const [showUnlock, setShowUnlock] = useState(false);
     const [paying, setPaying] = useState(false);
@@ -83,7 +83,23 @@ export default ({ buzzItem, showActions = true }: Props) => {
         setPaying(false);
     }
 
-    
+    const { data: mrc20 } = useQuery({
+        enabled: Boolean(accessControl?.data?.holdCheck),
+        queryKey: ['mrc20', accessControl],
+        queryFn: async () => {
+            const { data } = await getMRC20Info({ tick: accessControl!.data.holdCheck.ticker })
+            if (data) {
+                const userInfo = await getUserInfo({ address: data.address });
+                return {
+                    ...data,
+                    deployerUserInfo: userInfo
+                }
+            }
+            return undefined
+        }
+    })
+
+
 
 
 
@@ -200,24 +216,58 @@ export default ({ buzzItem, showActions = true }: Props) => {
                     </>
                 }
                 {
-                    buzzItem.genesisHeight !== 0 && decryptContent?.buzzType === 'pay' && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <Text type="warning" style={{ lineHeight: '16px' }}>{
-                                accessControl?.data?.payCheck?.amount
-                            }</Text>
-                            <img src={_btc} alt="" width={16} height={16} />
+                    buzzItem.genesisHeight !== 0 && decryptContent?.buzzType === 'pay' && <>{
+                        accessControl?.data?.payCheck && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Text type="warning" style={{ lineHeight: '16px' }}>{
+                                    accessControl?.data?.payCheck?.amount
+                                }</Text>
+                                <img src={_btc} alt="" width={16} height={16} />
+                            </div>
+                            <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
+                                disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
+                                    e.stopPropagation()
+                                    setShowUnlock(true)
+                                }}
+                                loading={decryptContent?.status === 'mempool'}
+                            >
+                                {decryptContent.status === 'unpurchased' ? 'Unlock' : 'Unlocked'}
+                            </Button>
                         </div>
-                        <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
-                            disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
-                                e.stopPropagation()
-                                setShowUnlock(true)
+                    }
+                        {
+                            accessControl?.data?.holdCheck && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <Text type="warning" style={{ lineHeight: '16px' }}>
+                                        {
+                                            `Hold ${accessControl?.data?.holdCheck?.amount} ${accessControl?.data?.holdCheck?.ticker}`
+                                        }
+                                    </Text>
+                                    {
+                                        mrc20 && <Avatar
+                                            size={20}
+                                            src={
+                                                <img
+                                                    src={mrc20.deployerUserInfo.avatar ? mrc20.deployerUserInfo.avatar.indexOf('http') > -1 ? mrc20.deployerUserInfo.avatar : BASE_MAN_URL + mrc20.deployerUserInfo.avatar : defaultAvatar
+                                                    }
+                                                    alt="avatar"
+                                                />
+                                            }
+                                        ></Avatar >
+                                    }
+                                </div>
+                                <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
+                                    disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
+                                        window.open(`https://${curNetwork === 'testnet' ? 'testnet' : 'www'}.metaid.market/idCoin/${accessControl?.data?.holdCheck?.ticker}`, openWindowTarget())
+                                    }}
+                                    loading={decryptContent?.status === 'mempool'}
+                                >
+                                    Mint
+                                </Button>
+                            </div>
+                        }
 
-                            }}
-                            loading={decryptContent?.status === 'mempool'}
-                        >
-                            {decryptContent.status === 'unpurchased' ? 'Unlock' : 'Unlocked'}
-                        </Button>
-                    </div>
+                    </>
                 }
 
 
