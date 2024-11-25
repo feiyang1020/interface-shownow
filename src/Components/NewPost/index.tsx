@@ -81,7 +81,7 @@ export default ({ show, onClose, quotePin }: Props) => {
     };
     const { isLoading, data: IdCoin } = useQuery({
         queryKey: ['idCoin', user],
-        enabled: Boolean(user),
+        enabled: Boolean(user && show),
         queryFn: async () => {
             const address = await window.metaidwallet.btc.getAddress()
             const ret = await getDeployList({ address, tickType: 'idcoins' });

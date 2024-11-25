@@ -237,8 +237,13 @@ export default () => {
   }, [init]);
 
   const fetchFeeRateData = useCallback(async () => {
-    const feeRateData = await fetchFeeRate({ netWork: curNetwork });
-    setFeeRate(feeRateData?.fastestFee);
+    try{
+      const feeRateData = await fetchFeeRate({ netWork: curNetwork });
+      setFeeRate(feeRateData?.fastestFee);
+    }catch(e){
+      console.log(e)
+    }
+    
   }, []);
   const updateFeeRate = useIntervalAsync(fetchFeeRateData, 60000);
 

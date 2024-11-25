@@ -264,8 +264,6 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                     ...data,
                     deployerUserInfo: userInfo
                 }
-                console.log(data, 'data')
-                // return data
             }
             return undefined
         }
