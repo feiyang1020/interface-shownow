@@ -1,4 +1,4 @@
-import { BASE_MAN_URL, curNetwork, FLAG } from "@/config";
+import { BASE_MAN_URL, curNetwork, FallbackImage, FLAG } from "@/config";
 import { fetchCurrentBuzzLikes, getControlByContentPin, getMRC20Info, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { GiftOutlined, HeartFilled, HeartOutlined, LockOutlined, MessageOutlined, SyncOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -185,6 +185,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                                                 height={120}
                                                 style={{ objectFit: 'cover' }}
                                                 src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
+                                                fallback={FallbackImage}
                                             />
                                         })
                                     }
@@ -196,6 +197,7 @@ export default ({ buzzItem, showActions = true }: Props) => {
                                                 height={120}
                                                 style={{ objectFit: 'cover' }}
                                                 src={`data:image/jpeg;base64,${pid}`}
+                                                fallback={FallbackImage}
                                             />
                                         }) :
                                             decryptContent?.encryptFiles
