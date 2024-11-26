@@ -198,11 +198,11 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
             : '';
     }, [buzzItem])
 
-    const commentData = useQuery({
-        enabled: !isNil(buzzItem?.id),
-        queryKey: ['comment-detail', buzzItem!.id, showComment, reLoading],
-        queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
-    })
+    // const commentData = useQuery({
+    //     enabled: !isNil(buzzItem?.id),
+    //     queryKey: ['comment-detail', buzzItem!.id, showComment, reLoading],
+    //     queryFn: () => fetchCurrentBuzzComments({ pinId: buzzItem!.id }),
+    // })
 
     const { isLoading: isQuoteLoading, data: quoteDetailData, } = useQuery({
         enabled: !isEmpty(quotePinId),
@@ -481,12 +481,12 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 <Button type='text' icon={<MessageOutlined />} onClick={() => {
                     showComment ? setShowComment(false) : setShowComment(true)
                 }}>
-                    {commentData.data?.length}
+                    {buzzItem.commentCount}
                 </Button>
 
 
                 <Button type='text' onClick={handleLike} icon={isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}>
-                    {currentLikeData?.length}
+                    {buzzItem?.likeCount}
                 </Button>
                 <div className="item">
                     <GiftOutlined />

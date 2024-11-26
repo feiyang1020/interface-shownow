@@ -9,15 +9,16 @@ import { useEffect } from "react";
 
 type CommentPanelProps = {
     tweetId: string,
-    refetchNum: number
+    refetchNum: number,
+    commentData?: API.CommentRes[]
 }
 
 const CommentItem = ({ commentRes }: { commentRes: API.CommentRes }) => {
     const { btcConnector } = useModel('user')
     const currentUserInfoData = useQuery({
-        enabled: !isNil(commentRes?.pinAddress),
-        queryKey: ['userInfo', commentRes?.pinAddress],
-        queryFn: () => getUserInfo({ address: commentRes?.pinAddress }),
+        enabled: !isNil(commentRes?.createAddress),
+        queryKey: ['userInfo', commentRes?.createAddress],
+        queryFn: () => getUserInfo({ address: commentRes?.createAddress }),
     });
     return <List.Item>
         <List.Item.Meta
@@ -29,21 +30,21 @@ const CommentItem = ({ commentRes }: { commentRes: API.CommentRes }) => {
     </List.Item>
 }
 
-export default ({ tweetId, refetchNum }: CommentPanelProps) => {
-    const commentData = useQuery({
-        enabled: !isNil(tweetId),
-        queryKey: ['comment-detail', tweetId],
-        queryFn: () => fetchCurrentBuzzComments({ pinId: tweetId }),
-    });
-    useEffect(() => {
-        if (refetchNum) {
-            commentData.refetch()
-        }
-    }, [refetchNum])
-    const commentsNum = (commentData?.data ?? []).length;
+export default ({ tweetId, refetchNum,commentData }: CommentPanelProps) => {
+    // const commentData = useQuery({
+    //     enabled: !isNil(tweetId),
+    //     queryKey: ['comment-detail', tweetId],
+    //     queryFn: () => fetchCurrentBuzzComments({ pinId: tweetId }),
+    // });
+    // useEffect(() => {
+    //     if (refetchNum) {
+    //         commentData.refetch()
+    //     }
+    // }, [refetchNum])
+    const commentsNum = (commentData ?? []).length;
     return <List
         itemLayout="horizontal"
-        dataSource={commentData?.data ?? []}
+        dataSource={commentData ?? []}
         renderItem={(item, index) => (
             <CommentItem commentRes={item} />
         )}

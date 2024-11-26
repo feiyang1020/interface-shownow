@@ -18,13 +18,13 @@ export default () => {
     const [refetchNum, setRefetchNum] = useState(0);
     const [reLoading, setReLoading] = useState(false)
     const [showComment, setShowComment] = useState(false)
-    const { isLoading: isQuoteLoading, data: quoteDetailData } = useQuery({
+    const { isLoading: isQuoteLoading, data: buzzDetail } = useQuery({
         enabled: !isEmpty(quotePinId),
         queryKey: ['buzzDetail', quotePinId, user.address],
         queryFn: () => fetchBuzzDetail({ pinId: quotePinId! }),
     })
 
-    if (!quoteDetailData) return null
+    if (!buzzDetail) return null
     return <Row gutter={[12, 12]} >
         <Col span={24} md={15}>
             <Card loading={isQuoteLoading} title={
@@ -41,7 +41,7 @@ export default () => {
 
                 }
             }}>
-                <Buzz buzzItem={quoteDetailData.data.tweet} showActions={true} padding={0} reLoading={reLoading} />
+                <Buzz buzzItem={buzzDetail.data.tweet} showActions={true} padding={0} reLoading={reLoading} />
                 <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />
@@ -54,7 +54,7 @@ export default () => {
                     setReLoading(!reLoading)
                 }} show={showComment} />
                 <Divider />
-                <CommentPanel tweetId={match?.params.id ?? ''} refetchNum={refetchNum} />
+                <CommentPanel tweetId={match?.params.id ?? ''} refetchNum={refetchNum} commentData={buzzDetail?.data.comments} />
 
             </Card>
         </Col>

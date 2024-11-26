@@ -48,6 +48,7 @@ declare namespace API {
     pinId: string;
     pinNumber: number;
     replyTo: string;
+    createAddress: string;
   };
 
   type LikeRes = {
@@ -128,7 +129,7 @@ declare namespace API {
     data: {
       tweet: Buzz;
       like: LikeRes;
-      comment: CommentRes[];
+      comments: CommentRes[];
     };
   };
 
