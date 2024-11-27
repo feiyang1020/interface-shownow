@@ -55,10 +55,6 @@ export default ({ buzzItem, showActions = true }: Props) => {
         queryKey: ['buzzdecryptContent', buzzItem!.id, chain, user.address],
         queryFn: () => decodePayBuzz(buzzItem, manPubKey!, chain),
     })
-
-
-
-
     const handlePay = async () => {
         setPaying(true);
         try {

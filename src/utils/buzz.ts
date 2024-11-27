@@ -125,7 +125,7 @@ export const postPayBuzz = async (
       }
     );
     transactions = pinTransations as MvcTransaction[];
-    pid = transactions[transactions.length - 1].txComposer.getTxId();
+    pid = transactions[transactions.length - 1].txComposer.getTxId()+'i0';
   }
 
   const { sharedSecret, ecdhPubKey } = await window.metaidwallet.common.ecdh({
