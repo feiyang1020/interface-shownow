@@ -52,6 +52,7 @@ export const postPayBuzz = async (
   payType?: string,
   payTicker?: API.IdCoin
 ) => {
+  let transactions: MvcTransaction[] = [];
   const randomKey = generateAESKey();
   const publicContent = content;
   const _encryptContent = encryptContent
@@ -68,6 +69,7 @@ export const postPayBuzz = async (
     btcConnector,
     mvcConnector
   );
+  transactions = fileTransactions;
   const {
     attachments: encryptAttachments,
     fileTransactions: encryptFileTransactions,
@@ -78,8 +80,10 @@ export const postPayBuzz = async (
     chain,
     btcConnector,
     mvcConnector,
-    randomKey
+    randomKey,
+    transactions
   );
+  transactions = encryptFileTransactions;
 
   const payload = {
     publicContent,
@@ -111,52 +115,44 @@ export const postPayBuzz = async (
     const [revealTxId] = ret.revealTxIds;
     pid = `${revealTxId}i0`;
   } else {
-    const { txid } = await mvcConnector!.createPin(metaidData, {
-      network: curNetwork,
-      signMessage: "create paybuzz",
-      serialAction: "finish",
-      transactions: [ ...fileTransactions,...encryptFileTransactions],
-    });
-    console.log(txid, "transactions");
-    pid = `${txid}i0`;
+    const { transactions: pinTransations } = await mvcConnector!.createPin(
+      metaidData,
+      {
+        network: curNetwork,
+        signMessage: "create paybuzz",
+        serialAction: "combo",
+        transactions: [...transactions],
+      }
+    );
+    transactions = pinTransations as MvcTransaction[];
+    pid = transactions[transactions.length - 1].txComposer.getTxId();
   }
 
   const { sharedSecret, ecdhPubKey } = await window.metaidwallet.common.ecdh({
     externalPubKey: manPubKey,
   });
 
-  const contorlPayload:any = {
+  const contorlPayload: any = {
     controlPins: [pid],
     manDomain: "",
     manPubkey: manPubKey,
     creatorPubkey: ecdhPubKey,
     encryptedKey: encryptPayloadAES(sharedSecret, randomKey),
-    // holdCheck: {
-    //   type: "chainCoin",
-    //   ticker: "",
-    //   amount: "",
-    // },
-    // payCheck: {
-    //   type: "chainCoin", //"chainCoin" or "mrc20"
-    //   ticker: "",
-    //   amount: price,
-    //   payTo: address,
-    // },
   };
 
-  if(payType === "mrc20" && payTicker) {
+  if (payType === "mrc20" && payTicker) {
     contorlPayload.holdCheck = {
       type: "mrc20",
       ticker: payTicker.tick,
-      amount: '1',
-    }
-  }else{
+      amount: "1",
+    };
+  } else {
     contorlPayload.payCheck = {
       type: "chainCoin",
       ticker: "",
       amount: price,
       payTo: address,
-    }
+    };
   }
   const contorlPath = `${host || ""}/metaaccess/accesscontrol`;
   const contorlMetaidData: InscribeData = {
@@ -182,7 +178,7 @@ export const postPayBuzz = async (
       network: curNetwork,
       signMessage: "create accesscontrol",
       serialAction: "finish",
-      transactions: [],
+      transactions: [...transactions],
     });
   }
 };
@@ -269,12 +265,13 @@ export const postEncryptImages = async (
   chain: API.Chain,
   btcConnector: IBtcConnector | undefined,
   mvcConnector: IMvcConnector | undefined,
-  randomKey: string
+  randomKey: string,
+  _fileTransactions: MvcTransaction[]
 ) => {
   if (images.length === 0)
     return {
       attachments: [],
-      fileTransactions: [],
+      fileTransactions: [..._fileTransactions],
     };
 
   const fileOptions: CreateOptions[] = [];
@@ -306,7 +303,7 @@ export const postEncryptImages = async (
       fileTransactions: [],
     };
   } else {
-    let fileTransactions: MvcTransaction[] = [];
+    let fileTransactions: MvcTransaction[] = [..._fileTransactions];
     const fileEntity = (await mvcConnector!.use("file")) as IMvcEntity;
     const finalAttachMetafileUri: string[] = [];
 
