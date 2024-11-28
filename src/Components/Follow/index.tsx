@@ -218,14 +218,14 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
 
 
 
-const FollowIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading,mempool }) => {
+const FollowIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading, mempool }) => {
     const { showConf } = useModel('dashboard');
     return (
         <div
             onClick={(e) => { e.preventDefault(); onFollowToggle && onFollowToggle(); }}
-            style={{ position: 'absolute', bottom: 0, right: 0, background: '#fff', borderRadius: '50%', border: '1px solid #fff', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ position: 'absolute', bottom: 0, right: 0, background: '#fff', borderRadius: '50%', border: '1px solid #fff', boxSizing: 'border-box', width: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {
-                (loading||mempool) ? <LoadingOutlined style={{ color: showConf?.brandColor }} size={16} /> : <>
+                (loading || mempool) ? <LoadingOutlined style={{ color: showConf?.brandColor }} size={16} /> : <>
                     {
                         isFollowing
                             ? <CheckCircleFilled size={16} style={{ color: showConf?.brandColor }} />
@@ -239,13 +239,13 @@ const FollowIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loadin
     );
 };
 
-const FollowButtonIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading,mempool }) => {
+const FollowButtonIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading, mempool }) => {
     const { showConf } = useModel('dashboard');
     return (
         <Button
             onClick={(e) => { e.preventDefault(); onFollowToggle && onFollowToggle(); }}
             style={{ color: '#fff', background: showConf?.gradientColor }}
-            loading={loading||mempool}
+            loading={loading || mempool}
             shape='round'
         >
             {

@@ -58,6 +58,7 @@ declare namespace API {
     pinAddress: string;
     pinId: string;
     pinNumber: number;
+    CreateMetaid: string;
   };
 
   type FeeRateApi = {
@@ -129,7 +130,7 @@ declare namespace API {
     message: string;
     data: {
       tweet: Buzz;
-      like: LikeRes;
+      like: LikeRes[];
       comments: CommentRes[];
     };
   };

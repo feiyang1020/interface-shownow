@@ -41,7 +41,7 @@ export default () => {
 
                 }
             }}>
-                <Buzz buzzItem={buzzDetail.data.tweet} showActions={true} padding={0} reLoading={reLoading} refetch={refetch} />
+                <Buzz buzzItem={buzzDetail.data.tweet} showActions={true} padding={0} reLoading={reLoading} refetch={refetch} like={buzzDetail.data.like} />
                 <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />

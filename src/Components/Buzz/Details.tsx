@@ -24,14 +24,16 @@ import { detectUrl, handleSpecial, openWindowTarget, sleep } from "@/utils/utils
 
 type Props = {
     buzzItem: API.Buzz
+    like?: API.LikeRes[]
     showActions?: boolean,
     padding?: number
     reLoading?: boolean
     refetch?: () => Promise<any>
-    isForward?: boolean
+    isForward?: boolean,
+    loading?: boolean
 }
 
-export default ({ buzzItem, showActions = true, padding = 20, reLoading = false, refetch, isForward = false }: Props) => {
+export default ({ buzzItem, showActions = true, padding = 20, reLoading = false, refetch, isForward = false, loading, like = [] }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
@@ -60,8 +62,8 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
     const isLiked = useMemo(() => {
         if (!buzzItem || !user) return false
         const likes = buzzItem.like ?? [];
-        return likes.includes(user.metaid)
-    }, [buzzItem, user])
+        return likes.includes(user.metaid) || like.some((item) => item.CreateMetaid === user.metaid)
+    }, [buzzItem, user, like])
     const handleLike = async () => {
         const pinId = buzzItem!.id;
         if (!isLogin) {
@@ -226,29 +228,38 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
     })
 
 
-    return <div className="tweet" style={{ padding }} >
-        <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
-            <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
-                {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
-            </Avatar>
-            <FollowIconComponent metaid={currentUserInfoData.data?.metaid || ''} />
+    return <Card className="tweet"
+        loading={loading}
+        style={{ width: '100%' }}
+        styles={{ header: { height: 40 } }}
+        title={
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
+                    <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
+                        {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
+                    </Avatar>
+                    <FollowIconComponent metaid={currentUserInfoData.data?.metaid || ''} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }} onClick={(e) => {
+                    e.stopPropagation()
+                    history.push(`/profile/${buzzItem.creator}`)
+                }}>
+                    <Text style={{ fontSize: 14, lineHeight: 1 }}> {currentUserInfoData.data?.name || 'Unnamed'}</Text>
+                    <Text type="secondary" style={{ fontSize: 10, lineHeight: 1 }}>{currentUserInfoData.data?.metaid.slice(0, 8)}</Text>
+                </div>
+            </div>
+        }
+    >
 
-        </div>
 
         <div className="content" style={{
             cursor: 'pointer'
         }} >
-            <div className="creater" onClick={(e) => {
-                e.stopPropagation()
-                history.push(`/profile/${buzzItem.creator}`)
-            }}>
-                <div className="name" style={{ fontSize: 14 }}>{currentUserInfoData.data?.name || 'Unnamed'}</div>
-                <div className="metaid">{currentUserInfoData.data?.metaid.slice(0, 8)}</div>
-            </div>
+
             <div onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-                <div className="text" style={{ margin: '8px 0', }} >
+                <div className="text"  >
                     {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
                         <span key={index} style={{ wordBreak: 'break-all' }}>
                             <div
@@ -390,12 +401,12 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
 
                 {(!isEmpty(quotePinId)) && (
 
-                    <Card style={{ padding: 0, marginBottom: 12, boxShadow: 'none' }} bordered={Boolean(isQuoteLoading || quoteDetailData?.data.tweet)} styles={{ body: { padding: 12 } }} loading={isQuoteLoading}>
+                    <Card style={{ padding: 0, marginBottom: 12, boxShadow: 'none' }} bordered={false} styles={{ body: { padding: 0 } }} loading={isQuoteLoading}>
                         {quoteDetailData?.data && <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />}
                     </Card>
 
                 )}
-                {<Space>
+                <Space>
                     <Button
                         size='small'
                         type="link"
@@ -424,7 +435,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                         .unix(buzzItem.timestamp)
                         .format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
 
-                </Space>}
+                </Space>
 
             </div>
 
@@ -493,5 +504,5 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                 </div>
             </div>
         </Unlock>
-    </div>
+    </Card>
 }
