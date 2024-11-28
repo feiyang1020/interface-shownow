@@ -112,6 +112,7 @@ declare namespace API {
     commentCount: number;
     shareCount: number;
     hot: number;
+    like:string[]
   };
 
   type BuzzListRet = {
