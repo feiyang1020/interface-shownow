@@ -23,32 +23,10 @@ export default () => {
     const [search, setSearch] = useState('');
     const [total, setTotal] = useState<null | number>(null);
 
-    const { data: myFollowingListData } = useQuery({
-        queryKey: ['myFollowing', user?.metaid],
-        enabled: !isEmpty(user?.metaid ?? ''),
-        queryFn: () =>
-            fetchFollowingList({
-                metaid: user?.metaid ?? '',
-                params: { cursor: '0', size: '100', followDetail: false },
-            }),
-    });
-    const getTotal = async () => {
-        setTotal(
-            await fetchMyFollowingTotal({
-                page: 1,
-                size: 1,
-                path: '/protocols/simplebuzz,/protocols/banana',
-                metaidList: myFollowingListData?.list ?? [],
-            })
-        );
-    };
 
-    useEffect(() => {
-        if (!isEmpty(myFollowingListData?.list ?? [])) {
-            getTotal();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+ 
+
+ 
 
 
     const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =

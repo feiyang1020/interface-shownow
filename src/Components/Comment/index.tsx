@@ -9,6 +9,7 @@ import { curNetwork, FLAG } from "@/config";
 import { isNil } from "ramda";
 import { useQueryClient } from "@tanstack/react-query";
 import commentEntitySchema, { getCommentEntitySchemaWithCustomHost } from "@/entities/comment";
+import { sleep } from "@/utils/utils";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -53,8 +54,8 @@ export default ({ show, onClose, tweetId }: Props) => {
 
                 console.log('create res for inscribe', createRes);
                 if (!isNil(createRes?.revealTxIds[0])) {
-                    // await sleep(5000);
-                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
+                    await sleep(5000);
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew', 'homebuzzesfollow', user.metaid] });
                     message.success('comment successfully');
                     setContent('');
                     onClose();
@@ -72,7 +73,9 @@ export default ({ show, onClose, tweetId }: Props) => {
                 console.log('create res for inscribe', createRes)
 
                 if (!isNil(createRes?.txid)) {
-                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] })
+                    await sleep(5000);
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
+                    queryClient.invalidateQueries({ queryKey: ['homebuzzesfollow', user.metaid] });
                     message.success('comment successfully')
                     setContent('')
                     onClose();

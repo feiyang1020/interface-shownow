@@ -20,7 +20,7 @@ import Unlock from "../Unlock";
 import { TicketIcon } from "lucide-react";
 import MRC20Icon from "../MRC20Icon";
 import defaultAvatar from '@/assets/avatar.svg'
-import { openWindowTarget } from "@/utils/utils";
+import { openWindowTarget, sleep } from "@/utils/utils";
 
 type Props = {
     buzzItem: API.Buzz
@@ -137,9 +137,10 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                     },
                 });
                 if (!isNil(likeRes?.revealTxIds[0])) {
+                    await sleep(5000);
                     queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                     queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
-                    // await sleep(5000);
+                   
                     message.success('like buzz successfully');
                 }
             } else {
@@ -167,6 +168,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 })
                 console.log('likeRes', likeRes)
                 if (!isNil(likeRes?.txid)) {
+                    await sleep(5000);
                     queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] })
                     queryClient.invalidateQueries({
                         queryKey: ['payLike', buzzItem!.id],
