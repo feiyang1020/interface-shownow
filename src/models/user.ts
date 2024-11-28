@@ -12,7 +12,12 @@ import {
 } from "@metaid/metaid";
 import { curNetwork, getHostByNet } from "@/config";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFeeRate, fetchFollowingList, getUserInfo } from "@/request/api";
+import {
+  fetchFeeRate,
+  fetchFollowingList,
+  getFollowList,
+  getUserInfo,
+} from "@/request/api";
 import useIntervalAsync from "@/hooks/useIntervalAsync";
 import { isEmpty } from "ramda";
 const checkExtension = () => {
@@ -62,7 +67,7 @@ export default () => {
   const [network, setNetwork] = useState<API.Network>(curNetwork);
   const [initializing, setInitializing] = useState<boolean>(true);
   const [feeRate, setFeeRate] = useState<number>(0);
-  const [followList, setFollowList] = useState<string[]>([]);
+  const [followList, setFollowList] = useState<API.FollowingItem[]>([]);
   const connectWallet = useCallback(async () => {
     const [isConnected, errMsg] = await checkWallet();
     if (!isConnected && !isEmpty(errMsg)) {
@@ -237,25 +242,21 @@ export default () => {
   }, [init]);
 
   const fetchFeeRateData = useCallback(async () => {
-    try{
+    try {
       const feeRateData = await fetchFeeRate({ netWork: curNetwork });
       setFeeRate(feeRateData?.fastestFee);
-    }catch(e){
-      console.log(e)
+    } catch (e) {
+      console.log(e);
     }
-    
   }, []);
   const updateFeeRate = useIntervalAsync(fetchFeeRateData, 60000);
 
   const fetchUserFollowingList = useCallback(async () => {
     if (user.metaid) {
-      const res = await fetchFollowingList({
+      const res = await getFollowList({
         metaid: user.metaid ?? "",
-        params: { cursor: "0", size: "100", followDetail: false },
       });
-      setFollowList(
-        res && res.list ? res?.list.map((item: string) => item) : []
-      );
+      setFollowList(res && res.data?.list ? res.data.list : []);
     }
   }, [user.metaid]);
 
@@ -300,5 +301,6 @@ export default () => {
     setFollowList,
     fetchUserInfo,
     switchChain,
+    fetchUserFollowingList
   };
 };

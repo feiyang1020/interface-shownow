@@ -231,4 +231,10 @@ declare namespace API {
     type: string;
     mintable: boolean;
   };
+
+  type FollowingItem = {
+    metaid: string;
+    mempool: number;
+    unfollow: number;
+  };
 }

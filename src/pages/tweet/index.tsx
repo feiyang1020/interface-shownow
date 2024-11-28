@@ -18,7 +18,7 @@ export default () => {
     const [refetchNum, setRefetchNum] = useState(0);
     const [reLoading, setReLoading] = useState(false)
     const [showComment, setShowComment] = useState(false)
-    const { isLoading: isQuoteLoading, data: buzzDetail } = useQuery({
+    const { isLoading: isQuoteLoading, data: buzzDetail,refetch } = useQuery({
         enabled: !isEmpty(quotePinId),
         queryKey: ['buzzDetail', quotePinId, user.address],
         queryFn: () => fetchBuzzDetail({ pinId: quotePinId! }),
@@ -51,6 +51,9 @@ export default () => {
                 <Comment tweetId={match?.params.id ?? ''} onClose={() => {
                     setShowComment(false);
                     setRefetchNum(refetchNum + 1);
+                    setTimeout(()=>{
+                        refetch()
+                    },1000)
                     setReLoading(!reLoading)
                 }} show={showComment} />
                 <Divider />

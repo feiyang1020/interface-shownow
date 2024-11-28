@@ -398,3 +398,16 @@ export const getDeployList = async (params: {
     params,
   });
 };
+
+export const getFollowList = async (params: { metaid: string }) => {
+  return request<{
+    code: number;
+    data: {
+      list: API.FollowingItem[];
+    };
+    message: string;
+  }>(`${BASE_MAN_URL}/social/buzz/follow`, {
+    method: "GET",
+    params,
+  });
+};
