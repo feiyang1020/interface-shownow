@@ -27,16 +27,18 @@ type Props = {
     showActions?: boolean,
     padding?: number
     reLoading?: boolean
+    refetch?: () => Promise<any>
 }
 
-export default ({ buzzItem, showActions = true, padding = 20, reLoading = false }: Props) => {
+export default ({ buzzItem, showActions = true, padding = 20, reLoading = false, refetch }: Props) => {
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
     const [paying, setPaying] = useState(false);
     const queryClient = useQueryClient();
     const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user');
-    const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
+    const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard');
+    const [handleLikeLoading, setHandleLikeLoading] = useState(false);
     const currentUserInfoData = useQuery({
         queryKey: ['userInfo', buzzItem!.address],
         queryFn: () => getUserInfo({ address: buzzItem!.address }),
@@ -116,6 +118,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
             message.error('You have already liked that buzz...');
             return;
         }
+        setHandleLikeLoading(true)
 
 
         try {
@@ -140,7 +143,9 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                     await sleep(5000);
                     queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                     queryClient.invalidateQueries({ queryKey: ['payLike', buzzItem!.id] });
-                   
+
+
+
                     message.success('like buzz successfully');
                 }
             } else {
@@ -168,7 +173,8 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 })
                 console.log('likeRes', likeRes)
                 if (!isNil(likeRes?.txid)) {
-                    await sleep(5000);
+                    await sleep(8000);
+                    refetch && refetch()
                     queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] })
                     queryClient.invalidateQueries({
                         queryKey: ['payLike', buzzItem!.id],
@@ -190,6 +196,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             message.error(toastMessage);
         }
+        setHandleLikeLoading(false)
     };
     const quotePinId = useMemo(() => {
         let _summary = buzzItem!.content;
@@ -487,7 +494,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
                 </Button>
 
 
-                <Button type='text' onClick={handleLike} icon={isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}>
+                <Button type='text' loading={handleLikeLoading} onClick={handleLike} icon={isLikeByCurrentUser ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}>
                     {buzzItem?.likeCount}
                 </Button>
                 <div className="item">
@@ -504,7 +511,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false 
 
         <Comment tweetId={buzzItem.id} onClose={() => {
             setShowComment(false)
-        }} show={showComment} />
+        }} show={showComment} refetch={refetch} />
         <NewPost show={showNewPost} onClose={() => { setShowNewPost(false) }} quotePin={buzzItem} />
         <Unlock show={showUnlock && (decryptContent?.status !== 'purchased' && decryptContent?.status !== 'mempool')} onClose={() => { setShowUnlock(false) }}  >
             <div style={{

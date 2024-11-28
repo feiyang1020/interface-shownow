@@ -15,8 +15,9 @@ type Props = {
     show: boolean,
     onClose: () => void
     tweetId: string
+    refetch?: () => Promise<any>
 }
-export default ({ show, onClose, tweetId }: Props) => {
+export default ({ show, onClose, tweetId, refetch }: Props) => {
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
     const { showConf, fetchServiceFee } = useModel('dashboard');
     const [content, setContent] = useState('');
@@ -54,8 +55,8 @@ export default ({ show, onClose, tweetId }: Props) => {
 
                 console.log('create res for inscribe', createRes);
                 if (!isNil(createRes?.revealTxIds[0])) {
-                    await sleep(5000);
-                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew', 'homebuzzesfollow', user.metaid] });
+                    await sleep(6000);
+                    refetch && refetch();
                     message.success('comment successfully');
                     setContent('');
                     onClose();
@@ -73,9 +74,8 @@ export default ({ show, onClose, tweetId }: Props) => {
                 console.log('create res for inscribe', createRes)
 
                 if (!isNil(createRes?.txid)) {
-                    await sleep(5000);
-                    queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
-                    queryClient.invalidateQueries({ queryKey: ['homebuzzesfollow', user.metaid] });
+                    await sleep(6000);
+                    refetch && refetch();
                     message.success('comment successfully')
                     setContent('')
                     onClose();

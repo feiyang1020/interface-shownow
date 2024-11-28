@@ -38,22 +38,9 @@ export default () => {
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
     const [total, setTotal] = useState<null | number>(null);
-    const getTotal = async (btcConnector: IBtcConnector) => {
-        setTotal(
-            await btcConnector?.totalPin({
-                network: curNetwork,
-                path: ['/protocols/simplebuzz', '/protocols/banana'],
+  
 
-            })
-        );
-    };
-
-    useEffect(() => {
-        if (!isNil(btcConnector)) {
-            getTotal(btcConnector!);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [btcConnector]);
+    
 
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
@@ -61,7 +48,7 @@ export default () => {
     });
 
 
-    const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
+    const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage,refetch } =
         useInfiniteQuery({
             queryKey: ['profilebuzzesnew',profileUserData.data?.metaid],
             enabled: Boolean(profileUserData.data?.metaid),
@@ -111,7 +98,7 @@ export default () => {
                                 dataSource={tweets}
                                 renderItem={(item: API.Pin) => (
                                     <List.Item key={item.id}>
-                                        <Buzz buzzItem={item} />
+                                        <Buzz buzzItem={item} refetch={refetch} />
                                     </List.Item>
                                 )}
                             />

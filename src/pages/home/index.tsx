@@ -26,7 +26,7 @@ export default () => {
    
 
 
-    const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } =
+    const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage,refetch } =
         useInfiniteQuery({
             queryKey: ['homebuzzesnew', user.address],
             enabled: Boolean(btcConnector),
@@ -72,7 +72,7 @@ export default () => {
                                 dataSource={tweets}
                                 renderItem={(item: API.Pin) => (
                                     <List.Item key={item.id}>
-                                        <Buzz buzzItem={item} />
+                                        <Buzz buzzItem={item} refetch={refetch} />
                                     </List.Item>
                                 )}
                             />
