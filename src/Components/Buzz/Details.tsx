@@ -62,7 +62,8 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
     const isLiked = useMemo(() => {
         if (!buzzItem || !user) return false
         const likes = buzzItem.like ?? [];
-        return likes.includes(user.metaid) || like.some((item) => item.CreateMetaid === user.metaid)
+        const _like = like ?? [];
+        return likes.includes(user.metaid) || _like.some((item) => item.CreateMetaid === user.metaid)
     }, [buzzItem, user, like])
     const handleLike = async () => {
         const pinId = buzzItem!.id;
