@@ -24,42 +24,37 @@ export default () => {
         queryFn: () => fetchBuzzDetail({ pinId: quotePinId! }),
     })
 
-    if (!buzzDetail) return null
-    return <Row gutter={[12, 12]} >
-        <Col span={24} md={15}>
-            <Card loading={isQuoteLoading} title={
-                <Button type="text" size='small' icon={<LeftOutlined />} onClick={() => history.back()}>
+    if (!buzzDetail) return null;
 
-                </Button>
-            } styles={{
-                header: {
-                    borderBottom: 'none',
-                    minHeight: 30,
-                    padding: '12px 20px'
-                },
-                body: {
+    return (<Card loading={isQuoteLoading} title={
+        <Button type="text" size='small' icon={<LeftOutlined />} onClick={() => history.back()}>
 
-                }
-            }}>
-                <Buzz buzzItem={buzzDetail.data.tweet} showActions={true} padding={0} reLoading={reLoading} refetch={refetch} like={buzzDetail.data.like} />
-                <Divider />
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />
-                    <Input value={''} placeholder="What's happening?" variant='borderless' style={{ flexGrow: 1 }} onClick={() => { setShowComment(true) }} />
-                    <Button type='primary' shape='round' style={{ background: showConf?.gradientColor }} onClick={() => { }}>Reply</Button>
-                </div>
-                <Comment tweetId={match?.params.id ?? ''} refetch={refetch} onClose={() => {
-                    setShowComment(false);
-                    setRefetchNum(refetchNum + 1);
-                    setReLoading(!reLoading)
-                }} show={showComment} />
-                <Divider />
-                <CommentPanel tweetId={match?.params.id ?? ''} refetchNum={refetchNum} commentData={buzzDetail?.data.comments} />
+        </Button>
+    } styles={{
+        header: {
+            borderBottom: 'none',
+            minHeight: 30,
+            padding: '12px 20px'
+        },
+        body: {
 
-            </Card>
-        </Col>
-        <Col md={9} span={24}>
-            <Recommend />
-        </Col>
-    </Row>
+        }
+    }}>
+        <Buzz buzzItem={buzzDetail.data.tweet} showActions={true} padding={0} reLoading={reLoading} refetch={refetch} like={buzzDetail.data.like} />
+        <Divider />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />
+            <Input value={''} placeholder="What's happening?" variant='borderless' style={{ flexGrow: 1 }} onClick={() => { setShowComment(true) }} />
+            <Button type='primary' shape='round' style={{ background: showConf?.gradientColor }} onClick={() => { }}>Reply</Button>
+        </div>
+        <Comment tweetId={match?.params.id ?? ''} refetch={refetch} onClose={() => {
+            setShowComment(false);
+            setRefetchNum(refetchNum + 1);
+            setReLoading(!reLoading)
+        }} show={showComment} />
+        <Divider />
+        <CommentPanel tweetId={match?.params.id ?? ''} refetchNum={refetchNum} commentData={buzzDetail?.data.comments} />
+
+    </Card>)
+
 }

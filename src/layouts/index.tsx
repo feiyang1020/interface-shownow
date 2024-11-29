@@ -14,6 +14,7 @@ import Mobilefooter from './Mobilefooter';
 import _btc from '@/assets/btc.png'
 import _mvc from '@/assets/mvc.png'
 import { Divide, Pencil } from 'lucide-react';
+import Recommend from '@/Components/Recommend';
 const { useBreakpoint } = Grid
 
 const queryClient = new QueryClient()
@@ -75,7 +76,7 @@ export default function Lay() {
 
               </Sider> : ''
           }
-          <Layout className='layout2'>
+          <Layout className='layout2' style={{ background: " #f6f9fc",}}>
             <Header style={{
               position: 'sticky',
               top: 0,
@@ -196,7 +197,16 @@ export default function Lay() {
               </Row>
 
             </Header>
-            <Outlet />
+            <Row gutter={[12, 12]}>
+              <Col span={24} md={15}>
+                <Outlet />
+              </Col>
+              {
+                md && <Col md={9} span={24}>
+                  <Recommend />
+                </Col>
+              }
+            </Row>
             {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
           </Layout>
 

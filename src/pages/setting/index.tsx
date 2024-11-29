@@ -126,7 +126,6 @@ export default () => {
                 layout="horizontal"
                 style={{ maxWidth: 600 }}
                 form={form}
-
             >
                 <Form.Item label="Name" name='name'>
                     <Input />

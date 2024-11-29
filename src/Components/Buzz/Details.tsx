@@ -2,7 +2,7 @@ import { BASE_MAN_URL, curNetwork, FallbackImage, FLAG } from "@/config";
 import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getIDCoinInfo, getMRC20Info, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Card, Divider, Image, message, Space, Tag, Typography } from "antd";
+import { Avatar, Button, Card, Divider, Image, message, Space, Spin, Tag, Typography } from "antd";
 import { is, isEmpty, isNil } from "ramda";
 import { useMemo, useState } from "react";
 import { useModel, history } from "umi";
@@ -345,7 +345,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                     </>
                 }
                 {
-                    buzzItem.genesisHeight !== 0 && decryptContent?.buzzType === 'pay' && <>{
+                    decryptContent?.buzzType === 'pay' && <Spin spinning={accessControl?.data.mempool === 1}>{
                         accessControl?.data?.payCheck && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Text type="warning" style={{ lineHeight: '16px' }}>{
@@ -396,7 +396,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                             </div>
                         }
 
-                    </>
+                    </Spin>
                 }
 
 

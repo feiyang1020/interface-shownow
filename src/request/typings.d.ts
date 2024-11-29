@@ -157,6 +157,7 @@ declare namespace API {
       payTo: string;
       validPeriod: string;
     };
+    mempool: number;
   };
 
   type IdCoin = {

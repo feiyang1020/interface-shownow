@@ -72,8 +72,7 @@ export default () => {
         }, []) : []
     }, [data])
     return <div className="profilePage">
-        <Row gutter={[12, 12]}>
-            <Col span={24} md={15}>
+       
                 <div className="tweets">
                     <div
                         id="scrollableDiv"
@@ -106,13 +105,7 @@ export default () => {
                     </div>
 
                 </div>
-            </Col>
-            {
-                md && <Col md={9} span={24}>
-                    <Recommend />
-                </Col>
-            }
-        </Row>
+            
 
 
     </div>
