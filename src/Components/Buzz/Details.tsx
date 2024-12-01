@@ -402,7 +402,10 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
 
                 {(!isEmpty(quotePinId)) && (
 
-                    <Card style={{ padding: 0, marginBottom: 12, boxShadow: 'none' }} bordered={false} styles={{ body: { padding: 0 } }} loading={isQuoteLoading}>
+                    <Card onClick={(e)=>{
+                        e.stopPropagation()
+
+                    }} style={{ padding: 0, marginBottom: 12, boxShadow: 'none' }} bordered={false} styles={{ body: { padding: 0 } }} loading={isQuoteLoading}>
                         {quoteDetailData?.data && <ForwardTweet buzzItem={quoteDetailData?.data.tweet} showActions={false} />}
                     </Card>
 
