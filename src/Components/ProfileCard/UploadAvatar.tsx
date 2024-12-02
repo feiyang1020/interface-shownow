@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 
-import { Form, Input, Upload, Button, message, Avatar, UploadProps } from "antd";
+import { Form, Input, Upload, Button, message, Avatar, UploadProps, theme } from "antd";
 import { LoadingOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useModel } from "umi";
 
@@ -25,6 +25,7 @@ const beforeUpload = (file: FileType) => {
 };
 
 const UploadAvatar = (props: any) => {
+    const {token:{colorText}}=theme.useToken()
     const { user } = useModel('user');
     const [imageUrl, setImageUrl] = useState<string>(props.value);
     const [loading, setLoading] = useState(false);
@@ -53,7 +54,7 @@ const UploadAvatar = (props: any) => {
     };
 
     const uploadButton = (
-        <button style={{ border: 0, background: 'none', color: '#000' }} type="button">
+        <button style={{ border: 0, background: 'none', color: colorText }} type="button">
             <PlusOutlined />
             <div style={{ marginTop: 8 }}>Upload</div>
         </button>

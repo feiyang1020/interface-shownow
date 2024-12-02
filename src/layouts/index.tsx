@@ -58,7 +58,7 @@ export default function Lay() {
     <QueryClientProvider client={queryClient}>
       <ConfigProvider
         theme={{
-          algorithm: showConf?.theme ? theme.defaultAlgorithm : theme.darkAlgorithm,
+          algorithm: showConf?.theme!=='dark' ? theme.defaultAlgorithm : theme.darkAlgorithm,
           ...themeTokens,
         }}
       >

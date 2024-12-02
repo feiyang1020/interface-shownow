@@ -3,7 +3,7 @@ import followEntitySchema, { getFollowEntitySchemaWithCustomHost } from '@/entit
 import { fetchFollowDetailPin } from '@/request/api';
 import { sleep } from '@/utils/utils';
 import { CheckCircleFilled, LoadingOutlined, PlusCircleFilled } from '@ant-design/icons';
-import { Button, message } from 'antd';
+import { Button, message, theme } from 'antd';
 import { MvcEntity } from 'node_modules/@metaid/metaid/dist/core/entity/mvc';
 import { isNil } from 'ramda';
 import React, { useMemo, useState } from 'react';
@@ -220,10 +220,13 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
 
 const FollowIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading, mempool }) => {
     const { showConf } = useModel('dashboard');
+    const {token:{
+        colorBgBase
+    }}=theme.useToken()
     return (
         <div
             onClick={(e) => { e.preventDefault(); onFollowToggle && onFollowToggle(); }}
-            style={{ position: 'absolute', bottom: 0, right: 0, background: '#fff', borderRadius: '50%', border: '1px solid #fff', boxSizing: 'border-box', width: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ position: 'absolute', bottom: 0, right: 0, background: colorBgBase, borderRadius: '50%', border: `1px solid ${colorBgBase}`, boxSizing: 'border-box', width: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {
                 (loading || mempool) ? <LoadingOutlined style={{ color: showConf?.brandColor }} size={16} /> : <>
                     {

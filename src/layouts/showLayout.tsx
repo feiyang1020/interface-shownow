@@ -186,7 +186,7 @@ export default function ShowLayout() {
                             </Col>
                         }
                     </Row>
-                    {!md ? <Footer className='footer'><Mobilefooter /></Footer> : ''}
+                    {!md ? <Footer className='footer' style={{background:colorBgContainer}}><Mobilefooter /></Footer> : ''}
                 </Layout>
 
                 <NewPost show={showPost} onClose={() => setShowPost(false)} />

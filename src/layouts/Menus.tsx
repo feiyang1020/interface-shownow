@@ -23,7 +23,8 @@ export default () => {
     const path = location.pathname;
     const [curMenu, setCurMenu] = useState<string>('home');
     const { token: {
-        colorPrimary
+        colorPrimary,
+        colorTextSecondary
     } } = theme.useToken()
     useEffect(() => {
         if (path === '/') {
@@ -37,12 +38,12 @@ export default () => {
     return <div className='menus'>
         {menus.map((item) => {
             return <div key={item.key} className={`item ${curMenu === item.key ? 'active' : ''}`} style={{
-                color: curMenu === item.key ? colorPrimary : '#333'
+                color: curMenu === item.key ? colorPrimary : colorTextSecondary
             }} onClick={() => {
                 setCurMenu(item.key)
                 history.push(`/${item.key}`)
             }} >
-                <LinearIcon name={item.key} color={curMenu === item.key ? colorPrimary : '#333'} />
+                <LinearIcon name={item.key} color={curMenu === item.key ? colorPrimary : colorTextSecondary} />
                 <span>{item.label}</span>
             </div>
         })
