@@ -3,6 +3,10 @@ declare namespace DB {
     alias: string;
     brandColor: string;
     gradientColor: string;
+    showRecommend: boolean;
+    showMenu: boolean;
+    theme: 'light' | 'dark';
+    colorBgLayout:string;
     logo: string;
     twitterUrl: string;
     host: string;

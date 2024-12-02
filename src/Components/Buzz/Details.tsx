@@ -2,7 +2,7 @@ import { BASE_MAN_URL, curNetwork, FallbackImage, FLAG } from "@/config";
 import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getIDCoinInfo, getMRC20Info, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { CheckCircleOutlined, DownOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Divider, Image, message, Space, Spin, Tag, Typography } from "antd";
+import { Button, Card, theme, Image, message, Space, Spin, Tag, Typography } from "antd";
 import { is, isEmpty, isNil } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useModel, history } from "umi";
@@ -18,6 +18,7 @@ const { Paragraph, Text } = Typography;
 import _btc from '@/assets/btc.png'
 import Unlock from "../Unlock";
 import { detectUrl, handleSpecial, openWindowTarget, sleep } from "@/utils/utils";
+
 import UserAvatar from "../UserAvatar";
 
 type Props = {
@@ -31,7 +32,14 @@ type Props = {
     loading?: boolean
 }
 
-export default ({ buzzItem, showActions = true, padding = 20, reLoading = false, refetch, isForward = false, loading, like = [] }: Props) => {
+export default ({ buzzItem, showActions = true, refetch, isForward = false, loading, like = [] }: Props) => {
+    const { token: {
+        colorBgMask,
+        colorBgBase,
+        colorBgBlur,
+        colorBgContainer
+    } } = theme.useToken();
+    console.log('colorBgMask', colorBgMask)
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
@@ -204,8 +212,8 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                 refetchDecrypt()
                 message.success('Pay successfully, please wait for the transaction to be confirmed!')
                 setShowUnlock(false);
-                
-                
+
+
 
             }
         } catch (e) {
@@ -304,7 +312,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                             <div style={{
                                 width: '100%',
                                 paddingTop: 78,
-                                backgroundImage: 'linear-gradient(-180deg,rgba(255,255,255,0) 0%,#fff 100%)',
+                                backgroundImage: `linear-gradient(-180deg,${colorBgBlur} 0%,${colorBgContainer} 100%)`,
                                 position: 'absolute',
                                 bottom: 0,
                                 left: 0,

@@ -17,7 +17,13 @@ export default () => {
     //   console.log(ret.host, "ret.host");
     // }
     ret.host = "";
-    setShowConf(ret);
+    setShowConf({
+      ...ret,
+      theme: "light",
+      showMenu: true,
+      showRecommend: true,
+      colorBgLayout: "#f6f9fc",
+    });
     setLoading(false);
   }, []);
   useEffect(() => {
