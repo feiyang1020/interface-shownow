@@ -200,11 +200,12 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                     payCheck.payTo,
                     payCheck.amount,
                 )
+                await sleep(2000);
+                refetchDecrypt()
                 message.success('Pay successfully, please wait for the transaction to be confirmed!')
                 setShowUnlock(false);
-                setTimeout(() => {
-                    refetchDecrypt()
-                }, 1000)
+                
+                
 
             }
         } catch (e) {
