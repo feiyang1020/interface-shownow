@@ -2,7 +2,7 @@ import { BASE_MAN_URL, curNetwork, FallbackImage, FLAG } from "@/config";
 import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getIDCoinInfo, getMRC20Info, getPinDetailByPid, getUserInfo } from "@/request/api";
 import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Card, Divider, Image, message, Space, Spin, Tag, Typography } from "antd";
+import { Button, Card, Divider, Image, message, Space, Spin, Tag, Typography } from "antd";
 import { is, isEmpty, isNil } from "ramda";
 import { useMemo, useState } from "react";
 import { useModel, history } from "umi";
@@ -17,10 +17,8 @@ import { buildAccessPass, decodePayBuzz } from "@/utils/buzz";
 const { Paragraph, Text } = Typography;
 import _btc from '@/assets/btc.png'
 import Unlock from "../Unlock";
-import { TicketIcon } from "lucide-react";
-import MRC20Icon from "../MRC20Icon";
-import defaultAvatar from '@/assets/avatar.svg'
 import { detectUrl, handleSpecial, openWindowTarget, sleep } from "@/utils/utils";
+import UserAvatar from "../UserAvatar";
 
 type Props = {
     buzzItem: API.Buzz
@@ -236,9 +234,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
         title={
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
-                    <Avatar src={currentUserInfoData.data?.avatar ? <img width={40} height={40} src={BASE_MAN_URL + currentUserInfoData.data?.avatar}></img> : null} size={40} >
-                        {currentUserInfoData.data?.name ? currentUserInfoData.data?.name?.slice(0, 1) : currentUserInfoData.data?.metaid.slice(0, 1)}
-                    </Avatar>
+                    <UserAvatar src={currentUserInfoData.data?.avatar} size={40} />
                     <FollowIconComponent metaid={currentUserInfoData.data?.metaid || ''} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }} onClick={(e) => {
@@ -373,16 +369,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                                         }
                                     </Text>
                                     {
-                                        mrc20 && <Avatar
-                                            size={20}
-                                            src={
-                                                <img
-                                                    src={mrc20.deployerUserInfo.avatar ? mrc20.deployerUserInfo.avatar.indexOf('http') > -1 ? mrc20.deployerUserInfo.avatar : BASE_MAN_URL + mrc20.deployerUserInfo.avatar : defaultAvatar
-                                                    }
-                                                    alt="avatar"
-                                                />
-                                            }
-                                        ></Avatar >
+                                        mrc20 && <UserAvatar src={mrc20.deployerUserInfo.avatar} size={20} />
                                     }
                                 </div>
                                 <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
@@ -402,7 +389,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
 
                 {(!isEmpty(quotePinId)) && (
 
-                    <Card onClick={(e)=>{
+                    <Card onClick={(e) => {
                         e.stopPropagation()
 
                     }} style={{ padding: 0, marginBottom: 12, boxShadow: 'none' }} bordered={false} styles={{ body: { padding: 0 } }} loading={isQuoteLoading}>

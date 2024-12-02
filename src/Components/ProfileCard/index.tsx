@@ -7,6 +7,7 @@ import { useModel } from "umi";
 import defaultImg from '@/assets/img 2@1x.png'
 import { Divide } from "lucide-react";
 import { FollowButtonComponent } from "../Follow";
+import UserAvatar from "../UserAvatar";
 
 type Props = {
     address: string
@@ -70,7 +71,7 @@ export default ({ address }: Props) => {
             <div style={{ padding: 20 }}>
 
                 <div className="avatar" style={{ marginTop: -60 }}>
-                    <Avatar size={80} src={`${BASE_MAN_URL}` + profileUserData?.data?.avatar} />
+                    <UserAvatar src={profileUserData?.data?.avatar} size={80} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 

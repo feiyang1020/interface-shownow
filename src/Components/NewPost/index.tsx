@@ -21,7 +21,7 @@ import { postPayBuzz } from "@/utils/buzz";
 import { IBtcConnector } from "metaid/dist";
 import { getDeployList, getIDCoinInfo, getMRC20Info, getUserInfo } from "@/request/api";
 import defaultAvatar from '@/assets/avatar.svg'
-import MRC20Icon from "../MRC20Icon";
+import UserAvatar from "../UserAvatar";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -439,17 +439,8 @@ export default ({ show, onClose, quotePin }: Props) => {
                                     {
                                         IdCoin ?
                                             <Checkbox defaultChecked disabled >
-                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>
-                                                    <Avatar
-                                                        size={32}
-                                                        src={
-                                                            <img
-                                                                src={IdCoin.deployerUserInfo?.avatar ? IdCoin.deployerUserInfo.avatar.indexOf('http') > -1 ? IdCoin.deployerUserInfo.avatar : BASE_MAN_URL + IdCoin.deployerUserInfo.avatar : defaultAvatar
-                                                                }
-                                                                alt="avatar"
-                                                            />
-                                                        }
-                                                    ></Avatar >
+                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>                                
+                                                    <UserAvatar src={IdCoin.deployerUserInfo?.avatar} size={32} /> 
                                                     <div className="right" style={{ flexGrow: 1 }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                                             <div>
@@ -475,11 +466,6 @@ export default ({ show, onClose, quotePin }: Props) => {
                                     }
                                 </>
                         }
-
-                        {/* <Input status={checkTokenID} variant='filled' placeholder="Ticker/Token ID" value={holdTokenID} onChange={(e) => {
-                            setHoldTokenID(e.target.value)
-                        }} style={{ flexGrow: 1 }} suffix={mrc20 ? <MRC20Icon size={20} tick={mrc20.tick} metadata={mrc20.metadata} /> : null} />
-                        {checkTokenID === 'error' && <span style={{ color: 'red' }}>This Ticker / Token ID does not correspond to any MRC-20; Please re-enter or <a href={curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch'} target='_blank' >launch</a>.</span>} */}
                     </>
                 }
             </div>

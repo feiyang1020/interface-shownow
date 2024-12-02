@@ -2,6 +2,7 @@ import Buzz from "@/Components/Buzz"
 import Comment from "@/Components/Comment"
 import CommentPanel from "@/Components/CommentPanel"
 import Recommend from "@/Components/Recommend"
+import UserAvatar from "@/Components/UserAvatar"
 import { fetchBuzzDetail, getPinDetailByPid } from "@/request/api"
 import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons"
 import { useQuery } from "@tanstack/react-query"
@@ -43,7 +44,7 @@ export default () => {
         <Buzz buzzItem={buzzDetail.data.tweet} showActions={true} padding={0} reLoading={reLoading} refetch={refetch} like={buzzDetail.data.like} />
         <Divider />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Avatar size="large" src={user?.avater} style={{ width: 48, height: 48, minWidth: 48 }} />
+            <UserAvatar src={user?.avater} size={48} />
             <Input value={''} placeholder="What's happening?" variant='borderless' style={{ flexGrow: 1 }} onClick={() => { setShowComment(true) }} />
             <Button type='primary' shape='round' style={{ background: showConf?.gradientColor }} onClick={() => { }}>Reply</Button>
         </div>

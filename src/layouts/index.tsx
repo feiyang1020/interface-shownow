@@ -1,10 +1,9 @@
 import { Link, Outlet, useModel } from 'umi';
-import { Avatar, Badge, Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, Space, Tag, theme } from 'antd';
+import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, Space, theme } from 'antd';
 import { useEffect, useState } from 'react';
-import logo from '@/assets/logo.svg';
 import './index.less';
 import Menus from './Menus';
-import { BellOutlined, CaretDownOutlined, DownOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, MessageOutlined, NotificationOutlined, SearchOutlined, SwitcherOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, EditOutlined, EllipsisOutlined, LoginOutlined } from '@ant-design/icons';
 import {
   QueryClient,
   QueryClientProvider,
@@ -13,8 +12,8 @@ import NewPost from '@/Components/NewPost';
 import Mobilefooter from './Mobilefooter';
 import _btc from '@/assets/btc.png'
 import _mvc from '@/assets/mvc.png'
-import { Divide, Pencil } from 'lucide-react';
 import Recommend from '@/Components/Recommend';
+import UserAvatar from '@/Components/UserAvatar';
 const { useBreakpoint } = Grid
 
 const queryClient = new QueryClient()
@@ -76,7 +75,7 @@ export default function Lay() {
 
               </Sider> : ''
           }
-          <Layout className='layout2' style={{ background: " #f6f9fc",}}>
+          <Layout className='layout2' style={{ background: " #f6f9fc", }}>
             <Header style={{
               position: 'sticky',
               top: 0,
@@ -98,7 +97,7 @@ export default function Lay() {
                 <Col span={24} md={9}>
                   <div className="userPanel">
                     <div className="user">
-                      <Avatar size="large" src={user.avater ? <img src={user.avater}></img> : null} />
+                      <UserAvatar src={user.avater} />
                       <div className='desc'>
                         <div className="name">
                           {user.name || 'Unnamed'}

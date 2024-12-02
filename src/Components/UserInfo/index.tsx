@@ -1,5 +1,6 @@
 import { Avatar } from "antd"
 import './index.less'
+import UserAvatar from "../UserAvatar"
 
 type Props = {
     user: {
@@ -12,7 +13,7 @@ type Props = {
 export default ({ user }: Props) => {
 
     return <div className="userInfo">
-        <Avatar size="large" src={user.avater} />
+        <UserAvatar src={user.avater} />
         <div className='desc'>
             <div className="name">
                 {user.name}

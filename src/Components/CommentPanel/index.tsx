@@ -1,11 +1,9 @@
-import { BASE_MAN_URL, curNetwork } from "@/config";
-import { fetchCurrentBuzzComments, getUserInfo } from "@/request/api";
+import {  getUserInfo } from "@/request/api";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, List } from "antd";
+import {  List } from "antd";
 import { isNil } from "ramda";
 import { useModel } from "umi";
-import dayjs from 'dayjs'
-import { useEffect } from "react";
+import UserAvatar from "../UserAvatar";
 
 type CommentPanelProps = {
     tweetId: string,
@@ -22,7 +20,7 @@ const CommentItem = ({ commentRes }: { commentRes: API.CommentRes }) => {
     });
     return <List.Item>
         <List.Item.Meta
-            avatar={<Avatar src={`${BASE_MAN_URL}${currentUserInfoData.data?.avatar}`} />}
+            avatar={<UserAvatar src={currentUserInfoData.data?.avatar} />}
             title={<a href="">{currentUserInfoData.data?.name}</a>}
             description={currentUserInfoData.data?.metaid.slice(0, 8)}
         />
