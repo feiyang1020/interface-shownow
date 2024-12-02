@@ -1,10 +1,10 @@
 import { BASE_MAN_URL, curNetwork, FallbackImage, FLAG } from "@/config";
 import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getControlByContentPin, getDecryptContent, getIDCoinInfo, getMRC20Info, getPinDetailByPid, getUserInfo } from "@/request/api";
-import { CheckCircleOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
+import { CheckCircleOutlined, DownOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Divider, Image, message, Space, Spin, Tag, Typography } from "antd";
 import { is, isEmpty, isNil } from "ramda";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useModel, history } from "umi";
 import Comment from "../Comment";
 import NewPost from "../NewPost";
@@ -35,6 +35,9 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null); // 引用内容容器
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false); // 是否溢出
     const [paying, setPaying] = useState(false);
     const queryClient = useQueryClient();
     const { btcConnector, user, isLogin, connect, feeRate, chain, mvcConnector } = useModel('user');
@@ -226,6 +229,14 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
         }
     })
 
+    useEffect(() => {
+        // 检测内容是否溢出
+        if (contentRef.current) {
+            const { scrollHeight, offsetHeight } = contentRef.current;
+            setIsOverflowing(scrollHeight > offsetHeight);
+        }
+    }, [contentRef.current]); // 当内容变化时重新检测
+
 
     return <Card className="tweet"
         loading={loading}
@@ -256,10 +267,16 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
             <div onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-                <div className="text"  >
+                <div className="text" ref={contentRef} style={{
+                    position: 'relative',
+                    maxHeight: isExpanded ? 'none' : 200,
+                    overflow: 'hidden',
+                    transition: 'max-height 0.3s ease',
+                }}  >
                     {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
-                        <span key={index} style={{ wordBreak: 'break-all' }}>
+                        <span key={index} style={{ wordBreak: 'break-all', }}>
                             <div
+                                style={{ minHeight: 22 }}
                                 dangerouslySetInnerHTML={{
                                     __html: handleSpecial(detectUrl(line)),
                                 }}
@@ -272,6 +289,7 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                             {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
                                 <span key={'pay' + index} style={{ wordBreak: 'break-all' }}>
                                     <div
+                                        style={{ minHeight: 22 }}
                                         dangerouslySetInnerHTML={{
                                             __html: handleSpecial(detectUrl(line)),
                                         }}
@@ -280,6 +298,27 @@ export default ({ buzzItem, showActions = true, padding = 20, reLoading = false,
                             ))}
                         </>
                     }
+                    {
+                        isOverflowing && !isExpanded && (
+                            <div style={{
+                                width: '100%',
+                                paddingTop: 78,
+                                backgroundImage: 'linear-gradient(-180deg,rgba(255,255,255,0) 0%,#fff 100%)',
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                zIndex: 10,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}>
+                                <Button variant="filled" color="primary" size='small' onClick={(e) => { e.stopPropagation(); setIsExpanded(true) }} icon={<DownOutlined />} />
+                            </div>
+                        )
+                    }
+
+
                 </div>
 
 

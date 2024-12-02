@@ -31,7 +31,7 @@ export default function Lay() {
       setThemeTokens({
         token: {
           colorPrimary: showConf.brandColor,
-          coloeLink: showConf.brandColor,
+          colorLink: showConf.brandColor,
         },
         components: {
           "Avatar": {
