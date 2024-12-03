@@ -3,7 +3,7 @@ import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Inpu
 import { useEffect, useState } from 'react';
 import './index.less';
 import Menus from './Menus';
-import { CaretDownOutlined, EditOutlined, EllipsisOutlined, LoginOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, EditOutlined, EllipsisOutlined, LoginOutlined, PoweroffOutlined } from '@ant-design/icons';
 import {
     QueryClient,
     QueryClientProvider,
@@ -26,6 +26,9 @@ export default function ShowLayout() {
     const { user, chain, disConnect, feeRate, setFeeRate, connect, switchChain } = useModel('user')
     const { md } = useBreakpoint();
     const { token: {
+        colorPrimary,
+        colorTextSecondary,
+        colorText,
         colorBgLayout,
         colorBgContainer,
         colorBgElevated
@@ -65,7 +68,7 @@ export default function ShowLayout() {
                         background: colorBgLayout
                     }} className='header'>
                         <Row style={{ width: '100%', flexGrow: 1 }} gutter={[12, 12]}>
-                            {md ? <Col span={24} md={15}>
+                            {md ? <Col span={24} md={14}>
                                 <div className="searchWrap" style={{ background: colorBgContainer }} onClick={() => { setShowPost(true) }}>
                                     <Input size="large" prefix={
                                         <EditOutlined style={{ color: showConf?.brandColor }} />
@@ -74,7 +77,7 @@ export default function ShowLayout() {
                                     } />
                                 </div>
                             </Col> : ''}
-                            <Col span={24} md={9}>
+                            <Col span={24} md={10}>
                                 <div className="userPanel" style={{ background: colorBgContainer }}>
                                     <div className="user">
                                         <UserAvatar src={user.avater} />
@@ -82,92 +85,83 @@ export default function ShowLayout() {
                                             <Typography.Text className="name">
                                                 {user.name || 'Unnamed'}
                                             </Typography.Text>
-                                            <Typography.Text className="metaid">
-                                                MetaID：{user.metaid.slice(0, 8)}
+                                            <Typography.Text className="metaid" style={{ whiteSpace: 'nowrap' }}>
+                                                MetaID:{user.metaid.slice(0, 8)}
                                             </Typography.Text>
                                         </div>
 
                                     </div>
                                     <div className="actions">
-                                        {/* <Badge count={user.notice} className='action'>
-                        <BellOutlined style={{ fontSize: 20 }} />
-                      </Badge> */}
-                                        {/* <MessageOutlined style={{ fontSize: 20 }} className='action' /> */}
-                                        <Dropdown dropdownRender={() => {
+
+                                        <Dropdown placement='bottomCenter' dropdownRender={() => {
                                             return <div>
                                                 <Menu>
                                                     <Menu.Item key='1' disabled={chain === 'btc'} onClick={async () => {
                                                         await switchChain('btc');
                                                         queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                                                     }}>
-                                                        <Space>
-                                                            <img src={_btc} alt="" style={{ width: 20, height: 20 }} />
-                                                            BTC Netwotk
-                                                        </Space>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", gap: 16, padding: 8 }}>
+                                                            <Space>
+                                                                <img src={_btc} alt="" style={{ width: 24, height: 24 }} />
+                                                                <div style={{
+                                                                    display: 'flex',
+                                                                    flexDirection: 'column'
+                                                                }}>
+                                                                    <Typography.Text style={{ lineHeight: 1 }}>BTC </Typography.Text>
+                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>Network</Typography.Text>
+                                                                </div>
+                                                            </Space>
+                                                            <InputNumber value={feeRate} onChange={(_value) => {
+                                                                setFeeRate(Number(_value))
+                                                            }} controls={false} suffix={'sats'}
+                                                                precision={0}
+                                                            >
+                                                            </InputNumber>
+                                                        </div>
+
 
                                                     </Menu.Item>
                                                     <Menu.Item key='2' disabled={chain === 'mvc'} onClick={() => {
                                                         switchChain('mvc')
                                                     }}>
-                                                        <Space>
-                                                            <img src={_mvc} alt="" style={{ width: 20, height: 20 }} />
-                                                            MVC Network
-                                                        </Space>
+
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", gap: 16, padding: 8 }}>
+                                                            <Space>
+                                                                <img src={_mvc} alt="" style={{ width: 24, height: 24 }} />
+                                                                <div style={{
+                                                                    display: 'flex',
+                                                                    flexDirection: 'column'
+                                                                }}>
+                                                                    <Typography.Text style={{ lineHeight: 1 }}>MVC </Typography.Text>
+                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>Network</Typography.Text>
+                                                                </div>
+                                                            </Space>
+                                                            <InputNumber value={1} disabled variant='borderless' controls={false} suffix={'sats'}
+                                                                precision={0}
+                                                            >
+                                                            </InputNumber>
+                                                        </div>
+
 
                                                     </Menu.Item>
                                                 </Menu>
                                             </div>
                                         }}>
 
-                                            <Button shape='round' type='text'>
-                                                <img src={chain === 'btc' ? _btc : _mvc} alt="" style={{ width: 20, height: 20 }} />
-                                                <CaretDownOutlined />
+                                            <Button shape='round' type='text' variant='filled' color='default' style={{ height: 34 }}>
+                                                <img src={chain === 'btc' ? _btc : _mvc} alt="" style={{ width: 24, height: 24 }} />
+                                                <Typography>
+                                                    <Typography.Text style={{ color: colorPrimary }}>{chain === 'btc' ? feeRate : 1} </Typography.Text>
+                                                    <Typography.Text type='secondary'> sats</Typography.Text>
+                                                </Typography>
+                                                <CaretDownOutlined style={{ color: colorTextSecondary }} />
                                             </Button>
 
                                         </Dropdown>
-                                        <Dropdown placement='bottom' arrow dropdownRender={() => {
-                                            return <div
-                                                style={{
-                                                    background: colorBgElevated,
-                                                    minWidth: 200,
-                                                    padding: 12,
-                                                    borderRadius: 8,
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
+                                        <Button shape='circle' type='text' color='default' onClick={disConnect}>
+                                            <PoweroffOutlined />
 
-                                                    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-                                                }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                    <span>
-                                                        Fee Rate
-                                                    </span>
-                                                    <InputNumber value={feeRate} onChange={(_value) => {
-                                                        setFeeRate(Number(_value))
-                                                    }} variant='filled' controls={false} suffix={'sats'}
-                                                        precision={0}
-
-                                                    >
-                                                    </InputNumber>
-
-                                                </div>
-                                                {/* <Divider style={{ margin: '12px 0' }} /> */}
-                                                {/* <Button type='text' icon={<SwitcherOutlined />} onClick={() => {
-                            connect(chain === 'btc' ? 'mvc' : 'btc')
-                          }}>
-                            Switch To <Tag bordered={false} color={chain !== 'mvc' ? 'blue' : 'orange'}>{chain === 'btc' ? 'mvc' : 'btc'}</Tag>
-                          </Button> */}
-                                                <Divider style={{ margin: '12px 0' }} />
-                                                <Button danger type='text' icon={<LoginOutlined />} onClick={() => {
-                                                    disConnect()
-                                                }}>
-                                                    Log Out
-                                                </Button>
-                                            </div>
-                                        }}>
-
-                                            <EllipsisOutlined style={{ fontSize: 20 }} className='action' />
-                                        </Dropdown>
+                                        </Button>
 
                                     </div>
 
@@ -177,16 +171,16 @@ export default function ShowLayout() {
 
                     </Header>
                     <Row gutter={[12, 12]}>
-                        <Col span={24} md={showConf?.showRecommend ? 15 : 24}>
+                        <Col span={24} md={showConf?.showRecommend ? 14 : 24}>
                             <Outlet />
                         </Col>
                         {
-                            (md && showConf?.showRecommend) && <Col md={9} span={24}>
+                            (md && showConf?.showRecommend) && <Col md={10} span={24}>
                                 <Recommend />
                             </Col>
                         }
                     </Row>
-                    {!md ? <Footer className='footer' style={{background:colorBgContainer}}><Mobilefooter /></Footer> : ''}
+                    {!md ? <Footer className='footer' style={{ background: colorBgContainer }}><Mobilefooter /></Footer> : ''}
                 </Layout>
 
                 <NewPost show={showPost} onClose={() => setShowPost(false)} />
