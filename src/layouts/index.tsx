@@ -15,6 +15,7 @@ import _mvc from '@/assets/mvc.png'
 import Recommend from '@/Components/Recommend';
 import UserAvatar from '@/Components/UserAvatar';
 import ShowLayout from './showLayout';
+import { bitBuzzConf, showNowConf } from '@/models/dashboard';
 const { useBreakpoint } = Grid
 
 const queryClient = new QueryClient()
@@ -22,7 +23,7 @@ const { Header, Content, Footer, Sider } = Layout;
 
 export default function Lay() {
   const [collapsed, setCollapsed] = useState(false);
-  const { showConf } = useModel('dashboard')
+  const { showConf,setShowConf } = useModel('dashboard')
   const { user, chain, disConnect, feeRate, setFeeRate, connect, switchChain } = useModel('user')
   const [themeTokens, setThemeTokens] = useState({});
   const { md } = useBreakpoint();
@@ -54,7 +55,7 @@ export default function Lay() {
       if (showConf.colorButton) {
         components.Button.primaryColor = showConf.colorButton
       }
-      console.log(components,'components')
+      console.log(components, 'components')
 
       setThemeTokens({
         token: tokens,
@@ -75,6 +76,22 @@ export default function Lay() {
         }}
       >
         <ShowLayout />
+
+        <FloatButton
+          shape="square"
+          type="primary"
+          style={{ insetInlineEnd: 94 }}
+          description='Show Now'
+          onClick={() => setShowConf(showNowConf)}
+        />
+        <FloatButton
+          shape="square"
+          type="primary"
+        
+          style={{ insetInlineEnd: 24 }}
+          description='Bit Buzz'
+          onClick={() => setShowConf(bitBuzzConf)}
+        />
       </ConfigProvider>
     </QueryClientProvider>
   );

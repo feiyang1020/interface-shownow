@@ -52,7 +52,7 @@ export default function ShowLayout() {
                                 </div>
                                 <Menus />
                             </div>
-                            <Button size='large' shape='round' className='siderAction' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
+                            <Button size='large' shape='round' type='primary' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
                                 Post
                             </Button>
                         </Sider> : ''
