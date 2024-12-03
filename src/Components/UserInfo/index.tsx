@@ -1,4 +1,4 @@
-import { Avatar } from "antd"
+import { Avatar, Typography } from "antd"
 import './index.less'
 import UserAvatar from "../UserAvatar"
 
@@ -16,10 +16,10 @@ export default ({ user }: Props) => {
         <UserAvatar src={user.avater} />
         <div className='desc'>
             <div className="name">
-                {user.name}
+                <Typography.Text>{user.name}</Typography.Text>
             </div>
             <div className="metaid">
-                MetaID：{user.metaid.slice(0, 8)}
+                <Typography.Text type='secondary'> MetaID:{user.metaid.slice(0, 8)}</Typography.Text>
             </div>
         </div>
 

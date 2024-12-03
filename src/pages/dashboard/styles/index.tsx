@@ -1,5 +1,5 @@
 import { ProCard, ProFormColorPicker } from '@ant-design/pro-components';
-import { Avatar, Button, ColorPicker, Divider, Input, message, notification, Space, Tabs, Upload } from 'antd';
+import { Avatar, Button, ColorPicker, ConfigProvider, Divider, Input, message, notification, Segmented, Space, Switch, Tabs, theme, Upload } from 'antd';
 import type { TabsProps } from 'antd';
 import { useEffect, useState } from 'react';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
@@ -7,6 +7,11 @@ import { UploadOutlined } from '@ant-design/icons';
 import { useModel, history } from 'umi';
 import { saveConf } from '@/request/dashboard';
 import RcResizeObserver from 'rc-resize-observer';
+import { InputNumber } from 'antd/lib';
+import ShowLayout from '@/layouts/showLayout';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient()
 
 const DEFAULT_COLOR = [
     {
@@ -26,6 +31,7 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 };
 export default () => {
     const { showConf, loading, fetchConfig } = useModel('dashboard')
+    const [themeTokens, setThemeTokens] = useState({});
     const [styles, setStyles] = useState<DB.ShowConfDto>();
     const [submiting, setSubmiting] = useState(false);
     const [api, contextHolder] = notification.useNotification();
@@ -44,6 +50,7 @@ export default () => {
 
     }, [showConf])
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [fileList2, setFileList2] = useState<UploadFile[]>([]);
     const [imageUrl, setImageUrl] = useState<string | undefined>();
     const props: UploadProps = {
         onRemove: (file) => {
@@ -68,8 +75,28 @@ export default () => {
         fileList,
     };
 
+    const bgprops: UploadProps = {
+        onRemove: (file) => {
+            const index = fileList2.indexOf(file);
+            const newFileList = fileList2.slice();
+            newFileList.splice(index, 1);
+            setFileList2(newFileList);
+        },
+        beforeUpload: (file) => {
+            setFileList2([...fileList2, file]);
+            console.log(file);
+            getBase64(file as FileType, (url) => {
+
+                if (styles) {
+                    setStyles({ ...styles, homeBackgroundImage: url });
+                }
+            });
+            return false;
+        },
+        fileList: fileList2,
+    };
+
     const handleChange: UploadProps['onChange'] = (info) => {
-        console.log(info, info.file.status, 'info.file.status');
         if (info.file.status === 'uploading') {
             //   setLoading(true);
             return;
@@ -81,6 +108,23 @@ export default () => {
                 setImageUrl(url);
                 if (styles) {
                     setStyles({ ...styles, logo: url });
+                }
+            });
+        }
+    };
+
+    const handleBackImageChange: UploadProps['onChange'] = (info) => {
+        if (info.file.status === 'uploading') {
+            //   setLoading(true);
+            return;
+        }
+        if (info.file.status === 'done') {
+            // Get this url from response in real world.
+            getBase64(info.file.originFileObj as FileType, (url) => {
+                // setLoading(false);
+                setImageUrl(url);
+                if (styles) {
+                    setStyles({ ...styles, homeBackgroundImage: url });
                 }
             });
         }
@@ -126,14 +170,39 @@ export default () => {
             key: '1',
             label: 'Color',
             children: <div >
-
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Theme</span>
+                    <Segmented<'light' | 'dark'> options={['light', 'dark']} value={styles && styles.theme} onChange={(value) => {
+                        if (styles) {
+                            setStyles({ ...styles, theme: value })
+                        }
+                    }} />
+                </div>
+                <Divider />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span>Brand Color</span>
                     <ColorPicker size="large" showText value={styles && styles.brandColor} onChange={(color) => {
                         if (styles) {
                             setStyles({ ...styles, brandColor: color.toRgbString() });
                         }
-
+                    }} />
+                </div>
+                <Divider />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Layout Color</span>
+                    <ColorPicker size="large" showText value={styles && styles.colorBgLayout} onChange={(color) => {
+                        if (styles) {
+                            setStyles({ ...styles, colorBgLayout: color.toRgbString() });
+                        }
+                    }} />
+                </div>
+                <Divider />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Header Color</span>
+                    <ColorPicker size="large" showText value={styles && styles.colorHeaderBg} onChange={(color) => {
+                        if (styles) {
+                            setStyles({ ...styles, colorHeaderBg: color.toRgbString() });
+                        }
                     }} />
                 </div>
                 <Divider />
@@ -154,13 +223,61 @@ export default () => {
                         }}
                     />
                 </div>
+                <Divider />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Border Color</span>
+                    <ColorPicker size="large" showText value={styles && styles.colorBorderSecondary} onChange={(color) => {
+                        if (styles) {
+                            setStyles({ ...styles, colorBorderSecondary: color.toRgbString() });
+                        }
+                    }} />
+                </div>
+
+                <Divider />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Button Text Color</span>
+                    <ColorPicker size="large" showText value={styles && styles.colorButton} onChange={(color) => {
+                        if (styles) {
+                            setStyles({ ...styles, colorBorderSecondary: color.toRgbString() });
+                        }
+                    }} />
+                </div>
+
+
 
             </div>,
         },
         {
             key: '2',
-            label: 'Size',
-            children: 'Coming Soon',
+            label: 'Layout',
+            children: <div >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Slider Menu</span>
+                    <Switch value={styles?.showSliderMenu} onChange={(value) => {
+                        if (styles) {
+                            setStyles({ ...styles, showSliderMenu: value })
+                        }
+                    }} />
+                </div>
+                <Divider />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Recommend</span>
+                    <Switch value={styles?.showRecommend} onChange={(value) => {
+                        if (styles) {
+                            setStyles({ ...styles, showRecommend: value })
+                        }
+                    }} />
+                </div>
+                <Divider />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Content Size</span>
+                    <InputNumber value={styles?.contentSize} onChange={(value) => {
+                        if (styles) {
+                            setStyles({ ...styles, contentSize: Number(value) })
+                        }
+                    }} />
+                </div>
+            </div>
         },
         {
             key: '3',
@@ -174,7 +291,15 @@ export default () => {
                         <Button icon={<UploadOutlined />}>Select Image</Button>
                     </Upload>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',gap:24 }}>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Home Background Image</span>
+
+                    <Upload {...bgprops} listType="picture" maxCount={1} onChange={handleBackImageChange}>
+                        <Button icon={<UploadOutlined />}>Select Image</Button>
+                    </Upload>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
                     <span>Twitter</span>
 
                     <Input value={styles?.twitterUrl} onChange={(e) => {
@@ -184,9 +309,63 @@ export default () => {
 
                     }} />
                 </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+                    <span> Main Title</span>
+
+                    <Input value={styles?.brandIntroMainTitle} onChange={(e) => {
+                        if (styles) {
+                            setStyles({ ...styles, brandIntroMainTitle: e.target.value });
+                        }
+
+                    }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+                    <span> Sub Title</span>
+
+                    <Input value={styles?.brandIntroSubTitle} onChange={(e) => {
+                        if (styles) {
+                            setStyles({ ...styles, brandIntroSubTitle: e.target.value });
+                        }
+
+                    }} />
+                </div>
             </Space>,
         },
     ];
+
+    useEffect(() => {
+        if (styles) {
+            const tokens: any = {
+                colorPrimary: styles.brandColor,
+                colorLink: styles.brandColor,
+            }
+            if (styles.colorBgLayout) {
+                tokens.colorBgLayout = styles.colorBgLayout
+            }
+            if (styles.colorBorderSecondary) {
+                tokens.colorBorderSecondary = styles.colorBorderSecondary
+            }
+            const components = {
+                "Avatar": {
+                    "colorTextPlaceholder": styles.brandColor,
+                },
+                "Button": {
+                    "defaultBorderColor": "rgba(217,217,217,0)",
+                    "defaultShadow": "0 2px 0 rgba(0, 0, 0,0)"
+                }
+            }
+            if (styles.colorButton) {
+                components.Button.primaryColor = styles.colorButton
+            }
+            console.log(components, 'components')
+
+            setThemeTokens({
+                token: tokens,
+                components
+            })
+        }
+
+    }, [styles])
 
     if (!styles) return <div>no data</div>
     return <div>
@@ -206,11 +385,17 @@ export default () => {
                     <Button type="primary" onClick={handleSave} loading={submiting}>Save</Button>}
                 >
                     <div style={{ height: '100vh' }}>
-                        <Space direction="vertical" size="large">
-                            <Button type="primary" style={{ background: styles.brandColor }}>Brand Button  </Button>
-                            <Button type="primary" style={{ background: styles.gradientColor }}>Gradient Button</Button>
-                            <img height={64} src={styles.logo ? styles.logo : ''} />
-                        </Space>
+                        <QueryClientProvider client={queryClient}>
+                            <ConfigProvider
+                                theme={{
+                                    algorithm: styles?.theme !== 'dark' ? theme.defaultAlgorithm : theme.darkAlgorithm,
+                                    ...themeTokens,
+                                }}
+                            >
+                                <ShowLayout />
+                            </ConfigProvider>
+                        </QueryClientProvider>
+
 
 
                     </div>

@@ -1,5 +1,5 @@
-import { Link, Outlet, useModel } from 'umi';
-import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Row, Space, theme, Typography } from 'antd';
+import { Link, Outlet, useModel, history } from 'umi';
+import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Radio, Row, Segmented, Space, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import './index.less';
 import Menus from './Menus';
@@ -15,6 +15,7 @@ import _btc from '@/assets/btc.png'
 import _mvc from '@/assets/mvc.png'
 import Recommend from '@/Components/Recommend';
 import UserAvatar from '@/Components/UserAvatar';
+import TopTool from './TopTool';
 const { useBreakpoint } = Grid
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -28,68 +29,76 @@ export default function ShowLayout() {
     const { token: {
         colorPrimary,
         colorTextSecondary,
-        colorText,
+        colorBgBase,
         colorBgLayout,
         colorBgContainer,
-        colorBgElevated
     } } = theme.useToken()
 
 
+
+
     const [showPost, setShowPost] = useState(false)
+    if (!showConf) return null
 
     return (
-        <div style={{ background: colorBgLayout }}>
-            <Layout className='layout'>
+        <div style={{ background: colorBgLayout, maxHeight: '100vh', overflow: 'hidden' }}>
+            <Layout className='layout' style={{ width: showConf.showSliderMenu ? showConf.contentSize : '100%', }} >
                 {
-                    md && showConf?.showMenu ?
-
+                    md && showConf?.showSliderMenu ?
                         <Sider style={{ background: colorBgContainer, height: '100vh' }} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sider'>
                             <div>
                                 <div className="logoWrap">
                                     <img src={showConf?.logo} alt="" className="logo" />
                                 </div>
                                 <Menus />
-
                             </div>
                             <Button size='large' shape='round' className='siderAction' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
                                 Post
                             </Button>
-
                         </Sider> : ''
                 }
-                <Layout className='layout2' style={{ background: colorBgLayout, }}>
+                <Layout className='layout2' style={{ background: colorBgLayout, padding: 0, flexGrow: 1 }} >
                     <Header style={{
-                        position: 'sticky',
-                        top: 0,
-                        zIndex: 1,
                         width: '100%',
                         padding: 0,
-                        // background: " #f6f9fc",
-                        background: colorBgLayout
+                        background: showConf?.colorHeaderBg || colorBgLayout,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                     }} className='header'>
-                        <Row style={{ width: '100%', flexGrow: 1 }} gutter={[12, 12]}>
-                            {md ? <Col span={24} md={14}>
+                        <Row style={{ width: !showConf.showSliderMenu ? showConf.contentSize : '100%', maxWidth: "100%", }} gutter={[12, 12]}>
+                            {
+                                !showConf?.showSliderMenu && <Col span={6} md={showConf?.showSliderMenu ? 0 : 4} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <div className="logoWrap">
+                                        <img src={showConf?.logo} alt="" className="logo" />
+                                    </div>
+                                </Col>
+                            }
+
+                            {md ? <Col span={24} md={showConf?.showSliderMenu ? 14 : 10}>
+
                                 <div className="searchWrap" style={{ background: colorBgContainer }} onClick={() => { setShowPost(true) }}>
                                     <Input size="large" prefix={
                                         <EditOutlined style={{ color: showConf?.brandColor }} />
                                     } placeholder='What is happening？' variant="borderless" suffix={
-                                        <Button shape='round' style={{ background: showConf?.gradientColor, color: '#fff', marginRight: 12 }} > Post</Button>
+                                        <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf.colorButton, marginRight: 12 }} > Post</Button>
                                     } />
                                 </div>
                             </Col> : ''}
-                            <Col span={24} md={10}>
+                            <Col span={showConf?.showSliderMenu ? 24 : 18} md={10}>
                                 <div className="userPanel" style={{ background: colorBgContainer }}>
-                                    <div className="user">
+                                    <div className="user" onClick={() => { history.push('/profile') }}>
                                         <UserAvatar src={user.avater} />
-                                        <div className='desc'>
-                                            <Typography.Text className="name">
-                                                {user.name || 'Unnamed'}
-                                            </Typography.Text>
-                                            <Typography.Text className="metaid" style={{ whiteSpace: 'nowrap' }}>
-                                                MetaID:{user.metaid.slice(0, 8)}
-                                            </Typography.Text>
-                                        </div>
-
+                                        {
+                                            !md && !showConf?.showSliderMenu ? '' : <div className='desc'>
+                                                <Typography.Text className="name">
+                                                    {user.name || 'Unnamed'}
+                                                </Typography.Text>
+                                                <Typography.Text className="metaid" style={{ whiteSpace: 'nowrap' }}>
+                                                    MetaID:{user.metaid.slice(0, 8)}
+                                                </Typography.Text>
+                                            </div>
+                                        }
                                     </div>
                                     <div className="actions">
 
@@ -168,19 +177,24 @@ export default function ShowLayout() {
                                 </div>
                             </Col>
                         </Row>
-
                     </Header>
-                    <Row gutter={[12, 12]}>
-                        <Col span={24} md={showConf?.showRecommend ? 14 : 24}>
-                            <Outlet />
-                        </Col>
-                        {
-                            (md && showConf?.showRecommend) && <Col md={10} span={24}>
-                                <Recommend />
+                    {
+                        !showConf?.showSliderMenu && <TopTool />
+                    }
+                    <Content style={{ flexGrow: 1, width: !showConf.showSliderMenu ? showConf.contentSize : '100%', maxWidth: "100%", padding: 12 }}>
+                        <Row gutter={[12, 12]} style={{ height: '100%', position: 'relative', padding: 0, }}>
+                            <Col span={24} md={showConf?.showRecommend ? 14 : 24} style={{ height: '100%', width: '100%', overflow: 'scroll' }} >
+                                <Outlet />
                             </Col>
-                        }
-                    </Row>
-                    {!md ? <Footer className='footer' style={{ background: colorBgContainer }}><Mobilefooter /></Footer> : ''}
+                            {
+                                (md && showConf?.showRecommend) && <Col md={10} span={24}>
+                                    <Recommend />
+                                </Col>
+                            }
+                        </Row>
+                    </Content>
+
+                    {!md && showConf?.showSliderMenu ? <Footer className='footer' style={{ background: colorBgContainer }}><Mobilefooter /></Footer> : ''}
                 </Layout>
 
                 <NewPost show={showPost} onClose={() => setShowPost(false)} />

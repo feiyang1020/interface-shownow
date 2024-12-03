@@ -116,9 +116,9 @@ export default () => {
         setSubmitting(false);
     }
     return <div>
-        <Button shape='round' style={{ color: '#fff', background: showConf?.gradientColor }}>Account</Button>
+        <Button shape='round' style={{ color: showConf?.colorButton, background: showConf?.gradientColor }}>Account</Button>
         <Card title="Personal data" style={{ marginTop: 12 }} bordered={false} extra={
-            <Button shape='round' type="primary" style={{ color: '#fff', background: showConf?.gradientColor }} loading={submitting} onClick={updateUser}>Save</Button>
+            <Button shape='round' type="primary" style={{ color: showConf?.colorButton, background: showConf?.gradientColor }} loading={submitting} onClick={updateUser}>Save</Button>
         }>
             <Form
                 labelCol={{ span: 4 }}

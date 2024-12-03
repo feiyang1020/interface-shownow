@@ -16,14 +16,33 @@ export default () => {
     //   ret.host = userInfo!.metaid.slice(0, 16) + ":";
     //   console.log(ret.host, "ret.host");
     // }
-    ret.host = "";
-    setShowConf({
+
+    const defaultConf = {
       ...ret,
       theme: "light",
-      showMenu: true,
+      showSliderMenu: true,
       showRecommend: true,
-      colorBgLayout: "#f6f9fc",
-    });
+      colorBgLayout: "#F6F9FC",
+      colorBorderSecondary: "",
+      colorHeaderBg: "",
+      contentSize: 1200,
+      colorButton: "#ffffff",
+    };
+
+    const bitBuzz = {
+      ...ret,
+      theme: "dark",
+      showSliderMenu: false,
+      showRecommend: false,
+      colorBgLayout: "",
+      colorBorderSecondary: "#ffffff",
+      colorHeaderBg: "rgb(218, 247, 115)",
+      contentSize: 900,
+      colorButton: "#000000",
+    };
+
+    ret.host = "";
+    setShowConf(bitBuzz);
     setLoading(false);
   }, []);
   useEffect(() => {

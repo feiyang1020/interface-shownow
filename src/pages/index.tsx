@@ -1,4 +1,4 @@
-import { Button, Space, Grid, notification, message } from 'antd';
+import { Button, Space, Grid, notification, message, theme, Typography } from 'antd';
 import logo from '../assets/logo.svg';
 import bg from '../assets/bg.svg';
 import './index.less';
@@ -12,6 +12,9 @@ export default function HomePage() {
   const { isLogin, setIsLogin, connect, setShowConnect: _setShowConnect } = useModel('user');
   const [api, contextHolder] = notification.useNotification();
   const { showConf } = useModel('dashboard');
+  const { token: {
+    colorBgLayout
+  } } = theme.useToken()
   const { md } = useBreakpoint()
   const handleConnect = async () => {
     await connect();
@@ -58,10 +61,8 @@ export default function HomePage() {
 
   }
   return (
-    <div className='indexPage'>
-      {md && <img src={bg} alt="" className="bgImg" />}
-
-
+    <div className='indexPage' style={{ background: showConf?.colorBgLayout || colorBgLayout }} >
+      {md && <img src={showConf?.homeBackgroundImage || bg} alt="" className="bgImg" />}
       <div className="indexContent">
         <div className="header">
           <img src={showConf?.logo} alt="" className="logo" />
@@ -70,13 +71,13 @@ export default function HomePage() {
           }} style={{ color: showConf?.brandColor }}>Connect</Button>
         </div>
         <div className="info">
-          <h1>Unbounded Creation Infinite Earnings</h1>
-          <p>At Show Now, post and create videos to turn your creativity and talent into interaction and revenue</p>
-          <h3 style={{ marginTop: 113 }}>
+          <Typography.Title >{showConf?.brandIntroMainTitle || 'Unbounded Creation Infinite Earnings'}</Typography.Title>
+          <Typography.Text>{showConf?.brandIntroSubTitle || 'At Show Now, post and create videos to turn your creativity and talent into interaction and revenue'}</Typography.Text>
+          <Typography.Title level={3} style={{ marginTop: 113 }}>
             Get Started
-          </h3>
-          <p>Connect your wallet to create a new Account or open an existing one</p>
-          <Space>
+          </Typography.Title>
+          <Typography.Text>Connect your wallet to create a new Account or open an existing one</Typography.Text>
+          <Space style={{ marginTop: 100 }}>
             <Button shape='round' disabled={!showConf?.twitterUrl} onClick={() => {
               window.open(showConf?.twitterUrl)
             }}>Twitter</Button>

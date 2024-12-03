@@ -35,12 +35,11 @@ type Props = {
 
 export default ({ buzzItem, showActions = true, refetch, isForward = false, loading, like = [] }: Props) => {
     const { token: {
-        colorBgMask,
-        colorBgBase,
+        colorBorderSecondary,
+        colorBorder,
         colorBgBlur,
         colorBgContainer
     } } = theme.useToken();
-    console.log('colorBgMask', colorBgMask)
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
@@ -250,8 +249,8 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
 
     return <Card className="tweet"
         loading={loading}
-        style={{ width: '100%' }}
-        styles={{ header: { height: 40 } }}
+        style={{ width: '100%', borderColor: isForward ? colorBorder : colorBorderSecondary }}
+        styles={{ header: { height: 40, borderColor: isForward ? colorBorder : colorBorderSecondary } }}
         title={
             <div style={{ height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div className="avatar" style={{ cursor: 'pointer', position: 'relative' }} >
@@ -402,7 +401,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                                 }</Text>
                                 <img src={_btc} alt="" width={16} height={16} />
                             </div>
-                            <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
+                            <Button shape='round' size='small' type='primary'
                                 disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                     e.stopPropagation()
                                     setShowUnlock(true)
@@ -425,7 +424,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                                         mrc20 && <UserAvatar src={mrc20.deployerUserInfo.avatar} size={20} />
                                     }
                                 </div>
-                                <Button shape='round' size='small' style={{ background: decryptContent.status === 'unpurchased' ? showConf?.gradientColor : '', color: decryptContent.status === 'unpurchased' ? '#fff' : '' }}
+                                <Button shape='round' size='small' type='primary'
                                     disabled={decryptContent?.status === 'purchased' || decryptContent?.status === 'mempool'} onClick={async (e) => {
                                         window.open(`https://${curNetwork === 'testnet' ? 'testnet' : 'www'}.metaid.market/idCoin/${accessControl?.data?.holdCheck?.ticker}`, openWindowTarget())
                                     }}
@@ -536,7 +535,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                     }} >
                         Cancel
                     </Button>
-                    <Button shape='round' block loading={paying} style={{ background: showConf?.gradientColor, color: '#fff' }}
+                    <Button shape='round' block loading={paying} type='primary'
                         onClick={async (e) => {
                             e.stopPropagation()
                             handlePay()

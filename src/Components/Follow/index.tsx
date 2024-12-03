@@ -220,9 +220,9 @@ const withFollow = (WrappedComponent: React.ComponentType<FollowProps>) => {
 
 const FollowIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, loading, mempool }) => {
     const { showConf } = useModel('dashboard');
-    const {token:{
+    const { token: {
         colorBgBase
-    }}=theme.useToken()
+    } } = theme.useToken()
     return (
         <div
             onClick={(e) => { e.preventDefault(); onFollowToggle && onFollowToggle(); }}
@@ -247,7 +247,7 @@ const FollowButtonIcon: React.FC<FollowProps> = ({ isFollowing, onFollowToggle, 
     return (
         <Button
             onClick={(e) => { e.preventDefault(); onFollowToggle && onFollowToggle(); }}
-            style={{ color: '#fff', background: showConf?.gradientColor }}
+            style={{ color: showConf?.colorButton, background: showConf?.gradientColor }}
             loading={loading || mempool}
             shape='round'
         >

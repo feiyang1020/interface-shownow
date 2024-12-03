@@ -38,19 +38,19 @@ export default () => {
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
     const [total, setTotal] = useState<null | number>(null);
-  
 
-    
+
+
 
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
-        queryFn: () =>getUserInfo({ address }),
+        queryFn: () => getUserInfo({ address }),
     });
 
 
-    const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage,refetch } =
+    const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
         useInfiniteQuery({
-            queryKey: ['profilebuzzesnew',profileUserData.data?.metaid],
+            queryKey: ['profilebuzzesnew', profileUserData.data?.metaid],
             enabled: Boolean(profileUserData.data?.metaid),
             queryFn: ({ pageParam }) =>
                 fetchAllBuzzs({
@@ -71,42 +71,36 @@ export default () => {
             return [...acc || [], ...item.data.list || []]
         }, []) : []
     }, [data])
-    return <div className="profilePage">
-       
-                <div className="tweets">
-                    <div
-                        id="scrollableDiv"
-                        style={{
-                            height: `calc(100vh - ${md ? 80 : 130}px)`,
-                            overflow: 'auto',
-                        }}
-                    >
-                        <div style={{ paddingBottom: 12 }}>
-                            <ProfileCard address={address} />
-                        </div>
+    return <div
+        className="profilePage"
+        id="scrollableDiv"
+        style={{
+            height: `100%`,
+            overflow: 'auto',
+        }}
+    >
+        <div style={{ paddingBottom: 12 }}>
+            <ProfileCard address={address} />
+        </div>
 
-                        <InfiniteScroll
-                            dataLength={tweets.length}
-                            next={fetchNextPage}
-                            hasMore={hasNextPage}
-                            loader={<Skeleton avatar paragraph={{ rows: 2 }} active />}
-                            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-                            scrollableTarget="scrollableDiv"
-                        >
-                            <List
-                                dataSource={tweets}
-                                renderItem={(item: API.Pin) => (
-                                    <List.Item key={item.id}>
-                                        <Buzz buzzItem={item} refetch={refetch} />
-                                    </List.Item>
-                                )}
-                            />
-                        </InfiniteScroll>
-                    </div>
-
-                </div>
-            
-
-
+        <InfiniteScroll
+            dataLength={tweets.length}
+            next={fetchNextPage}
+            hasMore={hasNextPage}
+            loader={<Skeleton avatar paragraph={{ rows: 2 }} active />}
+            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+            scrollableTarget="scrollableDiv"
+        >
+            <List
+                dataSource={tweets}
+                renderItem={(item: API.Pin) => (
+                    <List.Item key={item.id}>
+                        <Buzz buzzItem={item} refetch={refetch} />
+                    </List.Item>
+                )}
+            />
+        </InfiniteScroll>
     </div>
+
+
 }

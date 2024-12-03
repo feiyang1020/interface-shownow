@@ -106,7 +106,7 @@ export default ({ show, onClose, tweetId, refetch }: Props) => {
                 <Space>
                     <Button disabled icon={<FileImageOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
                 </Space>
-                <Button type='primary' shape='round' loading={isAdding} style={{ background: showConf?.gradientColor, color: '#fff' }} onClick={handleAddComment}>
+                <Button type='primary' shape='round' loading={isAdding}  onClick={handleAddComment}>
                     Comment
                 </Button>
             </div>

@@ -20,7 +20,7 @@ const { useBreakpoint } = Grid
 const queryClient = new QueryClient()
 const { Header, Content, Footer, Sider } = Layout;
 
-export default function Lay() {
+export default function LoginLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const { showConf } = useModel('dashboard')
   const { user, chain, disConnect, feeRate, setFeeRate, connect, switchChain } = useModel('user')
@@ -54,7 +54,7 @@ export default function Lay() {
       if (showConf.colorButton) {
         components.Button.primaryColor = showConf.colorButton
       }
-      console.log(components,'components')
+      console.log(components, 'components')
 
       setThemeTokens({
         token: tokens,
@@ -74,7 +74,7 @@ export default function Lay() {
           ...themeTokens,
         }}
       >
-        <ShowLayout />
+        <Outlet />
       </ConfigProvider>
     </QueryClientProvider>
   );

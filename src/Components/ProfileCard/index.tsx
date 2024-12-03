@@ -1,13 +1,14 @@
 import { BASE_MAN_URL, curNetwork } from "@/config";
 import { fetchFollowDetailPin, fetchFollowingList, getUserInfo } from "@/request/api";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, Card, Divider, Space } from "antd"
+import { Avatar, Button, Card, Divider, Space } from "antd"
 import { F, isEmpty } from "ramda";
-import { useModel } from "umi";
+import { useModel, history } from "umi";
 import defaultImg from '@/assets/img 2@1x.png'
 import { Divide } from "lucide-react";
 import { FollowButtonComponent } from "../Follow";
 import UserAvatar from "../UserAvatar";
+import { EditOutlined } from "@ant-design/icons";
 
 type Props = {
     address: string
@@ -19,15 +20,6 @@ export default ({ address }: Props) => {
     const profileUserData = useQuery({
         queryKey: ['userInfo', address],
         queryFn: () => getUserInfo({ address }),
-    });
-    const { data: myFollowingListData } = useQuery({
-        queryKey: ['myFollowing', btcConnector?.metaid],
-        enabled: !isEmpty(btcConnector?.metaid ?? ''),
-        queryFn: () =>
-            fetchFollowingList({
-                metaid: btcConnector?.metaid ?? '',
-                params: { cursor: '0', size: '100', followDetail: false },
-            }),
     });
     const { data: followDetailData } = useQuery({
         queryKey: [
@@ -83,6 +75,14 @@ export default ({ address }: Props) => {
 
 
                     <FollowButtonComponent metaid={profileUserData?.data?.metaid || ''} />
+                    {
+                        address === user.address && <Button icon={<EditOutlined />} variant='filled' color='default' shape='circle'  onClick={() => {
+                            history.push('/setting')
+                        }
+                        } />
+                    }
+
+
                 </div>
 
                 <Space >

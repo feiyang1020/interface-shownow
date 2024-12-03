@@ -48,37 +48,32 @@ export default () => {
             return [...acc || [], ...item.data.list || []]
         }, []) : []
     }, [data])
-    return <div className="homePage">
-
-        <div className="tweets">
-            <div
-                id="scrollableDiv"
-                style={{
-                    height: `calc(100vh - ${md ? 80 : 130}px)`,
-                    overflow: 'auto',
-                }}
-            >
-                {isLoading && <Skeleton avatar paragraph={{ rows: 2 }} active />}
-                <InfiniteScroll
-                    dataLength={tweets.length}
-                    next={fetchNextPage}
-                    hasMore={hasNextPage}
-                    loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-                    endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-                    scrollableTarget="scrollableDiv"
-                >
-                    <List
-                        dataSource={tweets}
-                        renderItem={(item: API.Pin) => (
-                            <List.Item key={item.id}>
-                                <Buzz buzzItem={item} refetch={refetch} />
-                            </List.Item>
-                        )}
-                    />
-                </InfiniteScroll>
-            </div>
-
-        </div>
-
+    return <div
+        id="scrollableDiv"
+        style={{
+            height: '100%',
+            overflow: 'auto',
+        }}
+    >
+        {isLoading && <Skeleton avatar paragraph={{ rows: 2 }} active />}
+        <InfiniteScroll
+            dataLength={tweets.length}
+            next={fetchNextPage}
+            hasMore={hasNextPage}
+            loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
+            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+            scrollableTarget="scrollableDiv"
+        >
+            <List
+                dataSource={tweets}
+                renderItem={(item: API.Pin) => (
+                    <List.Item key={item.id}>
+                        <Buzz buzzItem={item} refetch={refetch} />
+                    </List.Item>
+                )}
+            />
+        </InfiniteScroll>
     </div>
+
+
 }
