@@ -1,15 +1,25 @@
 import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
 import { Button, ConfigProvider, Radio, theme } from "antd";
+import { useEffect, useState } from "react";
 import { useLocation, history, useModel } from "umi";
 const indexPath = ['/home', '/follow', '/']
 export default () => {
     const { showConf } = useModel('dashboard')
+    const [curMenu, setCurMenu] = useState<string>('home');
     const location = useLocation();
     const path = location.pathname;
-    console.log(path, 'path')
     const { token: {
         colorBgBase
     } } = theme.useToken()
+
+    useEffect(() => {
+        if (path === '/') {
+            setCurMenu('home')
+        } else {
+            setCurMenu(path.split('/')[1])
+        }
+
+    }, [path])
 
     return <>
         {
@@ -26,19 +36,20 @@ export default () => {
                     <Radio.Group block options={[
                         {
                             label: 'New',
-                            value: '/home'
+                            value: 'home'
                         },
                         {
                             label: 'Follow',
-                            value: '/follow'
+                            value: 'follow'
                         }
-                    ]} defaultValue="/home" onChange={(e) => {
+                    ]} defaultValue="/home" value={curMenu} onChange={(e) => {
                         history.push(e.target.value)
+                        setCurMenu(e.target.value)
                     }} optionType="button" buttonStyle="solid" size='large' style={{ color: '#000' }} />
                 </ConfigProvider>
 
-            </div> : <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: "flex-start", width: showConf?.contentSize ,maxWidth:'calc( 100vw - 24px )' }}>
-                <Button type="text" size='large' onClick={() => history.back()} icon={<LeftOutlined/>}>
+            </div> : <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: "flex-start", width: showConf?.contentSize, maxWidth: 'calc( 100vw - 24px )' }}>
+                <Button type="text" size='large' onClick={() => history.back()} icon={<LeftOutlined />}>
                     Back
                 </Button>
             </div>
