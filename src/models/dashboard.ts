@@ -19,10 +19,10 @@ export default () => {
     ret.host = "";
     setShowConf({
       ...ret,
-      theme: "dark",
+      theme: "light",
       showMenu: true,
       showRecommend: true,
-      colorBgLayout: "#000",
+      colorBgLayout: "#f6f9fc",
     });
     setLoading(false);
   }, []);

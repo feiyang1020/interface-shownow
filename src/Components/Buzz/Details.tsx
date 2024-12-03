@@ -20,6 +20,7 @@ import Unlock from "../Unlock";
 import { detectUrl, handleSpecial, openWindowTarget, sleep } from "@/utils/utils";
 
 import UserAvatar from "../UserAvatar";
+import ImageGallery from "./ImageGallery";
 
 type Props = {
     buzzItem: API.Buzz
@@ -333,16 +334,17 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
 
 
 
-                {
+                {/* {
                     decryptContent?.publicFiles && <>
 
-                        <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }}>
+                        <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }} className="image-group">
                             <Image.PreviewGroup
                                 preview={{
                                     onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
                                 }}
+                                
                             >
-                                <div style={{
+                                <div className="imageItem" style={{
                                     display: 'flex',
                                     flexWrap: 'wrap',
                                     gap: '4px',
@@ -375,7 +377,6 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                                                 .map((pid: string) => {
                                                     return <div key={pid} style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
                                                         <LockOutlined style={{ fontSize: 24 }} />
-
                                                     </div>
                                                 }
                                                 )
@@ -387,7 +388,11 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                             </Image.PreviewGroup>
                         </div>
                     </>
+                } */}
+                {
+                    decryptContent && <ImageGallery decryptContent={decryptContent} />
                 }
+
                 {
                     decryptContent?.buzzType === 'pay' && <Spin spinning={accessControl?.data.mempool === 1}>{
                         accessControl?.data?.payCheck && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: "rgba(32, 32, 32, 0.06)", borderRadius: 8, padding: '4px 12px' }}>
