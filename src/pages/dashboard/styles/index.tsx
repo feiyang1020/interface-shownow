@@ -1,7 +1,7 @@
 import { ProCard, ProFormColorPicker } from '@ant-design/pro-components';
 import { Avatar, Button, ColorPicker, ConfigProvider, Divider, Input, message, notification, Segmented, Space, Switch, Tabs, theme, Upload } from 'antd';
 import type { TabsProps } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useModel, history } from 'umi';
@@ -10,6 +10,8 @@ import RcResizeObserver from 'rc-resize-observer';
 import { InputNumber } from 'antd/lib';
 import ShowLayout from '@/layouts/showLayout';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import HomePage from '@/pages/home';
+import IndexPage from '@/pages/index';
 
 const queryClient = new QueryClient()
 
@@ -30,7 +32,8 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
     reader.readAsDataURL(img);
 };
 export default () => {
-    const { showConf, loading, fetchConfig } = useModel('dashboard')
+    const { showConf, loading, fetchConfig, setShowConf } = useModel('dashboard');
+    const [overView, setOverView] = useState('Home Page');
     const [themeTokens, setThemeTokens] = useState({});
     const [styles, setStyles] = useState<DB.ShowConfDto>();
     const [submiting, setSubmiting] = useState(false);
@@ -38,7 +41,6 @@ export default () => {
     const [responsive, setResponsive] = useState(false);
     useEffect(() => {
         if (showConf) {
-            console.log(showConf, 'showConf');
             setStyles(prev => {
                 if (!prev) {
                     return showConf
@@ -49,6 +51,13 @@ export default () => {
         }
 
     }, [showConf])
+
+    useEffect(() => {
+        if (styles) {
+            console.log(styles, 'styles')
+            setShowConf(styles)
+        }
+    }, [styles])
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [fileList2, setFileList2] = useState<UploadFile[]>([]);
     const [imageUrl, setImageUrl] = useState<string | undefined>();
@@ -238,7 +247,7 @@ export default () => {
                     <span>Button Text Color</span>
                     <ColorPicker size="large" showText value={styles && styles.colorButton} onChange={(color) => {
                         if (styles) {
-                            setStyles({ ...styles, colorBorderSecondary: color.toRgbString() });
+                            setStyles({ ...styles, colorButton: color.toRgbString() });
                         }
                     }} />
                 </div>
@@ -367,6 +376,24 @@ export default () => {
 
     }, [styles])
 
+    const parentRef = useRef<HTMLDivElement>(null);
+    const childRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        console.log(parentRef.current, childRef.current, 'parent, child');
+        if (styles && parentRef.current && childRef.current) {
+            const parent = parentRef.current.getBoundingClientRect();
+            const child = childRef.current.getBoundingClientRect();
+            const scaleX = (parent.width - 48) / document.body.clientWidth;
+            childRef.current.style.transform = `scale(${scaleX})`;
+            childRef.current.style.transformOrigin = 'top left'; // 可调整缩放基准
+        }
+    }, [styles]);
+    const handleChildScroll = (e: React.TouchEvent<HTMLDivElement>) => {
+        e.stopPropagation(); // 阻止事件冒泡
+        console.log('子元素滑动事件触发', e);
+    };
+
     if (!styles) return <div>no data</div>
     return <div>
         {contextHolder}
@@ -381,10 +408,18 @@ export default () => {
                 <ProCard title="" colSpan={responsive ? 24 : 8}  >
                     <Tabs defaultActiveKey="1" items={items} />
                 </ProCard>
-                <ProCard colSpan={responsive ? 24 : 16} title="OverView" headerBordered extra={
+                <ProCard colSpan={responsive ? 24 : 16} title="OverView" ref={parentRef} headerBordered extra={
                     <Button type="primary" onClick={handleSave} loading={submiting}>Save</Button>}
                 >
-                    <div style={{ height: '100vh' }}>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'center',marginBottom:24}}>
+                        <Segmented<string> options={['Home Page', 'Login Page']} value={overView} onChange={(value) => {
+                            setOverView(value)
+                        }} />
+                    </div>
+
+
+
+                    <div ref={childRef} style={{ height: '100vh', width: '100vw', position: 'relative', pointerEvents: 'auto' }} onClick={() => { }}>
                         <QueryClientProvider client={queryClient}>
                             <ConfigProvider
                                 theme={{
@@ -392,7 +427,12 @@ export default () => {
                                     ...themeTokens,
                                 }}
                             >
-                                <ShowLayout />
+                                <div style={{ pointerEvents: 'none', }} onTouchMove={handleChildScroll}>
+                                    {
+                                        overView === 'Home Page' ? <ShowLayout > <HomePage /></ShowLayout> : <IndexPage />
+                                    }
+                                </div>
+
                             </ConfigProvider>
                         </QueryClientProvider>
 

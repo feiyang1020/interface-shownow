@@ -20,7 +20,7 @@ const { useBreakpoint } = Grid
 
 const { Header, Content, Footer, Sider } = Layout;
 
-export default function ShowLayout() {
+export default function ShowLayout({ children }: { children?: React.ReactNode }) {
     const queryClient = useQueryClient();
     const [collapsed, setCollapsed] = useState(false);
     const { showConf } = useModel('dashboard')
@@ -184,7 +184,7 @@ export default function ShowLayout() {
                     <Content style={{ flexGrow: 1, width: !showConf.showSliderMenu ? showConf.contentSize : '100%', maxWidth: "100%", padding: 12 }}>
                         <Row gutter={[12, 12]} style={{ height: '100%', position: 'relative', padding: 0, }}>
                             <Col span={24} md={showConf?.showRecommend ? 14 : 24} style={{ height: '100%', width: '100%', overflow: 'scroll' }} >
-                                <Outlet />
+                                {children ? children : <Outlet />}
                             </Col>
                             {
                                 (md && showConf?.showRecommend) && <Col md={10} span={24}>

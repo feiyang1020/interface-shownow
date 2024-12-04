@@ -2,7 +2,7 @@ import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
 import { Button, ConfigProvider, Radio, theme } from "antd";
 import { useEffect, useState } from "react";
 import { useLocation, history, useModel } from "umi";
-const indexPath = ['/home', '/follow', '/']
+const indexPath = ['/home', '/follow', '/', '/dashboard/styles']
 export default () => {
     const { showConf } = useModel('dashboard')
     const [curMenu, setCurMenu] = useState<string>('home');
@@ -13,7 +13,7 @@ export default () => {
     } } = theme.useToken()
 
     useEffect(() => {
-        if (path === '/') {
+        if (path === '/' || '/dashboard/styles') {
             setCurMenu('home')
         } else {
             setCurMenu(path.split('/')[1])
