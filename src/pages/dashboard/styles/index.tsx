@@ -12,6 +12,7 @@ import ShowLayout from '@/layouts/showLayout';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import HomePage from '@/pages/home';
 import IndexPage from '@/pages/index';
+import './index.less'
 
 const queryClient = new QueryClient()
 
@@ -419,7 +420,7 @@ export default () => {
 
 
 
-                    <div ref={childRef} style={{ height: '100vh', width: '100vw', position: 'relative', pointerEvents: 'auto' }} onClick={() => { }}>
+                    <div ref={childRef} className='previewerDemo' style={{ height: '100vh', width: '100vw', position: 'relative', pointerEvents: 'auto' }} onClick={() => { }}>
                         <QueryClientProvider client={queryClient}>
                             <ConfigProvider
                                 theme={{
