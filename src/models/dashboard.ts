@@ -60,7 +60,10 @@ export default () => {
     // }
 
     ret.host = "";
-    setShowConf(bitBuzzConf);
+    setShowConf({
+      ...showNowConf,
+      ...ret,
+    });
     setLoading(false);
   }, []);
   useEffect(() => {
