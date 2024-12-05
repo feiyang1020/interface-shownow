@@ -2,7 +2,7 @@
 import { useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
-import { Avatar, Button, Card, Checkbox, Divider, GetProp, Input, InputNumber, message, Result, Segmented, Space, Typography, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Button, Card, Checkbox, Col, Divider, GetProp, Input, InputNumber, message, Radio, Result, Row, Segmented, Space, Tag, Typography, Upload, UploadFile, UploadProps } from "antd";
 import { CloseOutlined, FileImageOutlined, LockOutlined, UnlockOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { AttachmentItem, convertToFileList, image2Attach } from "@/utils/file";
@@ -36,7 +36,9 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 };
 export default ({ show, onClose, quotePin }: Props) => {
     const isQuoted = !isNil(quotePin);
+
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
+    const [chainNet, setChainNet] = useState<API.Chain>(chain)
     const { showConf, fetchServiceFee, manPubKey } = useModel('dashboard')
     const [images, setImages] = useState<any[]>([]);
     const [content, setContent] = useState('');
@@ -167,11 +169,11 @@ export default ({ show, onClose, quotePin }: Props) => {
             }
             //   await sleep(5000);
 
-            console.log('finalBody', finalBody);
+
             if (!isNil(quotePin)) {
                 finalBody.quotePin = quotePin.id;
             }
-            if (chain === 'btc') {
+            if (chainNet === 'btc') {
                 console.log('finalBody', {
                     body: JSON.stringify(finalBody),
                     contentType: 'text/plain;utf-8',
@@ -270,7 +272,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 user.address,
                 feeRate,
                 showConf?.host || '',
-                chain,
+                chainNet,
                 btcConnector,
                 mvcConnector!,
                 manPubKey || '',
@@ -339,136 +341,195 @@ export default ({ show, onClose, quotePin }: Props) => {
             }}><Buzz buzzItem={quotePin} showActions={false} /></Card>
         }
         <div>
-            <UserInfo user={user} />
-            <TextArea rows={4} placeholder={isQuoted ? 'Add a comment' : "What is happening？"} style={{ marginTop: 24 }} value={content} onChange={(e) => setContent(e.target.value)} />
-            {
-                lock && <TextArea rows={4} placeholder={"encrypt Content"} style={{ marginTop: 24 }} value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} />
-            }
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 16 }}>
-                {images.map((image, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            position: 'relative',
-                            marginRight: 8,
-                            marginBottom: 8,
-                            width: 100,
-                            height: 100,
-                        }}
-                    >
-                        <img
-                            src={image.previewUrl}
-                            alt={`preview-${index}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                        <Button
-                            onClick={() => handleRemoveImage(index)}
-                            size="small"
-                            style={{
-                                position: 'absolute',
-                                top: 4,
-                                right: 4,
-                            }}
-                            icon={<CloseOutlined />}
-                        >
-                        </Button>
-                        {
-                            lock && <Button
-                                onClick={() => {
-                                    console.log('encryptFiles', encryptFiles);
-                                    if (encryptFiles.includes(image.previewUrl)) {
-                                        setEncryptFiles(encryptFiles.filter(item => item !== image.previewUrl))
-                                    } else {
-                                        setEncryptFiles([...encryptFiles, image.previewUrl])
-                                    }
-                                }}
-                                size="small"
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 4,
-                                    right: 4,
-                                }}
-                                icon={
-                                    !encryptFiles.includes(image.previewUrl) ?
-                                        <UnlockOutlined style={{ color: showConf?.brandColor }} /> :
-                                        <LockOutlined style={{ color: showConf?.brandColor }} />}
-                            >
+            <Row gutter={[12, 12]} >
+                <Col span={24}><Typography.Text strong>Select Network</Typography.Text></Col>
+                <Col span={24}>
+                    <Row gutter={[12, 12]}>
+                        <Col md={12} xs={24}>
+                            <Button onClick={() => {
+                                setChainNet('btc')
+                            }} style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} block>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                                    <img src={_btc} style={{ height: 40, width: 40 }}></img>
+                                    <Typography.Text >BTC Network</Typography.Text>
+                                </div>
+                                <Radio checked={chainNet === 'btc'} />
                             </Button>
-                        }
+                        </Col>
+                        <Col md={12} xs={24}>
+                            <Button onClick={() => {
+                                setChainNet('mvc')
+                            }} style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} block>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                                    <img src={_mvc} style={{ height: 40, width: 40 }}></img>
+                                    <div style={{ display: "flex", flexDirection: 'column', gap: 4 }}>
+                                        <Typography.Text >MicrovisonChain</Typography.Text>
+                                        <Tag style={{
+                                            fontSize: 8,
+                                            width: 80,
+                                            lineHeight: 1.2
+                                        }} color='orange' bordered={false}>Bitcoin Sidechain</Tag>
+                                    </div>
 
+                                </div>
+                                <Radio checked={chainNet === 'mvc'} />
+                            </Button>
+                        </Col>
+                    </Row>
+                </Col>
+                <Col span={24}><Typography.Text strong>Public</Typography.Text></Col>
+                <Col span={24}>
+                    <TextArea rows={4} placeholder={isQuoted ? 'Add a comment' : "What is happening？"} value={content} onChange={(e) => setContent(e.target.value)} />
+                </Col>
 
-                    </div>
-                ))}
-            </div>
-            {
-                !isQuoted && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                    <Button type='text' icon={
-                        !lock ? <UnlockOutlined style={{ color: showConf?.brandColor }} /> : <LockOutlined style={{ color: showConf?.brandColor }} />
-                    } onClick={() => setLock(!lock)} />
-                    {
-                        lock && <Segmented<string>
-                            options={[{
-                                label: 'Pay With BTC',
-                                value: 'btc'
-                            }, {
-                                label: 'Hold ID Coin',
-                                value: 'mrc20'
-                            }]}
-                            value={payType}
-                            onChange={(value) => {
-                                setPayType(value)
-                            }}
-                        />
-                    }
-
-                </div>
-            }
-            <div style={{ display: 'flex', marginTop: 20, flexDirection: 'column' }}>
                 {
-                    lock && payType === 'btc' && <InputNumber variant='filled' value={payAmount} onChange={(value) => {
-                        setPayAmount(value)
-                    }} style={{ flexGrow: 1, width: '100%' }} suffix={<img src={_btc} style={{ height: 20, width: 20 }}></img>} />
-                }
-                {
-                    lock && payType === 'mrc20' && <>
+                    !isQuoted && <>
+                        <Col span={24} style={{ justifyContent: 'space-between', display: 'flex', alignItems: "center" }}>
+                            <Typography.Text strong>Encrypt</Typography.Text>
+                            <Button type='text' icon={
+                                !lock ? <UnlockOutlined style={{ color: showConf?.brandColor }} /> : <LockOutlined style={{ color: showConf?.brandColor }} />
+                            } onClick={() => setLock(!lock)} />
+                        </Col>
                         {
-                            isLoading ?
-                                <span>loading...</span> :
-                                <>
-                                    {
-                                        IdCoin ?
-                                            <Checkbox defaultChecked disabled >
-                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>                                
-                                                    <UserAvatar src={IdCoin.deployerUserInfo?.avatar} size={32} /> 
-                                                    <div className="right" style={{ flexGrow: 1 }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                                            <div>
-                                                                <Typography.Title level={4} style={{ margin: 0 }}>
-                                                                    {IdCoin.tick}
-                                                                </Typography.Title>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div></Checkbox> :
-                                            <Result
-                                                icon={<></>}
-                                                title='Launch Your Unique ID-COIN Now!'
-                                                subTitle="It seems you haven't issued your personal ID-COIN yet. Head over to MetaID.market to create your ID-COIN and unlock new possibilities in the decentralized ecosystem. Start building your on-chain identity today!"
-                                                extra={
-                                                    <Button onClick={() => {
-                                                        window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch',openWindowTarget())
-                                                    }} type="primary" key="console">
-                                                        Launch Me
-                                                    </Button>
-                                                }
-                                            />
-                                    }
-                                </>
+                            lock && <Col span={24}><TextArea rows={4} placeholder={"encrypt Content"} value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} /></Col>
                         }
                     </>
                 }
-            </div>
+                <Col span={24}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 16 }}>
+                        {images.map((image, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    position: 'relative',
+                                    marginRight: 8,
+                                    marginBottom: 8,
+                                    width: 100,
+                                    height: 100,
+                                }}
+                            >
+                                <img
+                                    src={image.previewUrl}
+                                    alt={`preview-${index}`}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                                <Button
+                                    onClick={() => handleRemoveImage(index)}
+                                    size="small"
+                                    style={{
+                                        position: 'absolute',
+                                        top: 4,
+                                        right: 4,
+                                    }}
+                                    icon={<CloseOutlined />}
+                                >
+                                </Button>
+                                {
+                                    lock && <Button
+                                        onClick={() => {
+                                            console.log('encryptFiles', encryptFiles);
+                                            if (encryptFiles.includes(image.previewUrl)) {
+                                                setEncryptFiles(encryptFiles.filter(item => item !== image.previewUrl))
+                                            } else {
+                                                setEncryptFiles([...encryptFiles, image.previewUrl])
+                                            }
+                                        }}
+                                        size="small"
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: 4,
+                                            right: 4,
+                                        }}
+                                        icon={
+                                            !encryptFiles.includes(image.previewUrl) ?
+                                                <UnlockOutlined style={{ color: showConf?.brandColor }} /> :
+                                                <LockOutlined style={{ color: showConf?.brandColor }} />}
+                                    >
+                                    </Button>
+                                }
+
+
+                            </div>
+                        ))}
+                    </div>
+                </Col>
+                {
+                    !isQuoted && lock && <>
+                        <Col span={24} style={{ justifyContent: 'space-between', display: 'flex', alignItems: "center" }}>
+                            <Typography.Text strong>Payment method</Typography.Text>
+                            <Segmented<string>
+                                options={[{
+                                    label: 'Pay With BTC',
+                                    value: 'btc'
+                                }, {
+                                    label: 'Hold ID Coin',
+                                    value: 'mrc20'
+                                }]}
+                                value={payType}
+                                onChange={(value) => {
+                                    setPayType(value)
+                                }}
+                            />
+                        </Col>
+                        <Col span={24}>
+                            <div style={{ display: 'flex', marginTop: 20, flexDirection: 'column' }}>
+                                {
+                                    lock && payType === 'btc' && <InputNumber variant='filled' value={payAmount} onChange={(value) => {
+                                        setPayAmount(value)
+                                    }} style={{ flexGrow: 1, width: '100%' }} suffix={<img src={_btc} style={{ height: 20, width: 20 }}></img>} />
+                                }
+                                {
+                                    lock && payType === 'mrc20' && <>
+                                        {
+                                            isLoading ?
+                                                <span>loading...</span> :
+                                                <>
+                                                    {
+                                                        IdCoin ?
+                                                            <Checkbox defaultChecked disabled >
+                                                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: "center", justifyContent: 'flex-end', flexGrow: 1 }}>
+                                                                    <UserAvatar src={IdCoin.deployerUserInfo?.avatar} size={32} />
+                                                                    <div className="right" style={{ flexGrow: 1 }}>
+                                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                                            <div>
+                                                                                <Typography.Title level={4} style={{ margin: 0 }}>
+                                                                                    {IdCoin.tick}
+                                                                                </Typography.Title>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div></Checkbox> :
+                                                            <Result
+                                                                icon={<></>}
+                                                                title='Launch Your Unique ID-COIN Now!'
+                                                                subTitle="It seems you haven't issued your personal ID-COIN yet. Head over to MetaID.market to create your ID-COIN and unlock new possibilities in the decentralized ecosystem. Start building your on-chain identity today!"
+                                                                extra={
+                                                                    <Button onClick={() => {
+                                                                        window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch', openWindowTarget())
+                                                                    }} type="primary" key="console">
+                                                                        Launch Me
+                                                                    </Button>
+                                                                }
+                                                            />
+                                                    }
+                                                </>
+                                        }
+                                    </>
+                                }
+                            </div>
+                        </Col>
+                    </>
+                }
+                <Col>
+
+
+                </Col>
+
+
+
+            </Row>
+
+
 
 
             <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
