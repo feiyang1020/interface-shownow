@@ -57,7 +57,7 @@ export default ({ decryptContent }: Props) => {
                     decryptContent?.publicFiles.map((pid: string, index) => {
                         return <Image
                             key={pid}
-                            style={{ objectFit: 'cover', height: '100%', display: index > 8 ? 'none' : 'block' }}
+                            style={{ objectFit: 'cover', height: '100%',maxHeight:400, display: index > 8 ? 'none' : 'block' }}
                             src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
                             fallback={FallbackImage}
                             className="image-item"
