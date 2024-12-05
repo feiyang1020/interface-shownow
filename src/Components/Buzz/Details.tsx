@@ -283,7 +283,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                     transition: 'max-height 0.3s ease',
                 }}  >
                     {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
-                        <span key={index} style={{ wordBreak: 'break-all', }}>
+                        <span key={index} style={{ }}>
                             <div
                                 style={{ minHeight: 22 }}
                                 dangerouslySetInnerHTML={{
@@ -296,7 +296,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                         decryptContent?.buzzType === 'pay' && decryptContent.status === 'purchased' && decryptContent.encryptContent && <>
 
                             {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
-                                <span key={'pay' + index} style={{ wordBreak: 'break-all' }}>
+                                <span key={'pay' + index} style={{ }}>
                                     <div
                                         style={{ minHeight: 22 }}
                                         dangerouslySetInnerHTML={{
