@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import HomePage from '@/pages/home';
 import IndexPage from '@/pages/index';
 import './index.less'
+import { bitBuzzConf, showNowConf } from '@/models/dashboard';
 
 const queryClient = new QueryClient()
 
@@ -145,7 +146,7 @@ export default () => {
         const btn = (
             <Space>
                 <Button type="link" size="small" onClick={() => {
-                    api.destroy();
+                    api.destroy(key);
                     history.push('/')
                 }}>
                     View
@@ -156,7 +157,9 @@ export default () => {
             message: 'Save Success',
             btn,
             key,
-            onClose: close,
+            onClose: ()=>{
+                api.destroy(key);   
+            },
         });
     };
 
@@ -381,7 +384,6 @@ export default () => {
     const childRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log(parentRef.current, childRef.current, 'parent, child');
         if (styles && parentRef.current && childRef.current) {
             const parent = parentRef.current.getBoundingClientRect();
             const child = childRef.current.getBoundingClientRect();
@@ -392,7 +394,6 @@ export default () => {
     }, [styles]);
     const handleChildScroll = (e: React.TouchEvent<HTMLDivElement>) => {
         e.stopPropagation(); // 阻止事件冒泡
-        console.log('子元素滑动事件触发', e);
     };
 
     if (!styles) return <div>no data</div>
@@ -406,13 +407,24 @@ export default () => {
         >
             <ProCard split={responsive ? 'horizontal' : 'vertical'}>
 
-                <ProCard title="" colSpan={responsive ? 24 : 8}  >
+                <ProCard title="Recommended Theme" colSpan={responsive ? 24 : 8} extra={
+                    <Space>
+                        <Button type='link'  onClick={() => setStyles({
+                            ...styles,
+                            ...showNowConf as DB.ShowConfDto
+                        })}>ShowNow</Button>
+                        <Button type='link'  onClick={() => setStyles({
+                            ...styles,
+                            ...bitBuzzConf as DB.ShowConfDto
+                        })}>BitBuzz</Button>
+                    </Space>
+                }>
                     <Tabs defaultActiveKey="1" items={items} />
                 </ProCard>
                 <ProCard colSpan={responsive ? 24 : 16} title="OverView" ref={parentRef} headerBordered extra={
                     <Button type="primary" onClick={handleSave} loading={submiting}>Save</Button>}
                 >
-                    <div style={{display:'flex',alignItems:'center',justifyContent:'center',marginBottom:24}}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
                         <Segmented<string> options={['Home Page', 'Login Page']} value={overView} onChange={(value) => {
                             setOverView(value)
                         }} />

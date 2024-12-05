@@ -330,7 +330,7 @@ export default ({ show, onClose, quotePin }: Props) => {
     }, [holdTokenID])
 
 
-    return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Tweet' : 'Repost'}>
+    return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Buzz' : 'Repost'}>
         {
             isQuoted && <Card style={{ margin: 24 }} styles={{
                 body: {

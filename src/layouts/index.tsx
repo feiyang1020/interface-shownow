@@ -77,7 +77,7 @@ export default function Lay() {
       >
         <ShowLayout />
 
-        <FloatButton
+        {/* <FloatButton
           shape="square"
           type="primary"
           style={{ insetInlineEnd: 94 }}
@@ -91,7 +91,7 @@ export default function Lay() {
           style={{ insetInlineEnd: 24 }}
           description='Bit Buzz'
           onClick={() => setShowConf(bitBuzzConf)}
-        />
+        /> */}
       </ConfigProvider>
     </QueryClientProvider>
   );

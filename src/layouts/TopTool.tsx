@@ -13,7 +13,7 @@ export default () => {
     } } = theme.useToken()
 
     useEffect(() => {
-        if (path === '/' || '/dashboard/styles') {
+        if (path === '/' || path === '/dashboard/styles') {
             setCurMenu('home')
         } else {
             setCurMenu(path.split('/')[1])
@@ -42,9 +42,8 @@ export default () => {
                             label: 'Follow',
                             value: 'follow'
                         }
-                    ]} defaultValue="/home" value={curMenu} onChange={(e) => {
-                        history.push(e.target.value)
-                        setCurMenu(e.target.value)
+                    ]} value={curMenu} onChange={(e) => {
+                        history.push("/" + e.target.value)
                     }} optionType="button" buttonStyle="solid" size='large' style={{ color: '#000' }} />
                 </ConfigProvider>
 
