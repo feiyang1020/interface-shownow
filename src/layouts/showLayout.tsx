@@ -1,5 +1,5 @@
 import { Link, Outlet, useModel, history } from 'umi';
-import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Radio, Row, Segmented, Space, theme, Typography } from 'antd';
+import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Radio, Row, Segmented, Space, Tag, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import './index.less';
 import Menus from './Menus';
@@ -109,15 +109,16 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                                         await switchChain('btc');
                                                         queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
                                                     }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", gap: 16, padding: 8 }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between", width: "100%", gap: 16, padding: 8 }}>
                                                             <Space>
                                                                 <img src={_btc} alt="" style={{ width: 24, height: 24 }} />
                                                                 <div style={{
                                                                     display: 'flex',
-                                                                    flexDirection: 'column'
+                                                                    flexDirection: 'column',
+                                                                    alignItems: 'center'
                                                                 }}>
                                                                     <Typography.Text style={{ lineHeight: 1 }}>BTC </Typography.Text>
-                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>Network</Typography.Text>
+                                                                    {/* <Typography.Text type='secondary' style={{ lineHeight: 1 }}>Network</Typography.Text> */}
                                                                 </div>
                                                             </Space>
                                                             <InputNumber value={feeRate} onChange={(_value) => {
@@ -139,10 +140,12 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                                                 <img src={_mvc} alt="" style={{ width: 24, height: 24 }} />
                                                                 <div style={{
                                                                     display: 'flex',
-                                                                    flexDirection: 'column'
+                                                                    flexDirection: 'column',
+                                                                    gap: 4
                                                                 }}>
-                                                                    <Typography.Text style={{ lineHeight: 1 }}>MVC </Typography.Text>
-                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>Network</Typography.Text>
+                                                                    <Typography.Text style={{ lineHeight: 1 }}>MVC  </Typography.Text>
+                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>  <Tag color='orange' bordered={false}>Bitcoin Sidechain</Tag></Typography.Text>
+
                                                                 </div>
                                                             </Space>
                                                             <InputNumber value={1} disabled variant='borderless' controls={false} suffix={'sats'}
