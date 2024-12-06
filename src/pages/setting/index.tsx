@@ -1,4 +1,5 @@
 import UploadAvatar from "@/Components/ProfileCard/UploadAvatar";
+import Trans from "@/Components/Trans";
 import { BASE_MAN_URL, curNetwork } from "@/config";
 import { getUserInfo } from "@/request/api";
 import { image2Attach } from "@/utils/file";
@@ -116,9 +117,13 @@ export default () => {
         setSubmitting(false);
     }
     return <div>
-        <Button shape='round' style={{ color: showConf?.colorButton, background: showConf?.gradientColor }}>Account</Button>
-        <Card title="Personal data" style={{ marginTop: 12 }} bordered={false} extra={
-            <Button shape='round' type="primary" style={{ color: showConf?.colorButton, background: showConf?.gradientColor }} loading={submitting} onClick={updateUser}>Save</Button>
+        <Button shape='round' style={{ color: showConf?.colorButton, background: showConf?.gradientColor }}>
+            <Trans>Account</Trans>
+        </Button>
+        <Card title={<Trans>Personal data</Trans>} style={{ marginTop: 12 }} bordered={false} extra={
+            <Button shape='round' type="primary" style={{ color: showConf?.colorButton, background: showConf?.gradientColor }} loading={submitting} onClick={updateUser}>
+                <Trans>Save</Trans>
+            </Button>
         }>
             <Form
                 labelCol={{ span: 4 }}
@@ -127,14 +132,14 @@ export default () => {
                 style={{ maxWidth: 600 }}
                 form={form}
             >
-                <Form.Item label="Name" name='name'>
+                <Form.Item label={<Trans>Name</Trans>} name='name'>
                     <Input />
                 </Form.Item>
-                <Form.Item label="Avatar" name='avatar'>
+                <Form.Item label={<Trans>Avatar</Trans>}  name='avatar'>
                     <UploadAvatar />
                 </Form.Item>
 
-                <Form.Item label="Background" name='background'>
+                <Form.Item label={<Trans>Background</Trans>}  name='background'>
                     <UploadAvatar listType='picture-card' />
                 </Form.Item>
 

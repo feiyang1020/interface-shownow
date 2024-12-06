@@ -13,6 +13,7 @@ import { IBtcConnector } from "@metaid/metaid";
 import { isNil } from "ramda";
 import ProfileCard from "@/Components/ProfileCard";
 import Recommend from "@/Components/Recommend";
+import Trans from "@/Components/Trans";
 const { useBreakpoint } = Grid
 
 export default () => {
@@ -88,7 +89,7 @@ export default () => {
             next={fetchNextPage}
             hasMore={hasNextPage}
             loader={<Skeleton avatar paragraph={{ rows: 2 }} active />}
-            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+            endMessage={<Divider plain><Trans>It is all, nothing more 🤐</Trans> </Divider>}
             scrollableTarget="scrollableDiv"
         >
             <List

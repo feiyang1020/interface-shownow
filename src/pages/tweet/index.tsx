@@ -9,9 +9,10 @@ import { useQuery } from "@tanstack/react-query"
 import { Avatar, Button, Card, Col, Divider, Input, Row } from "antd"
 import { isEmpty } from "ramda"
 import { useState } from "react"
-import { useMatch, useModel } from "umi"
+import { useIntl, useMatch, useModel } from "umi"
 
 export default () => {
+    const { formatMessage } = useIntl()
     const { user } = useModel('user')
     const { showConf } = useModel('dashboard')
     const match = useMatch('/tweet/:id')
@@ -45,8 +46,10 @@ export default () => {
         <Divider />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <UserAvatar src={user?.avater} size={48} />
-            <Input value={''} placeholder="What's happening?" variant='borderless' style={{ flexGrow: 1 }} onClick={() => { setShowComment(true) }} />
-            <Button type='primary' shape='round' style={{ background: showConf?.gradientColor }} onClick={() => { }}>Reply</Button>
+            <Input value={''} placeholder={formatMessage({id:"What's happening?"})}  variant='borderless' style={{ flexGrow: 1 }} onClick={() => { setShowComment(true) }} />
+            <Button type='primary' shape='round' style={{ background: showConf?.gradientColor }} onClick={() => { }}>
+                {formatMessage({id:"Comment"})}
+            </Button>
         </div>
         <Comment tweetId={match?.params.id ?? ''} refetch={refetch} onClose={() => {
             setShowComment(false);

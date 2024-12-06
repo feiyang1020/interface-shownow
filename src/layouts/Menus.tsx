@@ -10,12 +10,13 @@ import { useLocation, history } from 'umi'
 import { useEffect, useState } from 'react'
 import { theme } from 'antd'
 import LinearIcon from '@/Components/Icon'
+import Trans from '@/Components/Trans'
 
-const menus = [
-    { key: 'home', icon: _home, activeIcon: _homeActive, label: 'Home' },
-    { key: 'follow', icon: _follow, activeIcon: _followActive, label: 'Follow' },
-    { key: 'profile', icon: _profile, activeIcon: _profileActive, label: 'Profile' },
-    { key: 'setting', icon: _setting, activeIcon: _settingActive, label: 'Setting' },
+export const menus = [
+    { key: 'home', icon: _home, activeIcon: _homeActive, label: <Trans>Home</Trans> },
+    { key: 'follow', icon: _follow, activeIcon: _followActive, label: <Trans>Follow</Trans> },
+    { key: 'profile', icon: _profile, activeIcon: _profileActive, label: <Trans>Profile</Trans> },
+    { key: 'setting', icon: _setting, activeIcon: _settingActive, label: <Trans>Setting</Trans> },
 ]
 
 export default () => {

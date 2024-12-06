@@ -22,6 +22,7 @@ import { IBtcConnector } from "metaid/dist";
 import { getDeployList, getIDCoinInfo, getMRC20Info, getUserInfo } from "@/request/api";
 import defaultAvatar from '@/assets/avatar.svg'
 import UserAvatar from "../UserAvatar";
+import Trans from "../Trans";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -333,7 +334,7 @@ export default ({ show, onClose, quotePin }: Props) => {
     }, [holdTokenID])
 
 
-    return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? 'New Buzz' : 'Repost'}>
+    return <Popup onClose={onClose} show={show} modalWidth={640} closable title={!isQuoted ? <Trans>New Buzz</Trans> : <Trans>Repost</Trans>}>
         {
             isQuoted && <Card style={{ margin: 24 }} styles={{
                 body: {
@@ -343,7 +344,7 @@ export default ({ show, onClose, quotePin }: Props) => {
         }
         <div>
             <Row gutter={[12, 12]} >
-                <Col span={24}><Typography.Text strong>Select Network</Typography.Text></Col>
+                <Col span={24}><Typography.Text strong> <Trans>Select Network</Trans></Typography.Text></Col>
                 <Col span={24}>
                     <Row gutter={[12, 12]}>
                         <Col md={12} xs={24}>
@@ -368,8 +369,9 @@ export default ({ show, onClose, quotePin }: Props) => {
                                         <Tag style={{
                                             fontSize: 8,
                                             width: 80,
-                                            lineHeight: 1.2
-                                        }} color='orange' bordered={false}>Bitcoin Sidechain</Tag>
+                                            lineHeight: 1.2,
+                                            textAlign: 'center'
+                                        }} color='orange' bordered={false}><Trans>Bitcoin Sidechain</Trans></Tag>
                                     </div>
 
                                 </div>
@@ -378,9 +380,9 @@ export default ({ show, onClose, quotePin }: Props) => {
                         </Col>
                     </Row>
                 </Col>
-                <Col span={24}><Typography.Text strong>Public</Typography.Text></Col>
+                <Col span={24}><Typography.Text strong><Trans>Public</Trans></Typography.Text></Col>
                 <Col span={24}>
-                    <TextArea rows={4} placeholder={isQuoted ? 'Add a comment' : formatMessage({
+                    <TextArea rows={4} placeholder={isQuoted ? formatMessage({id:"Add a comment"})  : formatMessage({
                         id: 'post_placeholder',
                     })} value={content} onChange={(e) => setContent(e.target.value)} />
                 </Col>
@@ -388,13 +390,13 @@ export default ({ show, onClose, quotePin }: Props) => {
                 {
                     !isQuoted && <>
                         <Col span={24} style={{ justifyContent: 'space-between', display: 'flex', alignItems: "center" }}>
-                            <Typography.Text strong>Encrypt</Typography.Text>
+                            <Typography.Text strong><Trans>Encrypt</Trans></Typography.Text>
                             <Button type='text' icon={
                                 !lock ? <UnlockOutlined style={{ color: showConf?.brandColor }} /> : <LockOutlined style={{ color: showConf?.brandColor }} />
                             } onClick={() => setLock(!lock)} />
                         </Col>
                         {
-                            lock && <Col span={24}><TextArea rows={4} placeholder={"encrypt Content"} value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} /></Col>
+                            lock && <Col span={24}><TextArea rows={4} placeholder={formatMessage({id:"encrypt content"}) } value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} /></Col>
                         }
                     </>
                 }
@@ -459,13 +461,13 @@ export default ({ show, onClose, quotePin }: Props) => {
                 {
                     !isQuoted && lock && <>
                         <Col span={24} style={{ justifyContent: 'space-between', display: 'flex', alignItems: "center" }}>
-                            <Typography.Text strong>Payment method</Typography.Text>
+                            <Typography.Text strong><Trans>Payment method</Trans></Typography.Text>
                             <Segmented<string>
                                 options={[{
-                                    label: 'Pay With BTC',
+                                    label: <Trans>Pay With BTC</Trans>,
                                     value: 'btc'
                                 }, {
-                                    label: 'Hold ID Coin',
+                                    label: <Trans>Hold ID Coin</Trans>,
                                     value: 'mrc20'
                                 }]}
                                 value={payType}
@@ -485,7 +487,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                                     lock && payType === 'mrc20' && <>
                                         {
                                             isLoading ?
-                                                <span>loading...</span> :
+                                                <span><Trans>loading</Trans></span> :
                                                 <>
                                                     {
                                                         IdCoin ?
@@ -504,13 +506,14 @@ export default ({ show, onClose, quotePin }: Props) => {
                                                                 </div></Checkbox> :
                                                             <Result
                                                                 icon={<></>}
-                                                                title='Launch Your Unique ID-COIN Now!'
-                                                                subTitle="It seems you haven't issued your personal ID-COIN yet. Head over to MetaID.market to create your ID-COIN and unlock new possibilities in the decentralized ecosystem. Start building your on-chain identity today!"
+                                                                title={<Trans>Launch Your Unique ID-COIN Now!</Trans>}
+                                                                subTitle={<Trans>It seems you haven't issued your personal ID-COIN yet. Head over to MetaID.market to create your ID-COIN and unlock new possibilities in the decentralized ecosystem. Start building your on-chain identity today!</Trans>}
                                                                 extra={
                                                                     <Button onClick={() => {
                                                                         window.open(curNetwork === 'testnet' ? 'https://testnet.metaid.market/launch' : 'https://metaid.market/launch', openWindowTarget())
                                                                     }} type="primary" key="console">
-                                                                        Launch Me
+
+                                                                        <Trans>Launch Me</Trans>
                                                                     </Button>
                                                                 }
                                                             />
@@ -545,7 +548,7 @@ export default ({ show, onClose, quotePin }: Props) => {
 
                 </Space>
                 <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf?.colorButton }} loading={isAdding} onClick={onCreateSubmit}>
-                    Post
+                    <Trans>Post</Trans>
                 </Button>
             </div>
         </div>

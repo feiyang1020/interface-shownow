@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, Upload, Button, message, Avatar, UploadProps, theme } from "antd";
 import { LoadingOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useModel } from "umi";
+import Trans from "../Trans";
 
 const getBase64 = (img: FileType, callback: (url: string) => void) => {
     const reader = new FileReader();
@@ -56,7 +57,7 @@ const UploadAvatar = (props: any) => {
     const uploadButton = (
         <button style={{ border: 0, background: 'none', color: colorText }} type="button">
             <PlusOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
+            <div style={{ marginTop: 8 }}><Trans>Upload</Trans></div>
         </button>
     );
     const handleUpload = async ({ file, onSuccess, onError }) => {

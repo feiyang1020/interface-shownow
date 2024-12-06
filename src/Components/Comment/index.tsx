@@ -1,5 +1,5 @@
 
-import { useModel } from "umi"
+import { useIntl, useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
 import { Button, Input, message, Space } from "antd";
@@ -10,6 +10,7 @@ import { isNil } from "ramda";
 import { useQueryClient } from "@tanstack/react-query";
 import commentEntitySchema, { getCommentEntitySchemaWithCustomHost } from "@/entities/comment";
 import { sleep } from "@/utils/utils";
+import Trans from "../Trans";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -18,6 +19,7 @@ type Props = {
     refetch?: () => Promise<any>
 }
 export default ({ show, onClose, tweetId, refetch }: Props) => {
+    const {formatMessage}=useIntl()
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
     const { showConf, fetchServiceFee } = useModel('dashboard');
     const [content, setContent] = useState('');
@@ -99,7 +101,7 @@ export default ({ show, onClose, tweetId, refetch }: Props) => {
     return <Popup onClose={onClose} show={show} modalWidth={800} closable >
         <div>
             <UserInfo user={user} />
-            <TextArea rows={6} placeholder="Post your reply " style={{ marginTop: 24 }} value={content} onChange={(e) => {
+            <TextArea rows={6} placeholder={formatMessage({id:'Post your reply'})} style={{ marginTop: 24 }} value={content} onChange={(e) => {
                 setContent(e.target.value)
             }} />
             <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -107,7 +109,7 @@ export default ({ show, onClose, tweetId, refetch }: Props) => {
                     <Button disabled icon={<FileImageOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
                 </Space>
                 <Button type='primary' shape='round' loading={isAdding}  onClick={handleAddComment}>
-                    Comment
+                    <Trans>Comment</Trans>
                 </Button>
             </div>
         </div>

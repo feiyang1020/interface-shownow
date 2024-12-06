@@ -9,6 +9,7 @@ import { Divide } from "lucide-react";
 import { FollowButtonComponent } from "../Follow";
 import UserAvatar from "../UserAvatar";
 import { EditOutlined } from "@ant-design/icons";
+import Trans from "../Trans";
 
 type Props = {
     address: string
@@ -76,7 +77,7 @@ export default ({ address }: Props) => {
 
                     <FollowButtonComponent metaid={profileUserData?.data?.metaid || ''} />
                     {
-                        address === user.address && <Button icon={<EditOutlined />} variant='filled' color='default' shape='circle'  onClick={() => {
+                        address === user.address && <Button icon={<EditOutlined />} variant='filled' color='default' shape='circle' onClick={() => {
                             history.push('/setting')
                         }
                         } />
@@ -88,12 +89,12 @@ export default ({ address }: Props) => {
                 <Space >
                     <Space>
                         <span>{followDetailData?.total || 0}</span>
-                        <span>Followers</span>
+                        <span><Trans>Followers</Trans> </span>
                     </Space>
                     <Divider type='vertical' />
                     <Space>
                         <span>{followingListData?.total || 0}</span>
-                        <span>Following</span>
+                        <span><Trans>Following</Trans></span>
                     </Space>
                 </Space>
 

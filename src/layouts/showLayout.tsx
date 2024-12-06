@@ -17,6 +17,7 @@ import Recommend from '@/Components/Recommend';
 import UserAvatar from '@/Components/UserAvatar';
 import TopTool from './TopTool';
 import SelectLang from './SelectLang';
+import Trans from '@/Components/Trans';
 const { useBreakpoint } = Grid
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -70,8 +71,8 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                     }} className='header'>
                         <Row style={{ width: !showConf.showSliderMenu ? showConf.contentSize : '100%', maxWidth: "100%", }} gutter={[12, 12]}>
                             {
-                                !showConf?.showSliderMenu && <Col span={6} md={showConf?.showSliderMenu ? 0 : 4} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <div className="logoWrap">
+                                !showConf?.showSliderMenu && <Col span={6} md={showConf?.showSliderMenu ? 0 : 4} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} >
+                                    <div className="logoWrap" onClick={() => history.push('/')}>
                                         <img src={showConf?.logo} alt="" className="logo" />
                                     </div>
                                 </Col>
@@ -83,7 +84,7 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                     <Input size="large" prefix={
                                         <EditOutlined style={{ color: showConf?.brandColor }} />
                                     } placeholder={formatMessage({
-                                        id:'post_placeholder'
+                                        id: 'post_placeholder'
                                     })} variant="borderless" suffix={
                                         <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf.colorButton, marginRight: 12 }} >
                                             {formatMessage({ id: 'Post' })}
@@ -150,7 +151,9 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                                                     gap: 4
                                                                 }}>
                                                                     <Typography.Text style={{ lineHeight: 1 }}>MVC  </Typography.Text>
-                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>  <Tag color='orange' bordered={false}>Bitcoin Sidechain</Tag></Typography.Text>
+                                                                    <Typography.Text type='secondary' style={{ lineHeight: 1 }}>  <Tag color='orange' bordered={false}><Trans>
+                                                                        Bitcoin Sidechain
+                                                                    </Trans> </Tag></Typography.Text>
 
                                                                 </div>
                                                             </Space>

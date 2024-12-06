@@ -1,3 +1,4 @@
+import Trans from "@/Components/Trans";
 import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
 import { Button, ConfigProvider, Radio, theme } from "antd";
 import { useEffect, useState } from "react";
@@ -35,11 +36,11 @@ export default () => {
                     }}>
                     <Radio.Group block options={[
                         {
-                            label: 'New',
+                            label: <Trans>New</Trans>,
                             value: 'home'
                         },
                         {
-                            label: 'Follow',
+                            label: <Trans>Follow</Trans>,
                             value: 'follow'
                         }
                     ]} value={curMenu} onChange={(e) => {
@@ -49,7 +50,7 @@ export default () => {
 
             </div> : <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: "flex-start", width: showConf?.contentSize, maxWidth: 'calc( 100vw - 24px )' }}>
                 <Button type="text" size='large' onClick={() => history.back()} icon={<LeftOutlined />}>
-                    Back
+                    <Trans>Back</Trans>
                 </Button>
             </div>
         }
