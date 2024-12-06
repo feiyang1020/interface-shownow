@@ -1,4 +1,4 @@
-import { Link, Outlet, useModel, history } from 'umi';
+import { Link, Outlet, useModel, history, useIntl } from 'umi';
 import { Button, Col, ConfigProvider, Divider, Dropdown, FloatButton, Grid, Input, InputNumber, Layout, Menu, Radio, Row, Segmented, Space, Tag, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import './index.less';
@@ -16,11 +16,13 @@ import _mvc from '@/assets/mvc.png'
 import Recommend from '@/Components/Recommend';
 import UserAvatar from '@/Components/UserAvatar';
 import TopTool from './TopTool';
+import SelectLang from './SelectLang';
 const { useBreakpoint } = Grid
 
 const { Header, Content, Footer, Sider } = Layout;
 
 export default function ShowLayout({ children }: { children?: React.ReactNode }) {
+    const { formatMessage } = useIntl()
     const queryClient = useQueryClient();
     const [collapsed, setCollapsed] = useState(false);
     const { showConf } = useModel('dashboard')
@@ -53,7 +55,7 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                 <Menus />
                             </div>
                             <Button size='large' shape='round' type='primary' style={{ background: showConf?.gradientColor }} onClick={() => { setShowPost(true) }}>
-                                Post
+                                {formatMessage({ id: 'Post' })}
                             </Button>
                         </Sider> : ''
                 }
@@ -81,7 +83,9 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                     <Input size="large" prefix={
                                         <EditOutlined style={{ color: showConf?.brandColor }} />
                                     } placeholder='What is happening？' variant="borderless" suffix={
-                                        <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf.colorButton, marginRight: 12 }} > Post</Button>
+                                        <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf.colorButton, marginRight: 12 }} >
+                                            {formatMessage({ id: 'Post' })}
+                                        </Button>
                                     } />
                                 </div>
                             </Col> : ''}
@@ -170,10 +174,11 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                             </Button>
 
                                         </Dropdown>
+
                                         <Button shape='circle' type='text' color='default' onClick={disConnect}>
                                             <PoweroffOutlined />
-
                                         </Button>
+                                        <SelectLang />
 
                                     </div>
 

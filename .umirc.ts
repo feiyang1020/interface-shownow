@@ -2,7 +2,17 @@ import { defineConfig } from "umi";
 
 export default defineConfig({
   routes: [
-    { path: "/login", component: "index", layout: false },
+    {
+      path: "/login",
+      component: "@/layouts/LoginLayout",
+      layout: false,
+      routes: [
+        {
+          path: "",
+          component: "@/pages/index",
+        },
+      ],
+    },
     {
       path: "/",
       component: "@/layouts/index",
@@ -35,12 +45,22 @@ export default defineConfig({
     },
   ],
 
-  plugins: ["@umijs/plugins/dist/model", "@umijs/plugins/dist/request"],
+  plugins: [
+    "@umijs/plugins/dist/model",
+    "@umijs/plugins/dist/request",
+    "@umijs/plugins/dist/locale",
+  ],
+  locale: {
+    default: "en-US",
+    baseSeparator: "-",
+    antd: true,
+    baseNavigator: false,
+  },
   model: {},
   request: {},
   npmClient: "pnpm",
-  outputPath:"dist",
-    // process.env.BUILD_ENV === "docker" ? "../server-shownow/public" : "dist",
+  outputPath: "dist",
+  // process.env.BUILD_ENV === "docker" ? "../server-shownow/public" : "dist",
   esbuildMinifyIIFE: true,
   jsMinifier: "none",
   favicons: ["/favicon.ico"],
