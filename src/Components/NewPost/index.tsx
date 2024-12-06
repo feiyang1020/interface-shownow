@@ -1,5 +1,5 @@
 
-import { useModel } from "umi"
+import { useIntl, useModel } from "umi"
 import Popup from "../ResponPopup"
 import UserInfo from "../UserInfo"
 import { Avatar, Button, Card, Checkbox, Col, Divider, GetProp, Input, InputNumber, message, Radio, Result, Row, Segmented, Space, Tag, Typography, Upload, UploadFile, UploadProps } from "antd";
@@ -35,6 +35,7 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
     reader.readAsDataURL(img);
 };
 export default ({ show, onClose, quotePin }: Props) => {
+    const { formatMessage } = useIntl()
     const isQuoted = !isNil(quotePin);
 
     const { user, btcConnector, feeRate, chain, mvcConnector } = useModel('user')
@@ -379,7 +380,9 @@ export default ({ show, onClose, quotePin }: Props) => {
                 </Col>
                 <Col span={24}><Typography.Text strong>Public</Typography.Text></Col>
                 <Col span={24}>
-                    <TextArea rows={4} placeholder={isQuoted ? 'Add a comment' : "What is happening？"} value={content} onChange={(e) => setContent(e.target.value)} />
+                    <TextArea rows={4} placeholder={isQuoted ? 'Add a comment' : formatMessage({
+                        id: 'post_placeholder',
+                    })} value={content} onChange={(e) => setContent(e.target.value)} />
                 </Col>
 
                 {

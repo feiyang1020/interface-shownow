@@ -82,7 +82,9 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                 <div className="searchWrap" style={{ background: colorBgContainer }} onClick={() => { setShowPost(true) }}>
                                     <Input size="large" prefix={
                                         <EditOutlined style={{ color: showConf?.brandColor }} />
-                                    } placeholder='What is happening？' variant="borderless" suffix={
+                                    } placeholder={formatMessage({
+                                        id:'post_placeholder'
+                                    })} variant="borderless" suffix={
                                         <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf.colorButton, marginRight: 12 }} >
                                             {formatMessage({ id: 'Post' })}
                                         </Button>
@@ -179,7 +181,6 @@ export default function ShowLayout({ children }: { children?: React.ReactNode })
                                             <PoweroffOutlined />
                                         </Button>
                                         <SelectLang />
-
                                     </div>
 
                                 </div>
