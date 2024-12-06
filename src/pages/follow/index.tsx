@@ -12,6 +12,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { IBtcConnector } from "@metaid/metaid";
 import { isEmpty, isNil } from "ramda";
 import Recommend from "@/Components/Recommend";
+import Trans from "@/Components/Trans";
 const { useBreakpoint } = Grid
 
 export default () => {
@@ -66,7 +67,7 @@ export default () => {
             next={fetchNextPage}
             hasMore={hasNextPage}
             loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+            endMessage={<Divider plain><Trans>It is all, nothing more 🤐</Trans></Divider>}
             scrollableTarget="scrollableDiv"
         >
             <List
