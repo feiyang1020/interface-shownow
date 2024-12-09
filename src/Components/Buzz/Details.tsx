@@ -253,6 +253,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
     }, [contentRef.current]); // 当内容变化时重新检测
 
     const handleTranslate = async () => {
+        if(!decryptContent) return;
         setShowTrans(!showTrans);
         if (isTranslated) {
             setIsTranslated(false);
@@ -260,8 +261,9 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
         }
         setIsTranslating(true);
         try {
+            const encryptContent = decryptContent.status === 'purchased' ? decryptContent.encryptContent : ''
             const res = await fetchTranlateResult({
-                sourceText: `${decryptContent?.publicContent}`,
+                sourceText: `${decryptContent.publicContent}\n${encryptContent}`,
                 from: locale === 'en-US' ? 'zh' : 'en',
                 to: locale === 'en-US' ? 'en' : 'zh',
             })
