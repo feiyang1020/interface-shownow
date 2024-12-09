@@ -38,4 +38,6 @@ export default {
   "Post your reply": "发表您的回复",
   Translate: "翻译",
   "Show original content": "显示原始内容",
+  Unlock: "解锁",
+  Unlocked: "已解锁",
 };

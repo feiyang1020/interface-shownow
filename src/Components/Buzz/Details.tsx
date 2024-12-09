@@ -22,6 +22,7 @@ import { detectUrl, handleSpecial, openWindowTarget, sleep } from "@/utils/utils
 import UserAvatar from "../UserAvatar";
 import ImageGallery from "./ImageGallery";
 import { fetchTranlateResult } from "@/request/baidu-translate";
+import Trans from "../Trans";
 
 type Props = {
     buzzItem: API.Buzz
@@ -253,7 +254,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
     }, [contentRef.current]); // 当内容变化时重新检测
 
     const handleTranslate = async () => {
-        if(!decryptContent) return;
+        if (!decryptContent) return;
         setShowTrans(!showTrans);
         if (isTranslated) {
             setIsTranslated(false);
@@ -337,7 +338,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                             />
                         </span>
                     ))}
-                    <Button type='link' style={{padding:0}} loading={isTranslating} onClick={(e) => { e.stopPropagation(); handleTranslate() }}>
+                    <Button type='link' style={{ padding: 0 }} loading={isTranslating} onClick={(e) => { e.stopPropagation(); handleTranslate() }}>
                         {showTrans ? formatMessage({ id: 'Show original content' }) : formatMessage({ id: 'Translate' })}
                     </Button>
 
@@ -383,7 +384,9 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                                 }}
                                 loading={decryptContent?.status === 'mempool'}
                             >
-                                {decryptContent.status === 'unpurchased' ? 'Unlock' : 'Unlocked'}
+                                <Trans>
+                                    {decryptContent.status === 'unpurchased' ? 'Unlock' : 'Unlocked'}
+                                </Trans>
                             </Button>
                         </div>
                     }
