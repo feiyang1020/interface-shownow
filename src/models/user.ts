@@ -66,7 +66,7 @@ export default () => {
   const [mvcConnector, setMvcConnector] = useState<IMvcConnector>();
   const [network, setNetwork] = useState<API.Network>(curNetwork);
   const [initializing, setInitializing] = useState<boolean>(true);
-  const [feeRate, setFeeRate] = useState<number>(0);
+  const [feeRate, setFeeRate] = useState<number>(1);
   const [followList, setFollowList] = useState<API.FollowingItem[]>([]);
   const connectWallet = useCallback(async () => {
     const [isConnected, errMsg] = await checkWallet();
@@ -244,7 +244,7 @@ export default () => {
   const fetchFeeRateData = useCallback(async () => {
     try {
       const feeRateData = await fetchFeeRate({ netWork: curNetwork });
-      setFeeRate(feeRateData?.fastestFee);
+      setFeeRate(feeRateData?.fastestFee||1);
     } catch (e) {
       console.log(e);
     }
