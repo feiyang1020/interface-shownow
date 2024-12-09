@@ -3,9 +3,9 @@ import { fetchBuzzDetail, fetchCurrentBuzzComments, fetchCurrentBuzzLikes, getCo
 import { CheckCircleOutlined, DownOutlined, GiftOutlined, HeartFilled, HeartOutlined, LinkOutlined, LockOutlined, MessageOutlined, PlusCircleFilled, SyncOutlined, UnlockFilled, UploadOutlined } from "@ant-design/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Card, theme, Image, message, Space, Spin, Tag, Typography } from "antd";
-import { is, isEmpty, isNil } from "ramda";
+import { is, isEmpty, isNil, set } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useModel, history } from "umi";
+import { useModel, history, useIntl } from "umi";
 import Comment from "../Comment";
 import NewPost from "../NewPost";
 import './index.less'
@@ -21,6 +21,7 @@ import { detectUrl, handleSpecial, openWindowTarget, sleep } from "@/utils/utils
 
 import UserAvatar from "../UserAvatar";
 import ImageGallery from "./ImageGallery";
+import { fetchTranlateResult } from "@/request/baidu-translate";
 
 type Props = {
     buzzItem: API.Buzz
@@ -40,6 +41,11 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
         colorBgBlur,
         colorBgContainer
     } } = theme.useToken();
+    const { formatMessage, locale } = useIntl()
+    const [isTranslated, setIsTranslated] = useState(false);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [showTrans, setShowTrans] = useState(false);
+    const [transResult, setTransResult] = useState<string[]>([]);
     const [showComment, setShowComment] = useState(false);
     const [showNewPost, setShowNewPost] = useState(false);
     const [showUnlock, setShowUnlock] = useState(false);
@@ -246,6 +252,43 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
         }
     }, [contentRef.current]); // 当内容变化时重新检测
 
+    const handleTranslate = async () => {
+        setShowTrans(!showTrans);
+        if (isTranslated) {
+            setIsTranslated(false);
+            return;
+        }
+        setIsTranslating(true);
+        try {
+            const res = await fetchTranlateResult({
+                sourceText: `${decryptContent?.publicContent}`,
+                from: locale === 'en-US' ? 'zh' : 'en',
+                to: locale === 'en-US' ? 'en' : 'zh',
+            })
+
+            setTransResult(res!.trans_result.map(item => {
+                return item.dst
+            }))
+
+            setIsTranslated(true);
+        } catch (e) {
+            message.error('Translate Failed');
+        }
+        setIsTranslating(false);
+    }
+
+    const textContent = useMemo(() => {
+        if (!decryptContent) return ''
+        if (!showTrans || isTranslating) {
+            const encryptContent = decryptContent.status === 'purchased' ? decryptContent.encryptContent : ''
+            return `${decryptContent.publicContent}\n${encryptContent}`
+        } else {
+            return transResult.join('\n')
+        }
+
+    }, [showTrans, transResult, decryptContent, isTranslating])
+    console.log('textContent', textContent)
+
 
     return <Card className="tweet"
         loading={loading}
@@ -282,8 +325,8 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                     overflow: 'hidden',
                     transition: 'max-height 0.3s ease',
                 }}  >
-                    {(decryptContent?.publicContent ?? '').split('\n').map((line: string, index: number) => (
-                        <span key={index} style={{ }}>
+                    {(textContent ?? '').split('\n').map((line: string, index: number) => (
+                        <span key={index} style={{}}>
                             <div
                                 style={{ minHeight: 22 }}
                                 dangerouslySetInnerHTML={{
@@ -292,21 +335,10 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                             />
                         </span>
                     ))}
-                    {
-                        decryptContent?.buzzType === 'pay' && decryptContent.status === 'purchased' && decryptContent.encryptContent && <>
+                    <Button type='link' style={{padding:0}} loading={isTranslating} onClick={(e) => { e.stopPropagation(); handleTranslate() }}>
+                        {showTrans ? formatMessage({ id: 'Show original content' }) : formatMessage({ id: 'Translate' })}
+                    </Button>
 
-                            {(decryptContent?.encryptContent ?? '').split('\n').map((line: string, index: number) => (
-                                <span key={'pay' + index} style={{ }}>
-                                    <div
-                                        style={{ minHeight: 22 }}
-                                        dangerouslySetInnerHTML={{
-                                            __html: handleSpecial(detectUrl(line)),
-                                        }}
-                                    />
-                                </span>
-                            ))}
-                        </>
-                    }
                     {
                         isOverflowing && !isExpanded && (
                             <div style={{
@@ -326,68 +358,9 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
                             </div>
                         )
                     }
-
-
                 </div>
 
 
-
-
-                {/* {
-                    decryptContent?.publicFiles && <>
-
-                        <div onClick={e => { e.stopPropagation() }} style={{ marginBottom: 12, marginTop: 12 }} className="image-group">
-                            <Image.PreviewGroup
-                                preview={{
-                                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                                }}
-                                
-                            >
-                                <div className="imageItem" style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    gap: '4px',
-                                }}
-                                >
-                                    {
-                                        decryptContent?.publicFiles.map((pid: string) => {
-                                            return <Image
-                                                key={pid}
-                                                width={120}
-                                                height={120}
-                                                style={{ objectFit: 'cover' }}
-                                                src={`${BASE_MAN_URL}/content/${pid.replace('metafile://', '')}`}
-                                                fallback={FallbackImage}
-                                            />
-                                        })
-                                    }
-                                    {
-                                        decryptContent.status === 'purchased' ? decryptContent?.encryptFiles.map((pid: string) => {
-                                            return <Image
-                                                key={pid}
-                                                width={120}
-                                                height={120}
-                                                style={{ objectFit: 'cover' }}
-                                                src={`data:image/jpeg;base64,${pid}`}
-                                                fallback={FallbackImage}
-                                            />
-                                        }) :
-                                            decryptContent?.encryptFiles
-                                                .map((pid: string) => {
-                                                    return <div key={pid} style={{ width: 120, height: 120, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
-                                                        <LockOutlined style={{ fontSize: 24 }} />
-                                                    </div>
-                                                }
-                                                )
-                                    }
-
-                                </div>
-
-
-                            </Image.PreviewGroup>
-                        </div>
-                    </>
-                } */}
                 {
                     decryptContent && <ImageGallery decryptContent={decryptContent} />
                 }
