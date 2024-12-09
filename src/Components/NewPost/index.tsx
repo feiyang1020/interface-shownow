@@ -23,6 +23,7 @@ import { getDeployList, getIDCoinInfo, getMRC20Info, getUserInfo } from "@/reque
 import defaultAvatar from '@/assets/avatar.svg'
 import UserAvatar from "../UserAvatar";
 import Trans from "../Trans";
+import NFTModal from "../NFTModal";
 const { TextArea } = Input;
 type Props = {
     show: boolean,
@@ -54,6 +55,8 @@ export default ({ show, onClose, quotePin }: Props) => {
     const [mrc20, setMrc20] = useState<API.MRC20TickInfo>();
     const [checkTokenID, setCheckTokenID] = useState<string>('');
     const [encryptFiles, setEncryptFiles] = useState<string[]>([]);
+    const [showNFTModal, setShowNFTModal] = useState(false);
+    const [nfts, setNFTs] = useState<API.NFT[]>([]);
 
     const handleBeforeUpload = (file: any) => {
         const isImage = file.type.startsWith('image/');
@@ -175,6 +178,9 @@ export default ({ show, onClose, quotePin }: Props) => {
             if (!isNil(quotePin)) {
                 finalBody.quotePin = quotePin.id;
             }
+            if (nfts.length > 0) {
+                finalBody.attachments = [ ...nfts.map(nft => `metafile://nft/mrc721/${nft.itemPinId}`), ...finalBody.attachments || []]
+            }
             if (chainNet === 'btc') {
                 console.log('finalBody', {
                     body: JSON.stringify(finalBody),
@@ -269,6 +275,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 encryptImages: await image2Attach(convertToFileList(encryptImages)),
                 publicImages: await image2Attach(convertToFileList(publicImages)),
                 encryptContent: encryptContent,
+                nfts: nfts.map(nft => `metafile://nft/mrc721/${nft.itemPinId}`),
             },
                 String(payAmount),
                 user.address,
@@ -382,7 +389,7 @@ export default ({ show, onClose, quotePin }: Props) => {
                 </Col>
                 <Col span={24}><Typography.Text strong><Trans>Public</Trans></Typography.Text></Col>
                 <Col span={24}>
-                    <TextArea rows={4} placeholder={isQuoted ? formatMessage({id:"Add a comment"})  : formatMessage({
+                    <TextArea rows={4} placeholder={isQuoted ? formatMessage({ id: "Add a comment" }) : formatMessage({
                         id: 'post_placeholder',
                     })} value={content} onChange={(e) => setContent(e.target.value)} />
                 </Col>
@@ -396,12 +403,43 @@ export default ({ show, onClose, quotePin }: Props) => {
                             } onClick={() => setLock(!lock)} />
                         </Col>
                         {
-                            lock && <Col span={24}><TextArea rows={4} placeholder={formatMessage({id:"encrypt content"}) } value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} /></Col>
+                            lock && <Col span={24}><TextArea rows={4} placeholder={formatMessage({ id: "encrypt content" })} value={encryptContent} onChange={(e) => setEncryptContent(e.target.value)} /></Col>
                         }
                     </>
                 }
                 <Col span={24}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 16 }}>
+                        {
+                            nfts.map((nft, index) => (
+                                <div
+                                    key={`nft` + index}
+                                    style={{
+                                        position: 'relative',
+                                        marginRight: 8,
+                                        marginBottom: 8,
+                                        width: 100,
+                                        height: 100,
+                                    }}
+                                >
+                                    <img
+                                        src={nft.previewImage}
+                                        alt={`preview-${index}`}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                    <Button
+                                        onClick={() => setNFTs(nfts.filter((_nft, i) => nft.itemPinId !== _nft.itemPinId))}
+                                        size="small"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 4,
+                                            right: 4,
+                                        }}
+                                        icon={<CloseOutlined />}
+                                    >
+                                    </Button>
+                                </div>
+                            ))
+                        }
                         {images.map((image, index) => (
                             <div
                                 key={index}
@@ -544,7 +582,9 @@ export default ({ show, onClose, quotePin }: Props) => {
                         showUploadList={false}  >
                         <Button icon={<FileImageOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
                     </Upload>
+                    <Button type='text' onClick={() => setShowNFTModal(true)} style={{ color: showConf?.brandColor }}>NFT</Button>
                     <Button disabled icon={<VideoCameraOutlined style={{ color: showConf?.brandColor }} />} type='text'></Button>
+
 
                 </Space>
                 <Button shape='round' style={{ background: showConf?.gradientColor, color: showConf?.colorButton }} loading={isAdding} onClick={onCreateSubmit}>
@@ -552,5 +592,6 @@ export default ({ show, onClose, quotePin }: Props) => {
                 </Button>
             </div>
         </div>
+        <NFTModal show={showNFTModal} onClose={() => { setShowNFTModal(false) }} nfts={nfts} setNFTs={setNFTs} />
     </Popup>
 }

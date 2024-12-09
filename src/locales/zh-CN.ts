@@ -40,4 +40,5 @@ export default {
   "Show original content": "显示原始内容",
   Unlock: "解锁",
   Unlocked: "已解锁",
+  'My NFT': '我的NFT',
 };

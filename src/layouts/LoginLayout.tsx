@@ -54,7 +54,6 @@ export default function LoginLayout() {
       if (showConf.colorButton) {
         components.Button.primaryColor = showConf.colorButton
       }
-      console.log(components, 'components')
 
       setThemeTokens({
         token: tokens,

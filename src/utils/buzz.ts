@@ -22,6 +22,7 @@ import { dec, isEmpty } from "ramda";
 import {
   getControlByContentPin,
   getDecryptContent,
+  getNFTItem,
   getPinDetailByPid,
 } from "@/request/api";
 import * as crypto from "crypto";
@@ -32,9 +33,10 @@ type PostParams = {
   encryptImages: AttachmentItem[];
   publicImages: AttachmentItem[];
   encryptContent: string;
+  nfts: string[];
 };
 export const postPayBuzz = async (
-  { content, encryptImages, publicImages, encryptContent }: PostParams,
+  { content, encryptImages, publicImages, encryptContent, nfts }: PostParams,
   price: string,
   address: string,
   feeRate: number,
@@ -89,7 +91,7 @@ export const postPayBuzz = async (
     publicContent,
     encryptContent: _encryptContent,
     contentType: "text/plain",
-    publicFiles: attachments,
+    publicFiles: [...nfts, ...attachments],
     encryptFiles: encryptAttachments,
   };
   const path = `${host || ""}/protocols/paybuzz`;
@@ -125,7 +127,7 @@ export const postPayBuzz = async (
       }
     );
     transactions = pinTransations as MvcTransaction[];
-    pid = transactions[transactions.length - 1].txComposer.getTxId()+'i0';
+    pid = transactions[transactions.length - 1].txComposer.getTxId() + "i0";
   }
 
   const { sharedSecret, ecdhPubKey } = await window.metaidwallet.common.ecdh({
@@ -403,12 +405,27 @@ export const decodePayBuzz = async (
   }
 
   if (!isEmpty(parseSummary?.attachments ?? [])) {
+    for (let i = 0; i < parseSummary.attachments.length; i++) {
+      if (parseSummary.attachments[i].startsWith("metafile://nft/mrc721/")) {
+        const _nftId = parseSummary.attachments[i].split(
+          "metafile://nft/mrc721/"
+        )[1];
+        try {
+          const nft = await getNFTItem({ pinId: _nftId });
+          parseSummary.attachments[i] = JSON.parse(
+            atob(nft.data.content)
+          ).attachment[0].content;
+        } catch (e) {}
+      }
+      if (parseSummary.attachments[i].startsWith("metafile://")) {
+        parseSummary.attachments[i] =
+          parseSummary.attachments[i].split("metafile://")[1];
+      }
+    }
     return {
       publicContent: parseSummary.content,
       encryptContent: "",
-      publicFiles: (parseSummary?.attachments ?? []).map(
-        (d: string) => d.split("metafile://")[1]
-      ),
+      publicFiles: parseSummary?.attachments ?? [],
       encryptFiles: [],
     };
   }
@@ -417,6 +434,24 @@ export const decodePayBuzz = async (
     parseSummary.encryptContent ||
     !isEmpty(parseSummary?.encryptFiles ?? [])
   ) {
+    for (let i = 0; i < parseSummary.publicFiles.length; i++) {
+      if (parseSummary.publicFiles[i].startsWith("metafile://nft/mrc721/")) {
+        const _nftId = parseSummary.publicFiles[i].split(
+          "metafile://nft/mrc721/"
+        )[1];
+        try {
+          const nft = await getNFTItem({ pinId: _nftId });
+          parseSummary.publicFiles[i] = JSON.parse(
+            atob(nft.data.content)
+          ).attachment[0].content;
+        } catch (e) {}
+      }
+      if (parseSummary.publicFiles[i].startsWith("metafile://")) {
+        parseSummary.publicFiles[i] =
+          parseSummary.publicFiles[i].split("metafile://")[1];
+      }
+    }
+
     const { data: controlPin } = await getControlByContentPin({
       pinId: buzzItem!.id,
     });

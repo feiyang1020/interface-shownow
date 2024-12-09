@@ -55,7 +55,6 @@ export default function Lay() {
       if (showConf.colorButton) {
         components.Button.primaryColor = showConf.colorButton
       }
-      console.log(components, 'components')
 
       setThemeTokens({
         token: tokens,

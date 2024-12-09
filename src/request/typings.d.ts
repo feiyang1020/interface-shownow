@@ -38,6 +38,45 @@ declare namespace API {
     chainName: string;
     dataValue: number;
   };
+  type NFT = {
+    collectionPinId: string;
+    collectionName: string;
+    itemPinId: string;
+    itemPinNumber: number;
+    descPinId: string;
+    name: string;
+    desc: string;
+    cover: string;
+    metaData: string;
+    createTime: number;
+    address: string;
+    content: string;
+    metaId: string;
+    descadded: boolean;
+    contentType: string;
+    contentTypeDetect: string;
+    contentString: string;
+    previewImage: string;
+  };
+  type NFTCollection = {
+    collectionname: string;
+    name: string;
+    totalsupply: number;
+    royaltyrate: number;
+    desc: string;
+    website: string;
+    cover: string;
+    metadata: any[];
+    pinid: string;
+    address: string;
+    metaid: string;
+    createtime: number;
+    totalnum: number;
+  };
+
+  type UserNFTs = NFTCollection & {
+    items: NFT[];
+  };
   type CommentRes = {
     _id: string;
     commentTo: string;
@@ -113,7 +152,7 @@ declare namespace API {
     commentCount: number;
     shareCount: number;
     hot: number;
-    like:string[]
+    like: string[];
   };
 
   type BuzzListRet = {

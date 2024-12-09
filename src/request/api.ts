@@ -411,3 +411,51 @@ export const getFollowList = async (params: { metaid: string }) => {
     params,
   });
 };
+
+export const getUserNFTCollections = async (params: {
+  address: string;
+  cousor: number;
+  size: number;
+}) => {
+  return request<{
+    code: number;
+    data: {
+      list: API.NFTCollection[];
+    };
+    message: string;
+  }>(`${BASE_MAN_URL}/api/mrc721/address/collection`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const getUserNFTCollectionItems = async (params: {
+  address: string;
+  cousor: number;
+  size: number;
+  pinId: string;
+}) => {
+  return request<{
+    code: number;
+    data: {
+      list: API.NFT[];
+    };
+    message: string;
+  }>(`${BASE_MAN_URL}/api/mrc721/address/item`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const getNFTItem = async (params: {
+  pinId: string;
+}) => {
+  return request<{
+    code: number;
+    data: API.NFT;
+    message: string;
+  }>(`${BASE_MAN_URL}/api/mrc721/item/info`, {
+    method: "GET",
+    params,
+  });
+};

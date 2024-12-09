@@ -12,7 +12,6 @@ export default function HomePage() {
   const { isLogin, setIsLogin, connect, setShowConnect: _setShowConnect } = useModel('user');
   const [api, contextHolder] = notification.useNotification();
   const { showConf } = useModel('dashboard');
-  console.log(showConf, 'showConf')
   const { token: {
     colorBgLayout
   } } = theme.useToken()
