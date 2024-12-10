@@ -24,7 +24,7 @@ export default ({ nfts }: Props) => {
                         preview={false}
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                        <Typography.Title level={5} style={{ margin: 0 }}>{nft.collectionName}</Typography.Title>
+                        <Typography.Title level={4} style={{ margin: 0 }}>{nft.collectionName}</Typography.Title>
                         <Typography.Text type='secondary'>#{nft.itemPinNumber}</Typography.Text>
                     </div>
                 </div>
