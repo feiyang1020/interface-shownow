@@ -387,6 +387,7 @@ export const decodePayBuzz = async (
   encryptContent: string;
   publicFiles: string[];
   encryptFiles: string[];
+  nfts: API.NFT[];
   buzzType: "normal" | "pay";
   status: API.PayStatus;
 }> => {
@@ -399,12 +400,15 @@ export const decodePayBuzz = async (
       encryptContent: "",
       publicFiles: [],
       encryptFiles: [],
+      nfts: [],
       buzzType: "normal",
       status: "unpurchased",
     };
   }
 
   if (!isEmpty(parseSummary?.attachments ?? [])) {
+    const _publicFiles: string[] = [];
+    const _nfts: API.NFT[] = [];
     for (let i = 0; i < parseSummary.attachments.length; i++) {
       if (parseSummary.attachments[i].startsWith("metafile://nft/mrc721/")) {
         const _nftId = parseSummary.attachments[i].split(
@@ -415,18 +419,27 @@ export const decodePayBuzz = async (
           parseSummary.attachments[i] = JSON.parse(
             atob(nft.data.content)
           ).attachment[0].content;
+          _nfts.push({
+            ...nft.data,
+            previewImage: parseSummary.attachments[i],
+          });
         } catch (e) {}
-      }
-      if (parseSummary.attachments[i].startsWith("metafile://")) {
-        parseSummary.attachments[i] =
-          parseSummary.attachments[i].split("metafile://")[1];
+      } else {
+        if (parseSummary.attachments[i].startsWith("metafile://")) {
+          parseSummary.attachments[i] =
+            parseSummary.attachments[i].split("metafile://")[1];
+        }
+        _publicFiles.push(parseSummary.attachments[i]);
       }
     }
     return {
       publicContent: parseSummary.content,
       encryptContent: "",
-      publicFiles: parseSummary?.attachments ?? [],
+      publicFiles: _publicFiles,
+      nfts: _nfts,
       encryptFiles: [],
+      buzzType: "normal",
+      status: "unpurchased",
     };
   }
 
@@ -434,6 +447,8 @@ export const decodePayBuzz = async (
     parseSummary.encryptContent ||
     !isEmpty(parseSummary?.encryptFiles ?? [])
   ) {
+    const _publicFiles: string[] = [];
+    const _nfts: API.NFT[] = [];
     for (let i = 0; i < parseSummary.publicFiles.length; i++) {
       if (parseSummary.publicFiles[i].startsWith("metafile://nft/mrc721/")) {
         const _nftId = parseSummary.publicFiles[i].split(
@@ -444,11 +459,17 @@ export const decodePayBuzz = async (
           parseSummary.publicFiles[i] = JSON.parse(
             atob(nft.data.content)
           ).attachment[0].content;
+          _nfts.push({
+            ...nft.data,
+            previewImage: parseSummary.publicFiles[i],
+          });
         } catch (e) {}
-      }
-      if (parseSummary.publicFiles[i].startsWith("metafile://")) {
-        parseSummary.publicFiles[i] =
-          parseSummary.publicFiles[i].split("metafile://")[1];
+      } else {
+        if (parseSummary.publicFiles[i].startsWith("metafile://")) {
+          parseSummary.publicFiles[i] =
+            parseSummary.publicFiles[i].split("metafile://")[1];
+        }
+        _publicFiles.push(parseSummary.publicFiles[i]);
       }
     }
 
@@ -459,8 +480,9 @@ export const decodePayBuzz = async (
       return {
         publicContent: parseSummary.publicContent,
         encryptContent: "",
-        publicFiles: parseSummary.publicFiles,
+        publicFiles: _publicFiles,
         encryptFiles: [],
+        nfts: _nfts,
         buzzType: "normal",
         status: "unpurchased",
       };
@@ -502,7 +524,8 @@ export const decodePayBuzz = async (
       return {
         publicContent: parseSummary.publicContent,
         encryptContent: Buffer.from(encryptContent, "hex").toString("utf-8"),
-        publicFiles: parseSummary.publicFiles,
+        publicFiles: _publicFiles,
+        nfts: _nfts,
         encryptFiles: decryptFiles,
         buzzType: "pay",
         status: "purchased",
@@ -530,7 +553,8 @@ export const decodePayBuzz = async (
       return {
         publicContent: parseSummary.publicContent,
         encryptContent: parseSummary.encryptContent,
-        publicFiles: parseSummary.publicFiles,
+        publicFiles: _publicFiles,
+        nfts: _nfts,
         encryptFiles: parseSummary.encryptFiles,
         buzzType: "pay",
         status: "unpurchased",
@@ -540,7 +564,8 @@ export const decodePayBuzz = async (
       publicContent: parseSummary.publicContent,
       encryptContent:
         data.status === "purchased" ? data.contentResult || "" : "",
-      publicFiles: parseSummary.publicFiles,
+      publicFiles: _publicFiles,
+      nfts: _nfts,
       encryptFiles:
         data.status === "purchased"
           ? data.filesResult || []
@@ -555,6 +580,7 @@ export const decodePayBuzz = async (
     encryptContent: "",
     publicFiles: [],
     encryptFiles: [],
+    nfts: [],
     buzzType: "normal",
     status: "unpurchased",
   };

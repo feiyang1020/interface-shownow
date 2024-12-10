@@ -23,6 +23,7 @@ import UserAvatar from "../UserAvatar";
 import ImageGallery from "./ImageGallery";
 import { fetchTranlateResult } from "@/request/baidu-translate";
 import Trans from "../Trans";
+import NFTGallery from "./NFTGallery";
 
 type Props = {
     buzzItem: API.Buzz
@@ -284,7 +285,7 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
         if (!decryptContent) return ''
         if (!showTrans || isTranslating) {
             const encryptContent = decryptContent.status === 'purchased' ? decryptContent.encryptContent : ''
-            return `${decryptContent.publicContent}\n${encryptContent}`
+            return `${decryptContent.publicContent}${(decryptContent.publicContent && encryptContent) ? '\n' : ''}${encryptContent}`
         } else {
             return transResult.join('\n')
         }
@@ -322,46 +323,53 @@ export default ({ buzzItem, showActions = true, refetch, isForward = false, load
             <div onClick={() => {
                 history.push(`/tweet/${buzzItem.id}`)
             }}>
-                <div className="text" ref={contentRef} style={{
-                    position: 'relative',
-                    maxHeight: isExpanded ? 'none' : 200,
-                    overflow: 'hidden',
-                    transition: 'max-height 0.3s ease',
-                }}  >
-                    {(textContent ?? '').split('\n').map((line: string, index: number) => (
-                        <span key={index} style={{}}>
-                            <div
-                                style={{ minHeight: 22 }}
-                                dangerouslySetInnerHTML={{
-                                    __html: handleSpecial(detectUrl(line)),
-                                }}
-                            />
-                        </span>
-                    ))}
-                    <Button type='link' style={{ padding: 0 }} loading={isTranslating} onClick={(e) => { e.stopPropagation(); handleTranslate() }}>
-                        {showTrans ? formatMessage({ id: 'Show original content' }) : formatMessage({ id: 'Translate' })}
-                    </Button>
+                {
+                    textContent.length > 0 && <div className="text" ref={contentRef} style={{
+                        position: 'relative',
+                        maxHeight: isExpanded ? 'none' : 200,
+                        overflow: 'hidden',
+                        transition: 'max-height 0.3s ease',
+                    }}  >
+                        {(textContent ?? '').split('\n').map((line: string, index: number) => (
+                            <span key={index} style={{}}>
+                                <div
+                                    style={{ minHeight: 22 }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: handleSpecial(detectUrl(line)),
+                                    }}
+                                />
+                            </span>
+                        ))}
 
-                    {
-                        isOverflowing && !isExpanded && (
-                            <div style={{
-                                width: '100%',
-                                paddingTop: 78,
-                                backgroundImage: `linear-gradient(-180deg,${colorBgBlur} 0%,${colorBgContainer} 100%)`,
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                zIndex: 10,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <Button variant="filled" color="primary" size='small' onClick={(e) => { e.stopPropagation(); setIsExpanded(true) }} icon={<DownOutlined />} />
-                            </div>
-                        )
-                    }
-                </div>
+                        <Button type='link' style={{ padding: 0 }} loading={isTranslating} onClick={(e) => { e.stopPropagation(); handleTranslate() }}>
+                            {showTrans ? formatMessage({ id: 'Show original content' }) : formatMessage({ id: 'Translate' })}
+                        </Button>
+
+                        {
+                            isOverflowing && !isExpanded && (
+                                <div style={{
+                                    width: '100%',
+                                    paddingTop: 78,
+                                    backgroundImage: `linear-gradient(-180deg,${colorBgBlur} 0%,${colorBgContainer} 100%)`,
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    zIndex: 10,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
+                                    <Button variant="filled" color="primary" size='small' onClick={(e) => { e.stopPropagation(); setIsExpanded(true) }} icon={<DownOutlined />} />
+                                </div>
+                            )
+                        }
+                    </div>
+                }
+
+                {
+                    decryptContent && <NFTGallery nfts={decryptContent.nfts} />
+                }
 
 
                 {
