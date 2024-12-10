@@ -1,6 +1,6 @@
 import { BASE_MAN_URL, FallbackImage } from "@/config";
 import { LockOutlined } from "@ant-design/icons";
-import { Image } from "antd";
+import { Image, theme } from "antd";
 import { useMemo } from "react";
 import './imageGallery.less'
 
@@ -15,6 +15,7 @@ type Props = {
     }
 }
 export default ({ decryptContent }: Props) => {
+    const { token: { borderRadiusLG } } = theme.useToken()
     const imageCount = useMemo(() => {
         return decryptContent?.publicFiles.length + decryptContent?.encryptFiles.length;
     }, [decryptContent]);
@@ -57,8 +58,8 @@ export default ({ decryptContent }: Props) => {
                     decryptContent?.publicFiles.map((pid: string, index) => {
                         return <Image
                             key={pid}
-                            style={{ objectFit: 'cover', height: '100%',maxHeight:400, display: index > 8 ? 'none' : 'block' }}
-                            src={`${BASE_MAN_URL}/content/${pid??''.replace('metafile://', '')}`}
+                            style={{ objectFit: 'cover', height: '100%', maxHeight: 400, display: index > 8 ? 'none' : 'block',borderRadius: borderRadiusLG, }}
+                            src={`${BASE_MAN_URL}/content/${pid ?? ''.replace('metafile://', '')}`}
                             fallback={FallbackImage}
                             className="image-item"
                         />
@@ -69,14 +70,14 @@ export default ({ decryptContent }: Props) => {
                         return <Image
                             key={pid}
 
-                            style={{ objectFit: 'cover', height: '100%', display: decryptContent?.publicFiles.length + index > 8 ? 'none' : 'block' }}
+                            style={{ borderRadius: borderRadiusLG, objectFit: 'cover', height: '100%', display: decryptContent?.publicFiles.length + index > 8 ? 'none' : 'block' }}
                             src={`data:image/jpeg;base64,${pid}`}
                             fallback={FallbackImage}
                         />
                     }) :
                         decryptContent?.encryptFiles
                             .map((pid: string, index) => {
-                                return <div key={pid} style={{ minHeight: 120, background: '#f5f5f5', height: '100%', display: decryptContent?.publicFiles.length + index > 8 ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
+                                return <div key={pid} style={{borderRadius: borderRadiusLG, minHeight: 120, background: '#f5f5f5', height: '100%', display: decryptContent?.publicFiles.length + index > 8 ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', color: '#8c8c8c' }}>
                                     <LockOutlined style={{ fontSize: 24 }} />
                                 </div>
                             }
