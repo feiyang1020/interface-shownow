@@ -6,7 +6,6 @@ type Props = {
     nfts: API.NFT[]
 }
 export default ({ nfts }: Props) => {
-    console.log('nfts', nfts)
     const { token: { colorBgLayout, borderRadiusLG, padding, colorPrimary, colorPrimaryBg } } = theme.useToken()
     if (!nfts.length) {
         return <></>
