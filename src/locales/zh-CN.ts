@@ -41,4 +41,5 @@ export default {
   Unlock: "解锁",
   Unlocked: "已解锁",
   'My NFT': '我的NFT',
+  'You can only select 2 NFTs': '您只能选择2个NFT',
 };

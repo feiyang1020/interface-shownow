@@ -1,8 +1,8 @@
-import { useModel } from "umi"
+import { useIntl, useModel } from "umi"
 import Popup from "../ResponPopup"
 import Trans from "../Trans"
 import { useState } from "react"
-import { Button, Collapse, ConfigProvider, Empty, Segmented, Space, Spin, theme, Typography } from "antd"
+import { Button, Collapse, ConfigProvider, Empty, message, Segmented, Space, Spin, theme, Typography } from "antd"
 import { getUserNFTCollectionItems, getUserNFTCollections } from "@/request/api"
 import { useQuery } from "@tanstack/react-query"
 import { BASE_MAN_URL } from "@/config"
@@ -14,6 +14,7 @@ type Props = {
     setNFTs: (nfts: API.NFT[]) => void
 }
 export default ({ onClose, show, nfts, setNFTs }: Props) => {
+    const { formatMessage } = useIntl()
     const { token: {
         colorBorderSecondary, colorPrimary
     } } = theme.useToken()
@@ -94,6 +95,11 @@ export default ({ onClose, show, nfts, setNFTs }: Props) => {
                                             border: _find ? `1px solid ${colorPrimary}` : 'none',
                                             overflow: 'hidden'
                                         }} onClick={(item) => {
+                                            if (!_find && nfts.length >= 2) {
+                                                message.error(formatMessage({ id: 'You can only select 2 NFTs' }))
+                                                return;
+
+                                            }
 
                                             setNFTs(!_find ? [...nfts, nft] : nfts.filter(_nft => _nft.itemPinId !== nft.itemPinId))
                                         }}>
