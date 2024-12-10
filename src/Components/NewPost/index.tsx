@@ -235,7 +235,8 @@ export default ({ show, onClose, quotePin }: Props) => {
                     message.success(`${isQuoted ? 'repost' : 'create'} buzz successfully`)
                     setContent('')
                     setImages([])
-                    onClose()
+                    onClose();
+                    setNFTs([])
                 }
             }
 
@@ -291,6 +292,7 @@ export default ({ show, onClose, quotePin }: Props) => {
             )
             setContent('')
             setImages([])
+            setNFTs([])
             onClose()
             queryClient.invalidateQueries({ queryKey: ['homebuzzesnew'] });
 
